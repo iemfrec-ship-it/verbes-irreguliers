@@ -1,0 +1,2850 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irregular Verbs</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #1a3a5c; --secondary: #2e86c1; --accent: #e67e22;
+    --success: #27ae60; --danger: #e74c3c; --warning: #f39c12;
+    --dark: #2c3e50; --shadow: 0 4px 20px rgba(0,0,0,0.12); --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #1a3a5c 0%, #2e86c1 100%); min-height: 100vh; color: var(--dark); }
+  .app { max-width: 960px; margin: 0 auto; padding: 20px; }
+  .screen { display: none; } .screen.active { display: block; }
+  .app-header { text-align: center; padding: 30px 20px 20px; color: white; }
+  .app-header h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .app-header h1 span { color: #f9ca24; }
+  .app-header p { opacity: 0.85; font-size: 1rem; margin-top: 6px; }
+  .card { background: white; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .card h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 18px; border-bottom: 3px solid var(--secondary); padding-bottom: 10px; }
+  .card h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary { background: var(--secondary); color: white; }
+  .btn-success { background: var(--success); color: white; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-dark { background: var(--dark); color: white; }
+  .btn-outline { background: transparent; border: 2px solid var(--secondary); color: var(--secondary); }
+  .btn-sm { padding: 7px 14px; font-size: 0.85rem; }
+  .btn-lg { padding: 14px 30px; font-size: 1.1rem; }
+  input, select, textarea { width: 100%; padding: 11px 14px; border: 2px solid #dde3ea; border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: border 0.2s; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--secondary); }
+  label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--dark); font-size: 0.9rem; }
+  .form-group { margin-bottom: 16px; }
+  .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; gap: 20px; }
+  .login-box { background: white; border-radius: var(--radius); padding: 36px 40px; width: 100%; max-width: 440px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); text-align: center; }
+  .login-box h2 { color: var(--primary); margin-bottom: 24px; font-size: 1.4rem; }
+  .login-box .icon { font-size: 3rem; margin-bottom: 10px; }
+  .login-choice { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .login-choice .btn { min-width: 160px; justify-content: center; }
+  .nav-bar { background: var(--primary); color: white; padding: 14px 20px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .nav-bar .nav-left { display: flex; align-items: center; gap: 14px; }
+  .nav-bar h2 { font-size: 1.1rem; font-weight: 700; }
+  .user-badge { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; }
+  .nav-tab { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; background: rgba(255,255,255,0.1); color: white; transition: all 0.2s; }
+  .nav-tab.active, .nav-tab:hover { background: var(--accent); }
+
+  /* VERB TABLE */
+  .verb-table-wrap { overflow-x: auto; }
+  .verb-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  .verb-table th { background: var(--primary); color: white; padding: 10px 14px; text-align: left; }
+  .verb-table td { padding: 9px 14px; border-bottom: 1px solid #eee; }
+  .verb-table tr:hover td { background: #f0f7ff; }
+  .verb-table tr:nth-child(even) td { background: #f9fbfd; }
+  .verb-table tr:nth-child(even):hover td { background: #e8f4fd; }
+  .verb-table .match-en { background: #fff8e1 !important; }
+  .verb-table .match-fr { background: #e8f5e9 !important; }
+
+  /* SEARCH */
+  .search-bar { display: flex; gap: 10px; margin-bottom: 16px; }
+  .search-bar input { flex: 1; }
+  .search-hint { font-size: 0.82rem; color: #888; margin-bottom: 10px; }
+  .search-lang-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; margin-left: 6px; }
+  .badge-en { background: #fff8e1; color: #795548; }
+  .badge-fr { background: #e8f5e9; color: #2e7d32; }
+
+  /* CHECKER */
+  .checker-result { padding: 16px 20px; border-radius: 10px; margin-top: 14px; font-weight: 600; font-size: 1rem; }
+  .checker-result.regular { background: #d5f5e3; color: #1e8449; border-left: 4px solid #27ae60; }
+  .checker-result.irregular { background: #fef9e7; color: #b7950b; border-left: 4px solid #f39c12; }
+  .checker-result.not-found { background: #fadbd8; color: #922b21; border-left: 4px solid #e74c3c; }
+
+  /* LESSON */
+  .lesson-block { background: #f4f8ff; border-radius: 10px; padding: 20px; margin-bottom: 16px; border-left: 4px solid var(--secondary); }
+  .lesson-block h3 { color: var(--primary); margin-bottom: 12px; }
+  .formula-box { background: white; border-radius: 8px; padding: 14px 18px; font-family: 'Courier New', monospace; font-size: 0.95rem; border: 2px solid #d6e4f0; margin: 8px 0; color: var(--dark); }
+  .formula-box .highlight { color: var(--secondary); font-weight: 700; }
+  .formula-box .verb { color: var(--accent); font-weight: 700; }
+  .example { color: #555; font-style: italic; margin-top: 6px; font-size: 0.9rem; }
+
+  /* LEVEL SELECTOR */
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 14px; margin: 18px 0; }
+  .level-card { padding: 20px 12px; border-radius: 12px; border: 3px solid #dde3ea; cursor: pointer; text-align: center; transition: all 0.2s; background: white; }
+  .level-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+  .level-card.selected, .level-card:hover { border-color: var(--secondary); background: #f0f7ff; }
+  .level-card .lv-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+  .level-card .lv-name { font-size: 1rem; font-weight: 800; color: var(--primary); }
+  .level-card .lv-desc { font-size: 0.75rem; color: #888; margin-top: 4px; }
+  .level-card.cap { border-color: #81c784; } .level-card.cap.selected, .level-card.cap:hover { background: #e8f5e9; border-color: #27ae60; }
+  .level-card.seconde { border-color: #64b5f6; } .level-card.seconde.selected, .level-card.seconde:hover { background: #e3f2fd; border-color: #1976d2; }
+  .level-card.premiere { border-color: #ffb74d; } .level-card.premiere.selected, .level-card.premiere:hover { background: #fff8e1; border-color: #e67e22; }
+  .level-card.terminale { border-color: #e57373; } .level-card.terminale.selected, .level-card.terminale:hover { background: #fdecea; border-color: #e74c3c; }
+
+  /* EXERCISES */
+  .exercise-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .exercise-card .ex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+  .ex-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+  .ex-badge.qcm { background: #d6eaf8; color: var(--secondary); }
+  .ex-badge.trous { background: #d5f5e3; color: var(--success); }
+  .ex-badge.ordre { background: #fef9e7; color: var(--warning); }
+  .ex-badge.transform { background: #fde8e8; color: var(--danger); }
+  .ex-badge.preterit { background: #e8f4fd; color: #1a5276; }
+  .ex-badge.pp { background: #f4ecf7; color: #6c3483; }
+  .ex-badge.both { background: #fef5e7; color: #784212; }
+  .ex-badge.lv-cap { background: #e8f5e9; color: #1b5e20; }
+  .ex-badge.lv-seconde { background: #e3f2fd; color: #0d47a1; }
+  .ex-badge.lv-premiere { background: #fff8e1; color: #e65100; }
+  .ex-badge.lv-terminale { background: #fdecea; color: #b71c1c; }
+
+  .qcm-options { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .qcm-option { padding: 11px 16px; border-radius: 8px; border: 2px solid #dde3ea; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; }
+  .qcm-option:hover { border-color: var(--secondary); background: #f0f7ff; }
+  .qcm-option.selected { border-color: var(--secondary); background: #d6eaf8; }
+  .qcm-option.correct { border-color: var(--success); background: #d5f5e3; color: #1e8449; font-weight: 700; }
+  .qcm-option.wrong { border-color: var(--danger); background: #fadbd8; color: #922b21; }
+
+  .fill-blank input { display: inline; width: 140px; padding: 4px 10px; border-radius: 6px; margin: 0 4px; font-size: 1rem; }
+  .fill-blank input.correct { border-color: var(--success); background: #d5f5e3; }
+  .fill-blank input.wrong { border-color: var(--danger); background: #fadbd8; }
+
+  .word-order { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; min-height: 48px; }
+  .word-chip { padding: 7px 13px; background: var(--secondary); color: white; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; user-select: none; }
+  .word-chip:hover { background: var(--primary); }
+  .word-chip.used { opacity: 0.3; pointer-events: none; }
+  .drop-zone { min-height: 48px; border: 2px dashed #aac; border-radius: 8px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; background: #f9fbfd; }
+  .drop-zone .word-chip { background: var(--accent); }
+  .drop-zone .word-chip.remove-chip:hover { background: var(--danger); }
+
+  .feedback-box { padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-weight: 600; font-size: 0.92rem; }
+  .feedback-box.ok { background: #d5f5e3; color: #1e8449; }
+  .feedback-box.ko { background: #fadbd8; color: #922b21; }
+
+  /* SCORE BAR */
+  .score-bar { display: flex; align-items: center; gap: 14px; background: var(--primary); color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .score-item { display: flex; flex-direction: column; align-items: center; }
+  .score-val { font-size: 1.5rem; font-weight: 800; }
+  .score-lbl { font-size: 0.72rem; opacity: 0.75; text-transform: uppercase; }
+
+  /* TOPIC BUTTONS */
+  .topic-buttons { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin: 24px 0; }
+  .topic-btn { flex: 1; min-width: 180px; padding: 22px 16px; border-radius: var(--radius); border: none; cursor: pointer; font-size: 1.05rem; font-weight: 700; color: white; transition: all 0.2s; text-align: center; }
+  .topic-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .topic-btn.pret { background: linear-gradient(135deg, #1a3a5c, #2e86c1); }
+  .topic-btn.pp { background: linear-gradient(135deg, #6c3483, #a569bd); }
+  .topic-btn.both { background: linear-gradient(135deg, #784212, #e67e22); }
+  .topic-btn .topic-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+  .topic-btn .topic-count { display: inline-block; background: rgba(255,255,255,0.25); border-radius: 20px; padding: 2px 10px; font-size: 0.8rem; margin-top: 6px; }
+
+  /* TEACHER */
+  .teacher-stat { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: var(--radius); padding: 20px; text-align: center; }
+  .teacher-stat .stat-val { font-size: 2rem; font-weight: 800; }
+  .teacher-stat .stat-lbl { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
+  .teacher-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  /* INJECT */
+  .inject-steps { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .inject-step { flex: 1; min-width: 80px; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.78rem; font-weight: 700; background: #eee; color: #888; }
+  .inject-step.active { background: var(--secondary); color: white; }
+  .inject-step.done { background: var(--success); color: white; }
+
+  .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+  .type-card { padding: 18px 12px; border-radius: 10px; border: 2px solid #dde3ea; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .type-card:hover, .type-card.selected { border-color: var(--secondary); background: #f0f7ff; }
+  .type-card .type-icon { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+  .type-card .type-name { font-size: 0.85rem; font-weight: 700; color: var(--dark); }
+
+  /* MULTI-ITEM inject */
+  .item-block { border: 2px solid #e0e7ef; border-radius: 10px; padding: 16px; margin-bottom: 14px; background: #fafcff; position: relative; }
+  .item-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; color: var(--secondary); font-size: 0.9rem; }
+  .btn-remove-item { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; }
+  .btn-remove-item:hover { background: #fde8e8; }
+  .btn-add-item { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: #e8f5e9; border: 2px dashed #27ae60; border-radius: 8px; color: #1b5e20; font-weight: 700; cursor: pointer; width: 100%; justify-content: center; font-size: 0.95rem; margin-top: 6px; transition: all 0.2s; }
+  .btn-add-item:hover { background: #c8e6c9; }
+
+  .generated-json { background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.8rem; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+  .modal-overlay.hidden { display: none; }
+  .modal { background: white; border-radius: var(--radius); padding: 28px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto; }
+  .modal h3 { color: var(--primary); margin-bottom: 16px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* FLOAT BUTTON */
+  #floatVerbBtn { position: fixed; bottom: 80px; right: 20px; background: var(--primary); color: white; border: none; border-radius: 50px; padding: 12px 20px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: 0.9rem; transition: all 0.2s; z-index: 100; display: none; }
+  #floatVerbBtn:hover { background: var(--secondary); transform: scale(1.05); }
+
+  footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+  footer a { color: rgba(255,255,255,0.9); text-decoration: underline; cursor: pointer; }
+
+  .alert { padding: 12px 18px; border-radius: 8px; margin-bottom: 14px; font-size: 0.9rem; font-weight: 600; }
+  .alert-success { background: #d5f5e3; color: #1e8449; }
+  .alert-danger { background: #fadbd8; color: #922b21; }
+  .alert-info { background: #d6eaf8; color: #1a5276; }
+  .alert-warning { background: #fef9e7; color: #7d6608; }
+
+  .progress-wrap { margin: 8px 0; }
+  .progress-track { height: 10px; background: #e0e7ef; border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--accent)); border-radius: 10px; transition: width 0.4s; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: #888; margin-top: 3px; }
+
+  /* RGPD */
+  .rgpd-content { max-width: 700px; margin: 0 auto; }
+  .rgpd-content h1 { color: var(--primary); font-size: 1.8rem; margin-bottom: 20px; }
+  .rgpd-content h2 { color: var(--secondary); font-size: 1.2rem; margin: 20px 0 10px; }
+  .rgpd-content p { color: #444; line-height: 1.7; margin-bottom: 10px; }
+  .placeholder-block { background: #fff3cd; border: 2px dashed #ffc107; border-radius: 8px; padding: 20px; text-align: center; color: #856404; margin: 16px 0; }
+
+  /* EXERCISE LIST (teacher manage) */
+  .ex-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #eee; gap: 10px; flex-wrap: wrap; }
+  .ex-list-item:hover { background: #f8fafc; }
+  .ex-list-desc { flex: 1; font-size: 0.9rem; color: var(--dark); }
+  .ex-list-meta { font-size: 0.78rem; color: #888; margin-top: 2px; }
+
+  /* Per-question inline feedback */
+  .q-hint { margin-top:4px; }
+  .q-block { padding:10px 0; }
+  .qcm-option.correct { border-color: var(--success); background:#d5f5e3; }
+  .qcm-option.wrong   { border-color: var(--danger);  background:#fadbd8; }
+  /* Exercise score pill */
+  #score-display { display:inline-flex; align-items:center; gap:6px; }
+
+  @media (max-width: 600px) {
+    .app-header h1 { font-size: 1.8rem; }
+    .card { padding: 18px; }
+    .topic-buttons { flex-direction: column; }
+    .login-box { padding: 24px 18px; }
+    .level-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<button id="floatVerbBtn" onclick="showVerbModal()">📚 Verbes irréguliers</button>
+
+<!-- MODAL VERBES -->
+<div class="modal-overlay hidden" id="verbModal">
+  <div class="modal" style="max-width:720px">
+    <h3>📚 Liste des verbes irréguliers</h3>
+    <p class="search-hint">Recherchez depuis le <span class="search-lang-badge badge-en">🇬🇧 anglais</span> ou le <span class="search-lang-badge badge-fr">🇫🇷 français</span> — prétérit et participe passé inclus</p>
+    <div class="search-bar">
+      <input type="text" id="modalVerbSearch" placeholder="🔍 Ex : went, aller, broken, écrire..." oninput="filterModalVerbs()">
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('modalVerbSearch').value='';filterModalVerbs()">✕</button>
+    </div>
+    <div id="modalSearchInfo" style="font-size:0.82rem;color:#888;margin-bottom:8px;min-height:18px"></div>
+    <div class="verb-table-wrap" style="max-height:50vh;overflow-y:auto">
+      <table class="verb-table">
+        <thead><tr><th>Infinitif</th><th>Prétérit</th><th>Participe passé</th><th>Traduction 🇫🇷</th></tr></thead>
+        <tbody id="modalVerbBody"></tbody>
+      </table>
+    </div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeVerbModal()">Fermer</button></div>
+  </div>
+</div>
+
+<!-- MODAL LOGIN -->
+<div class="modal-overlay hidden" id="loginModal">
+  <div class="modal">
+    <h3 id="loginModalTitle">Connexion</h3>
+    <div class="form-group">
+      <label id="loginModalLabel">Code d'accès</label>
+      <input type="password" id="loginModalInput" placeholder="••••••" onkeydown="if(event.key==='Enter')submitLogin()">
+    </div>
+    <div id="loginModalError" class="alert alert-danger" style="display:none"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeLoginModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitLogin()">Valider</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHANGE PASSWORD -->
+<div class="modal-overlay hidden" id="pwdModal">
+  <div class="modal">
+    <h3>🔑 Modifier le code d'accès</h3>
+    <div class="form-group">
+      <label>Type de code</label>
+      <select id="pwdType"><option value="teacher">Code professeur</option><option value="student">Code élèves</option></select>
+    </div>
+    <div class="form-group"><label>Nouveau code</label><input type="password" id="pwdNew" placeholder="Nouveau code"></div>
+    <div class="form-group"><label>Confirmer</label><input type="password" id="pwdConfirm" placeholder="Confirmation"></div>
+    <div id="pwdError" class="alert alert-danger" style="display:none"></div>
+    <div id="pwdSuccess" class="alert alert-success" style="display:none">Code modifié avec succès !</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closePwdModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitPwd()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="app-header">
+    <h1>Irregular <span>Verbs</span></h1>
+    <p>Outil pédagogique – Anglais Lycée</p>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="login-container">
+      <div class="login-box">
+        <div class="icon">🎓</div>
+        <h2>Bienvenue !</h2>
+        <p style="color:#666;margin-bottom:24px;font-size:0.95rem">Choisissez votre profil pour commencer</p>
+        <div class="login-choice">
+          <button class="btn btn-primary btn-lg" onclick="openLogin('student')">👤 Élève</button>
+          <button class="btn btn-dark btn-lg" onclick="openLogin('teacher')">🏫 Professeur</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT IDENTIFY -->
+  <div class="screen" id="screen-student-id">
+    <div class="login-container">
+      <div class="login-box" style="max-width:480px">
+        <div class="icon">👤</div>
+        <h2>Identification élève</h2>
+        <div class="form-group" style="text-align:left">
+          <label style="text-align:center;display:block">Identifiant</label>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin:12px 0">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <span style="font-size:0.75rem;font-weight:600;color:#888;text-transform:uppercase">Prénom</span>
+              <input type="text" id="sidPrenom" maxlength="2"
+                style="width:72px;text-align:center;font-size:1.5rem;font-weight:800;text-transform:uppercase;padding:10px 6px;letter-spacing:4px;border:2px solid #2e86c1;border-radius:8px"
+                oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase();if(this.value.length===2)document.getElementById('sidNom').focus()"
+                onkeydown="if(event.key==='Enter')document.getElementById('sidNom').focus()"
+                placeholder="CA">
+            </div>
+            <span style="font-size:2rem;font-weight:800;color:#1a3a5c;margin-top:18px">–</span>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <span style="font-size:0.75rem;font-weight:600;color:#888;text-transform:uppercase">Nom</span>
+              <input type="text" id="sidNom" maxlength="2"
+                style="width:72px;text-align:center;font-size:1.5rem;font-weight:800;text-transform:uppercase;padding:10px 6px;letter-spacing:4px;border:2px solid #2e86c1;border-radius:8px"
+                oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase()"
+                onkeydown="if(event.key==='Backspace'&&this.value==='')document.getElementById('sidPrenom').focus()"
+                placeholder="IE">
+            </div>
+          </div>
+          <small style="color:#888;display:block;text-align:center"><em>ex : CA – IE pour Carine Iemfre</em></small>
+        </div>
+        <div class="form-group" style="text-align:left">
+          <label>Classe</label>
+          <input type="text" id="studentClassInput" placeholder="ex : CVA, MDA, 1EREB..." style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div id="studentIdError" class="alert alert-danger" style="display:none"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-outline" onclick="goHome()">← Retour</button>
+          <button class="btn btn-primary" style="flex:1" onclick="validateStudentId()">Continuer →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT LEVEL SELECTION -->
+  <div class="screen" id="screen-student-level">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="btn btn-outline btn-sm" onclick="showScreen('screen-student-id')" style="color:white;border-color:white">← Retour</button>
+        <h2>📘 Irregular Verbs</h2>
+        <span class="user-badge" id="levelBadge">Élève</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🎯 Choisissez votre niveau</h2>
+      <p style="color:#666;margin-bottom:6px">Sélectionnez votre niveau pour accéder aux exercices adaptés.</p>
+      <div class="level-grid">
+        <div class="level-card cap" onclick="selectLevel('CAP',this)">
+          <span class="lv-icon">🛠️</span>
+          <div class="lv-name">CAP</div>
+          <div class="lv-desc">Bases essentielles</div>
+        </div>
+        <div class="level-card seconde" onclick="selectLevel('2nde',this)">
+          <span class="lv-icon">📗</span>
+          <div class="lv-name">2<sup>nde</sup></div>
+          <div class="lv-desc">Niveau intermédiaire</div>
+        </div>
+        <div class="level-card premiere" onclick="selectLevel('1ere',this)">
+          <span class="lv-icon">📙</span>
+          <div class="lv-name">1<sup>ère</sup></div>
+          <div class="lv-desc">Niveau avancé</div>
+        </div>
+        <div class="level-card terminale" onclick="selectLevel('Tle',this)">
+          <span class="lv-icon">🎓</span>
+          <div class="lv-name">Tle</div>
+          <div class="lv-desc">Niveau expert</div>
+        </div>
+      </div>
+      <div id="levelError" class="alert alert-danger" style="display:none">Veuillez sélectionner un niveau.</div>
+      <div style="text-align:center;margin-top:8px">
+        <button class="btn btn-primary btn-lg" onclick="confirmLevel()">Accéder aux exercices →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT DASHBOARD -->
+  <div class="screen" id="screen-student">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <h2>📘 Irregular Verbs</h2>
+        <span class="user-badge" id="studentBadge">Élève</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="generatePDF(null,false)">📄 PDF séance</button>
+        <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="generatePDF(null,false)">📄 PDF séance</button>
+        <button class="btn btn-danger btn-sm" onclick="logout()">Quitter & PDF</button>
+      </div>
+      </div>
+    </div>
+
+    <div class="score-bar">
+      <div class="score-item"><span class="score-val" id="scoreTotal">0</span><span class="score-lbl">Réponses</span></div>
+      <div class="score-item"><span class="score-val" id="scoreCorrect">0</span><span class="score-lbl">Réussies</span></div>
+      <div class="score-item"><span class="score-val" id="scoreWrong">0</span><span class="score-lbl">Erreurs</span></div>
+      <div class="score-item"><span class="score-val" id="scorePercent">0%</span><span class="score-lbl">Taux</span></div>
+      <div class="score-item"><span class="score-val" id="scoreLevelBadge" style="font-size:1rem">–</span><span class="score-lbl">Niveau</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Choisissez un thème d'exercices</h2>
+      <div class="topic-buttons">
+        <button class="topic-btn pret" onclick="selectTopic('preterit')">
+          <span class="topic-icon">🕐</span>Prétérit
+          <span class="topic-count" id="countPret">0 exercice(s)</span>
+        </button>
+        <button class="topic-btn pp" onclick="selectTopic('present_perfect')">
+          <span class="topic-icon">✅</span>Present Perfect
+          <span class="topic-count" id="countPP">0 exercice(s)</span>
+        </button>
+        <button class="topic-btn both" onclick="selectTopic('both')">
+          <span class="topic-icon">🔀</span>Prétérit / PP
+          <span class="topic-count" id="countBoth">0 exercice(s)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📖 Ressources</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="showScreen('screen-student-lesson')">📝 Rappel Prétérit</button>
+        <button class="btn btn-outline btn-sm" onclick="showVerbModal()">📚 Verbes irréguliers</button>
+        <button class="btn btn-outline btn-sm" onclick="changeLevel()">🎯 Changer de niveau</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT LESSON -->
+  <div class="screen" id="screen-student-lesson">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="btn btn-outline btn-sm" onclick="showScreen('screen-student')" style="color:white;border-color:white">← Retour</button>
+        <h2>📝 Le Prétérit</h2>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Construction du Prétérit en anglais</h2>
+      <div class="lesson-block">
+        <h3>✅ Forme affirmative</h3>
+        <div class="formula-box"><span class="highlight">Sujet</span> + <span class="verb">V-ed</span> (réguliers) / <span class="verb">forme irrégulière</span> + complément</div>
+        <p class="example">She <strong>worked</strong> yesterday. (régulier)</p>
+        <p class="example">He <strong>went</strong> to school. (irrégulier : go → went)</p>
+        <p class="example">They <strong>had</strong> a meeting. (irrégulier : have → had)</p>
+      </div>
+      <div class="lesson-block" style="border-color:var(--danger)">
+        <h3>❌ Forme négative</h3>
+        <div class="formula-box"><span class="highlight">Sujet</span> + <span class="verb">did not (didn't)</span> + <span class="highlight">base verbale</span> + complément</div>
+        <p class="example">She <strong>didn't work</strong> yesterday. &nbsp;|&nbsp; He <strong>didn't go</strong> to school.</p>
+        <p style="color:#c0392b;font-size:0.88rem;margin-top:8px">⚠️ On utilise la base verbale après <em>didn't</em>, pas le prétérit !</p>
+      </div>
+      <div class="lesson-block" style="border-color:var(--warning)">
+        <h3>❓ Forme interrogative</h3>
+        <div class="formula-box"><span class="verb">Did</span> + <span class="highlight">sujet</span> + <span class="highlight">base verbale</span> + complément + <span class="verb">?</span></div>
+        <p class="example"><strong>Did</strong> she work yesterday? &nbsp;|&nbsp; <strong>Did</strong> he go to school?</p>
+        <p style="color:#7d6608;font-size:0.88rem;margin-top:8px">💡 <em>Did</em> est invariable — il ne change pas selon le sujet.</p>
+      </div>
+      <div class="lesson-block" style="border-color:var(--success)">
+        <h3>🔁 Exemples de verbes irréguliers</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+          <div class="formula-box" style="font-size:0.85rem">go → went → gone</div>
+          <div class="formula-box" style="font-size:0.85rem">be → was/were → been</div>
+          <div class="formula-box" style="font-size:0.85rem">have → had → had</div>
+          <div class="formula-box" style="font-size:0.85rem">do → did → done</div>
+          <div class="formula-box" style="font-size:0.85rem">say → said → said</div>
+          <div class="formula-box" style="font-size:0.85rem">get → got → gotten</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="margin-top:14px" onclick="showVerbModal()">📚 Voir la liste complète</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISES -->
+  <div class="screen" id="screen-exercises">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="btn btn-outline btn-sm" onclick="showScreen('screen-student')" style="color:white;border-color:white">← Retour</button>
+        <h2 id="exScreenTitle">Exercices</h2>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="showVerbModal()" style="color:white;border-color:white">📚 Verbes</button>
+        <button class="btn btn-danger btn-sm" onclick="logout()">Quitter</button>
+      </div>
+    </div>
+    <div id="exercisesContainer"></div>
+  </div>
+
+  <!-- VERB SCREEN -->
+  <div class="screen" id="screen-verbs">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button id="verbsBackBtn" class="btn btn-outline btn-sm" style="color:white;border-color:white">← Retour</button>
+        <h2>📚 Verbes irréguliers</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p class="search-hint">Recherchez depuis le <span class="search-lang-badge badge-en">🇬🇧 anglais</span> (infinitif, prétérit, participe passé) ou le <span class="search-lang-badge badge-fr">🇫🇷 français</span> (traduction)</p>
+      <div class="search-bar">
+        <input type="text" id="verbSearch" placeholder="🔍 Ex : went, aller, broken, écrire..." oninput="filterVerbs()">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('verbSearch').value='';filterVerbs()">✕</button>
+      </div>
+      <div id="verbSearchInfo" style="font-size:0.82rem;color:#888;margin-bottom:10px;min-height:18px"></div>
+      <div class="verb-table-wrap">
+        <table class="verb-table">
+          <thead><tr><th>Infinitif</th><th>Prétérit</th><th>Participe passé</th><th>Traduction 🇫🇷</th></tr></thead>
+          <tbody id="verbTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🔍 Vérifier un verbe</h2>
+      <div class="form-group">
+        <label>Entrez un verbe (anglais ou français)</label>
+        <div style="display:flex;gap:10px">
+          <input type="text" id="checkerInput" placeholder="ex : go, aller, play, jouer..." onkeydown="if(event.key==='Enter')checkVerb()">
+          <button class="btn btn-primary" onclick="checkVerb()">Vérifier</button>
+        </div>
+      </div>
+      <div id="checkerResult"></div>
+    </div>
+  </div>
+
+  <!-- TEACHER -->
+  <div class="screen" id="screen-teacher">
+    <div class="nav-bar">
+      <div class="nav-left"><h2>🏫 Interface Professeur</h2></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" style="color:white;border-color:white" onclick="openPwdModal()">🔑 Codes</button>
+        <button class="btn btn-danger btn-sm" onclick="goHome()">Déconnexion</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="nav-tab active" onclick="switchTeacherTab('dashboard')">📊 Exercices</button>
+      
+      <button class="nav-tab" onclick="switchTeacherTab('verbs')">📚 Verbes</button>
+    </div>
+
+    <!-- Tab: Dashboard (exercices only) -->
+    <div id="tab-dashboard">
+      <div class="teacher-grid" id="teacherStats"></div>
+      <div class="card">
+        <h2>📋 Exercices par niveau et thème</h2>
+        <div id="exByLevelTheme"></div>
+      </div>
+    </div>
+
+    
+    <!-- Tab: Verbs (teacher) -->
+    <div id="tab-verbs" style="display:none">
+      <div class="card">
+        <h2>📚 Liste des 50 verbes irréguliers</h2>
+        <p class="search-hint">Recherchez en <span class="search-lang-badge badge-en">🇬🇧 anglais</span> ou en <span class="search-lang-badge badge-fr">🇫🇷 français</span></p>
+        <div class="search-bar">
+          <input type="text" id="teacherVerbSearch" placeholder="🔍 Rechercher..." oninput="filterTeacherVerbs()">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('teacherVerbSearch').value='';filterTeacherVerbs()">✕</button>
+        </div>
+        <div class="verb-table-wrap">
+          <table class="verb-table">
+            <thead><tr><th>Infinitif</th><th>Prétérit</th><th>Participe passé</th><th>Traduction</th></tr></thead>
+            <tbody id="teacherVerbTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RGPD -->
+  <div class="screen" id="screen-rgpd">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="btn btn-outline btn-sm" onclick="goHome()" style="color:white;border-color:white">← Retour</button>
+        <h2>Protection des données</h2>
+      </div>
+    </div>
+    <div class="card rgpd-content">
+      <h1>Politique de confidentialité & RGPD</h1>
+      <div class="placeholder-block"><p>📝 <strong>Page en cours de rédaction</strong></p><p>Cette section sera complétée ultérieurement par l'équipe pédagogique.</p></div>
+      <h2>Données collectées</h2>
+      <p>L'application Irregular Verbs collecte uniquement les données nécessaires au suivi pédagogique : identifiant élève (initiales), classe, niveau, et résultats aux exercices.</p>
+      <h2>Stockage</h2>
+      <p>Toutes les données sont stockées localement dans votre navigateur (localStorage). Aucune donnée n'est transmise à un serveur externe.</p>
+      <h2>Contact</h2>
+      <div class="placeholder-block"><p>Coordonnées du responsable de traitement – à compléter</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Créé par C. Iemfre &nbsp;|&nbsp; <a onclick="showScreen('screen-rgpd')">RGPD &amp; Données personnelles</a></p>
+</footer>
+
+<script>
+const EXERCISES_DATA = {
+
+// ============================================================
+// CAP - PRETERIT (3 exercises)
+// ============================================================
+"CAP_preterit": [
+{
+  level:"CAP", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form of the verb in brackets.",
+  questions:[
+    {q:"She ___ (go) to the supermarket yesterday.", options:["goed","gone","went","goes"], correct:2},
+    {q:"They ___ (have) a big breakfast this morning.", options:["haved","has","had","have"], correct:2},
+    {q:"He ___ (do) his homework last night.", options:["does","did","done","doed"], correct:1},
+    {q:"I ___ (see) a good film on TV yesterday.", options:["seed","saw","seen","sees"], correct:1},
+    {q:"We ___ (eat) pizza for dinner.", options:["eated","eaten","ate","eats"], correct:2},
+    {q:"She ___ (buy) new shoes at the weekend.", options:["buyed","bought","buys","buy"], correct:1},
+    {q:"The dog ___ (run) in the park.", options:["runned","runs","ran","run"], correct:2},
+    {q:"He ___ (make) a sandwich for lunch.", options:["maked","made","makes","make"], correct:1},
+    {q:"We ___ (come) home late last night.", options:["comed","comes","came","come"], correct:2},
+    {q:"She ___ (get) a text message from her friend.", options:["getted","gets","gotten","got"], correct:3}
+  ]
+},
+{
+  level:"CAP", topic:"preterit", type:"trous",
+  instruction:"Complete the sentences with the past simple of the verb in brackets.",
+  questions:[
+    {sentence:"I ___ (go) to school by bus yesterday.", answers:["went"]},
+    {sentence:"She ___ (have) a sandwich for lunch.", answers:["had"]},
+    {sentence:"They ___ (see) a great movie last Friday.", answers:["saw"]},
+    {sentence:"He ___ (do) the dishes after dinner.", answers:["did"]},
+    {sentence:"We ___ (come) back home at 6 o'clock.", answers:["came"]},
+    {sentence:"She ___ (buy) a new phone last week.", answers:["bought"]},
+    {sentence:"My brother ___ (eat) all the biscuits!", answers:["ate"]},
+    {sentence:"They ___ (run) to catch the bus.", answers:["ran"]},
+    {sentence:"I ___ (make) my bed this morning.", answers:["made"]},
+    {sentence:"He ___ (get) up very early on Monday.", answers:["got"]}
+  ]
+},
+{
+  level:"CAP", topic:"preterit", type:"ordre",
+  instruction:"Put the words in the correct order to make a past simple sentence.",
+  questions:[
+    {words:["yesterday","went","she","to","work"], correct:"She went to work yesterday."},
+    {words:["ate","they","pizza","last","night"], correct:"They ate pizza last night."},
+    {words:["bought","he","a","car","new"], correct:"He bought a new car."},
+    {words:["did","I","not","go","school","to"], correct:"I did not go to school."},
+    {words:["she","came","home","late"], correct:"She came home late."},
+    {words:["we","saw","a","film","good"], correct:"We saw a good film."},
+    {words:["he","made","breakfast","the"], correct:"He made the breakfast."},
+    {words:["did","they","their","do","homework"], correct:"Did they do their homework?"},
+    {words:["ran","the","children","fast"], correct:"The children ran fast."},
+    {words:["got","she","message","a"], correct:"She got a message."}
+  ]
+}
+],
+
+// ============================================================
+// CAP - PRESENT PERFECT (3 exercises)
+// ============================================================
+"CAP_present_perfect": [
+{
+  level:"CAP", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form.",
+  questions:[
+    {q:"She ___ (see) that film three times.", options:["saw","sees","has seen","have seen"], correct:2},
+    {q:"They ___ (eat) all the sandwiches.", options:["ate","has eaten","have eaten","eat"], correct:2},
+    {q:"I ___ never ___ (go) to London.", options:["have / went","have / gone","has / gone","did / go"], correct:1},
+    {q:"He ___ (buy) a new bike recently.", options:["buyed","has bought","have bought","bought"], correct:1},
+    {q:"We ___ (come) to this school for two years.", options:["came","have came","has come","have come"], correct:3},
+    {q:"She ___ already ___ (do) her homework.", options:["have / did","has / done","have / done","has / did"], correct:1},
+    {q:"I ___ (make) mistakes in this exercise.", options:["have made","has made","made","make"], correct:0},
+    {q:"___ you ever ___ (run) a marathon?", options:["Did / run","Have / ran","Have / run","Has / ran"], correct:2},
+    {q:"He ___ (get) his driving licence.", options:["has got","have got","got","gets"], correct:0},
+    {q:"They ___ (read) that book already.", options:["have read","has read","readed","reads"], correct:0}
+  ]
+},
+{
+  level:"CAP", topic:"present_perfect", type:"trous",
+  instruction:"Complete with the present perfect (have/has + past participle).",
+  questions:[
+    {sentence:"She ___ (eat) her lunch already.", answers:["has eaten"]},
+    {sentence:"I ___ never ___ (see) snow.", answers:["have","seen"]},
+    {sentence:"They ___ (go) to France twice.", answers:["have gone"]},
+    {sentence:"He ___ (buy) a new jacket.", answers:["has bought"]},
+    {sentence:"We ___ (do) this exercise before.", answers:["have done"]},
+    {sentence:"She ___ (come) to school late today.", answers:["has come"]},
+    {sentence:"I ___ (make) a cake for Mum.", answers:["have made"]},
+    {sentence:"They ___ (run) 5 km this morning.", answers:["have run"]},
+    {sentence:"He ___ (get) a new job.", answers:["has got"]},
+    {sentence:"We ___ (read) this story in class.", answers:["have read"]}
+  ]
+},
+{
+  level:"CAP", topic:"present_perfect", type:"transform",
+  instruction:"Transform the sentence into the present perfect.",
+  questions:[
+    {original:"She eats a burger.", transformInstruction:"Put into present perfect.", correct:"She has eaten a burger.", accepted:["She has eaten a burger."]},
+    {original:"They go to Paris.", transformInstruction:"Put into present perfect.", correct:"They have gone to Paris.", accepted:["They have gone to Paris."]},
+    {original:"He buys a ticket.", transformInstruction:"Put into present perfect.", correct:"He has bought a ticket.", accepted:["He has bought a ticket."]},
+    {original:"I see this film.", transformInstruction:"Put into present perfect.", correct:"I have seen this film.", accepted:["I have seen this film."]},
+    {original:"We do the shopping.", transformInstruction:"Put into present perfect.", correct:"We have done the shopping.", accepted:["We have done the shopping."]},
+    {original:"She makes a mistake.", transformInstruction:"Put into present perfect.", correct:"She has made a mistake.", accepted:["She has made a mistake."]},
+    {original:"He gets a letter.", transformInstruction:"Put into present perfect.", correct:"He has got a letter.", accepted:["He has got a letter.","He has gotten a letter."]},
+    {original:"They run a race.", transformInstruction:"Put into present perfect.", correct:"They have run a race.", accepted:["They have run a race."]},
+    {original:"I come home early.", transformInstruction:"Put into present perfect.", correct:"I have come home early.", accepted:["I have come home early."]},
+    {original:"She reads the book.", transformInstruction:"Put into present perfect.", correct:"She has read the book.", accepted:["She has read the book."]}
+  ]
+}
+],
+
+// ============================================================
+// CAP - BOTH (3 exercises)
+// ============================================================
+"CAP_both": [
+{
+  level:"CAP", topic:"both", type:"qcm",
+  instruction:"Choose the correct tense: past simple or present perfect.",
+  questions:[
+    {q:"I ___ (see) that film last week.", options:["have seen","saw","has seen","seen"], correct:1},
+    {q:"She ___ (eat) at that restaurant before.", options:["ate","has eaten","have eaten","eated"], correct:1},
+    {q:"They ___ (go) to Spain in 2022.", options:["have gone","went","has gone","gone"], correct:1},
+    {q:"He ___ (buy) a car. He's so happy!", options:["bought","has bought","have bought","buyed"], correct:1},
+    {q:"We ___ (come) here many times.", options:["came","have come","has come","comed"], correct:1},
+    {q:"I ___ (do) my homework an hour ago.", options:["have done","did","has done","done"], correct:1},
+    {q:"She ___ already ___ (make) lunch.", options:["have / made","has / made","did / make","made"], correct:1},
+    {q:"___ you ___ (run) this morning? Yes, at 7am.", options:["Have / run","Did / ran","Did / run","Have / ran"], correct:2},
+    {q:"He ___ (get) a new phone yesterday.", options:["has got","have got","got","gets"], correct:2},
+    {q:"We ___ never ___ (read) this author before.", options:["did / read","have / read","has / read","did / readed"], correct:1}
+  ]
+},
+{
+  level:"CAP", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect. Use the time expressions as clues.",
+  questions:[
+    {sentence:"She ___ (go) to Paris last summer.", answers:["went"]},
+    {sentence:"I ___ never ___ (eat) sushi before.", answers:["have","eaten"]},
+    {sentence:"They ___ (see) the Eiffel Tower in 2021.", answers:["saw"]},
+    {sentence:"He ___ just ___ (buy) some bread.", answers:["has","bought"]},
+    {sentence:"We ___ (do) this exercise yesterday.", answers:["did"]},
+    {sentence:"She ___ (come) to our school since September.", answers:["has come"]},
+    {sentence:"I ___ (make) dinner two hours ago.", answers:["made"]},
+    {sentence:"They ___ already ___ (run) 10 km today.", answers:["have","run"]},
+    {sentence:"He ___ (get) a message earlier.", answers:["got"]},
+    {sentence:"We ___ (read) that book in class last year.", answers:["read"]}
+  ]
+},
+{
+  level:"CAP", topic:"both", type:"transform",
+  instruction:"Rewrite the sentence using the tense indicated.",
+  questions:[
+    {original:"She went to London.", transformInstruction:"Make negative (past simple).", correct:"She didn't go to London.", accepted:["She didn't go to London.","She did not go to London."]},
+    {original:"They have eaten the cake.", transformInstruction:"Make it a question (present perfect).", correct:"Have they eaten the cake?", accepted:["Have they eaten the cake?"]},
+    {original:"He bought a car.", transformInstruction:"Make negative (past simple).", correct:"He didn't buy a car.", accepted:["He didn't buy a car.","He did not buy a car."]},
+    {original:"I have seen that film.", transformInstruction:"Make negative (present perfect).", correct:"I haven't seen that film.", accepted:["I haven't seen that film.","I have not seen that film."]},
+    {original:"We came home late.", transformInstruction:"Make it a question (past simple).", correct:"Did we come home late?", accepted:["Did we come home late?"]},
+    {original:"She has made a cake.", transformInstruction:"Make negative (present perfect).", correct:"She hasn't made a cake.", accepted:["She hasn't made a cake.","She has not made a cake."]},
+    {original:"He did his homework.", transformInstruction:"Make it a question (past simple).", correct:"Did he do his homework?", accepted:["Did he do his homework?"]},
+    {original:"They have run a marathon.", transformInstruction:"Make negative (present perfect).", correct:"They haven't run a marathon.", accepted:["They haven't run a marathon.","They have not run a marathon."]},
+    {original:"She got a new phone.", transformInstruction:"Make it a question (past simple).", correct:"Did she get a new phone?", accepted:["Did she get a new phone?"]},
+    {original:"We have read this book.", transformInstruction:"Make it a question (present perfect).", correct:"Have we read this book?", accepted:["Have we read this book?"]}
+  ]
+}
+],
+
+// ============================================================
+// 2NDE - PRETERIT (6 exercises)
+// ============================================================
+"2nde_preterit": [
+{
+  level:"2nde", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form.",
+  questions:[
+    {q:"She ___ (speak) to the manager about her problem.", options:["speaked","spoken","spoke","speaks"], correct:2},
+    {q:"They ___ (find) a wallet on the street.", options:["finded","found","find","finds"], correct:1},
+    {q:"He ___ (think) the answer was wrong.", options:["thinked","thought","thinks","think"], correct:1},
+    {q:"We ___ (leave) the party before midnight.", options:["leaved","left","leave","leaves"], correct:1},
+    {q:"She ___ (take) the wrong bus.", options:["taked","took","taken","takes"], correct:1},
+    {q:"I ___ (feel) very tired after the match.", options:["feeled","felt","feel","feels"], correct:1},
+    {q:"He ___ (tell) me a funny story.", options:["telled","told","tell","tells"], correct:1},
+    {q:"They ___ (drive) to the mountains.", options:["drived","drove","driven","drives"], correct:1},
+    {q:"She ___ (keep) all her old letters.", options:["keeped","kept","keep","keeps"], correct:1},
+    {q:"We ___ (meet) our teacher at the museum.", options:["meeted","met","meet","meets"], correct:1}
+  ]
+},
+{
+  level:"2nde", topic:"preterit", type:"trous",
+  instruction:"Complete the sentences with the past simple.",
+  questions:[
+    {sentence:"He ___ (speak) three languages when he was young.", answers:["spoke"]},
+    {sentence:"She ___ (find) her keys under the sofa.", answers:["found"]},
+    {sentence:"They ___ (leave) school at 5 o'clock.", answers:["left"]},
+    {sentence:"I ___ (think) it would rain, so I took my umbrella.", answers:["thought"]},
+    {sentence:"He ___ (take) a photo of the sunset.", answers:["took"]},
+    {sentence:"She ___ (feel) nervous before the exam.", answers:["felt"]},
+    {sentence:"We ___ (tell) him the news immediately.", answers:["told"]},
+    {sentence:"They ___ (drive) all night to get there.", answers:["drove"]},
+    {sentence:"She ___ (keep) working even when she was tired.", answers:["kept"]},
+    {sentence:"We ___ (meet) at the café and talked for hours.", answers:["met"]}
+  ]
+},
+{
+  level:"2nde", topic:"preterit", type:"ordre",
+  instruction:"Reorder the words to make a correct sentence.",
+  questions:[
+    {words:["spoke","she","to","boss","her","yesterday"], correct:"She spoke to her boss yesterday."},
+    {words:["found","they","wallet","a","street","the","on"], correct:"They found a wallet on the street."},
+    {words:["left","he","did","not","early"], correct:"He did not leave early."},
+    {words:["did","she","think","what","?"], correct:"What did she think?"},
+    {words:["took","I","bus","wrong","the"], correct:"I took the wrong bus."},
+    {words:["felt","nervous","she","very"], correct:"She felt very nervous."},
+    {words:["told","he","me","everything"], correct:"He told me everything."},
+    {words:["drove","they","to","Paris","together"], correct:"They drove to Paris together."},
+    {words:["kept","she","all","letters","old","her"], correct:"She kept all her old letters."},
+    {words:["met","we","teacher","our","museum","at","the"], correct:"We met our teacher at the museum."}
+  ]
+},
+{
+  level:"2nde", topic:"preterit", type:"transform",
+  instruction:"Transform the sentence as indicated.",
+  questions:[
+    {original:"She spoke to him.", transformInstruction:"Make negative.", correct:"She didn't speak to him.", accepted:["She didn't speak to him.","She did not speak to him."]},
+    {original:"They found the key.", transformInstruction:"Make a question.", correct:"Did they find the key?", accepted:["Did they find the key?"]},
+    {original:"He left early.", transformInstruction:"Make negative.", correct:"He didn't leave early.", accepted:["He didn't leave early.","He did not leave early."]},
+    {original:"She took my book.", transformInstruction:"Make a question.", correct:"Did she take my book?", accepted:["Did she take my book?"]},
+    {original:"We felt happy.", transformInstruction:"Make negative.", correct:"We didn't feel happy.", accepted:["We didn't feel happy.","We did not feel happy."]},
+    {original:"He told the truth.", transformInstruction:"Make a question.", correct:"Did he tell the truth?", accepted:["Did he tell the truth?"]},
+    {original:"She drove to work.", transformInstruction:"Make negative.", correct:"She didn't drive to work.", accepted:["She didn't drive to work.","She did not drive to work."]},
+    {original:"They kept quiet.", transformInstruction:"Make a question.", correct:"Did they keep quiet?", accepted:["Did they keep quiet?"]},
+    {original:"I thought it was easy.", transformInstruction:"Make negative.", correct:"I didn't think it was easy.", accepted:["I didn't think it was easy.","I did not think it was easy."]},
+    {original:"We met at school.", transformInstruction:"Make a question.", correct:"Did we meet at school?", accepted:["Did we meet at school?"]}
+  ]
+},
+{
+  level:"2nde", topic:"preterit", type:"trous",
+  instruction:"Complete with the past simple. Negative or affirmative as needed.",
+  questions:[
+    {sentence:"She ___ (not/go) to the party — she was ill.", answers:["didn't go"]},
+    {sentence:"They ___ (send) an email but nobody replied.", answers:["sent"]},
+    {sentence:"He ___ (not/know) the answer to the question.", answers:["didn't know"]},
+    {sentence:"We ___ (stand) in the queue for an hour.", answers:["stood"]},
+    {sentence:"She ___ (not/hear) the alarm clock.", answers:["didn't hear"]},
+    {sentence:"I ___ (grow) up in a small village.", answers:["grew"]},
+    {sentence:"They ___ (not/bring) enough food for everyone.", answers:["didn't bring"]},
+    {sentence:"He ___ (fall) asleep on the sofa.", answers:["fell"]},
+    {sentence:"She ___ (not/understand) the instructions.", answers:["didn't understand"]},
+    {sentence:"We ___ (hold) a meeting last Thursday.", answers:["held"]}
+  ]
+},
+{
+  level:"2nde", topic:"preterit", type:"qcm",
+  instruction:"Choose the sentence that is correct.",
+  questions:[
+    {q:"Which is correct?", options:["She speaked French fluently.","She spoke French fluently.","She has spoke French fluently.","She speak French fluently."], correct:1},
+    {q:"Which is correct?", options:["Did he went to school?","Did he goes to school?","Did he go to school?","Has he gone to school?"], correct:2},
+    {q:"Which is correct?", options:["They didn't came home.","They didn't come home.","They didn't comes home.","They haven't came home."], correct:1},
+    {q:"Which is correct?", options:["She taked a taxi.","She tooked a taxi.","She took a taxi.","She has take a taxi."], correct:2},
+    {q:"Which is correct?", options:["He felt tired yesterday.","He feeled tired yesterday.","He has felt tired yesterday.","He feels tired yesterday."], correct:0},
+    {q:"Which is correct?", options:["We meeted at noon.","We met at noon.","We have met at noon yesterday.","We meted at noon."], correct:1},
+    {q:"Which is correct?", options:["Did she told you?","Did she tell you?","Did she tells you?","Has she tell you?"], correct:1},
+    {q:"Which is correct?", options:["They drived all night.","They driven all night.","They drove all night.","They have drove all night."], correct:2},
+    {q:"Which is correct?", options:["She keeped the receipt.","She keeps the receipt.","She kept the receipt.","She has keep the receipt."], correct:2},
+    {q:"Which is correct?", options:["He thinked it was funny.","He thought it was funny.","He thinks it was funny yesterday.","He has thought it was funny."], correct:1}
+  ]
+}
+],
+
+// ============================================================
+// 2NDE - PRESENT PERFECT (6 exercises)
+// ============================================================
+"2nde_present_perfect": [
+{
+  level:"2nde", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form.",
+  questions:[
+    {q:"She ___ (speak) to the director about it.", options:["spoke","has spoken","have spoken","speaks"], correct:1},
+    {q:"They ___ (find) a solution to the problem.", options:["found","has found","have found","find"], correct:2},
+    {q:"He ___ (think) about your proposal.", options:["thought","has thought","have thought","think"], correct:1},
+    {q:"We ___ (leave) a message on his phone.", options:["left","has left","have left","leave"], correct:2},
+    {q:"She ___ never ___ (take) a plane.", options:["has / took","has / taken","have / taken","did / take"], correct:1},
+    {q:"I ___ (feel) better since I took the medicine.", options:["felt","has felt","have felt","feel"], correct:2},
+    {q:"They ___ (tell) everyone the good news.", options:["told","has told","have told","tell"], correct:2},
+    {q:"___ you ever ___ (drive) a lorry?", options:["Did / drove","Have / drove","Have / driven","Has / driven"], correct:2},
+    {q:"She ___ (keep) the same job for ten years.", options:["kept","has kept","have kept","keep"], correct:1},
+    {q:"We ___ (meet) some interesting people on this trip.", options:["met","has met","have met","meet"], correct:2}
+  ]
+},
+{
+  level:"2nde", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect. Use the words in brackets.",
+  questions:[
+    {sentence:"She ___ (speak) to the manager twice this week.", answers:["has spoken"]},
+    {sentence:"I ___ never ___ (find) his behaviour strange before.", answers:["have","found"]},
+    {sentence:"They ___ (leave) already — the bus was early.", answers:["have left"]},
+    {sentence:"He ___ (think) about your offer and he's interested.", answers:["has thought"]},
+    {sentence:"We ___ (take) this road before, haven't we?", answers:["have taken"]},
+    {sentence:"She ___ (feel) unwell all day.", answers:["has felt"]},
+    {sentence:"I ___ (tell) you three times already!", answers:["have told"]},
+    {sentence:"They ___ (drive) over 500 km today.", answers:["have driven"]},
+    {sentence:"She ___ (keep) every birthday card she ever received.", answers:["has kept"]},
+    {sentence:"We ___ (meet) before, I'm sure of it.", answers:["have met"]}
+  ]
+},
+{
+  level:"2nde", topic:"present_perfect", type:"ordre",
+  instruction:"Put the words in order to make a present perfect sentence.",
+  questions:[
+    {words:["has","she","spoken","to","him","already"], correct:"She has already spoken to him."},
+    {words:["have","they","found","solution","a"], correct:"They have found a solution."},
+    {words:["he","has","not","yet","thought","about","it"], correct:"He has not thought about it yet."},
+    {words:["have","we","left","message","a"], correct:"We have left a message."},
+    {words:["she","has","never","taken","plane","a"], correct:"She has never taken a plane."},
+    {words:["have","I","felt","better","never"], correct:"I have never felt better."},
+    {words:["they","have","told","news","the","everyone"], correct:"They have told everyone the news."},
+    {words:["have","you","ever","driven","abroad","?"], correct:"Have you ever driven abroad?"},
+    {words:["she","has","kept","job","same","the"], correct:"She has kept the same job."},
+    {words:["we","have","met","interesting","people"], correct:"We have met interesting people."}
+  ]
+},
+{
+  level:"2nde", topic:"present_perfect", type:"transform",
+  instruction:"Transform the sentence as shown.",
+  questions:[
+    {original:"She has spoken to him.", transformInstruction:"Make negative.", correct:"She hasn't spoken to him.", accepted:["She hasn't spoken to him.","She has not spoken to him."]},
+    {original:"They have found the answer.", transformInstruction:"Make a question.", correct:"Have they found the answer?", accepted:["Have they found the answer?"]},
+    {original:"He has thought about it.", transformInstruction:"Make negative.", correct:"He hasn't thought about it.", accepted:["He hasn't thought about it.","He has not thought about it."]},
+    {original:"We have left already.", transformInstruction:"Make a question.", correct:"Have we left already?", accepted:["Have we left already?"]},
+    {original:"She has taken a risk.", transformInstruction:"Make negative.", correct:"She hasn't taken a risk.", accepted:["She hasn't taken a risk.","She has not taken a risk."]},
+    {original:"I have felt this way before.", transformInstruction:"Make a question.", correct:"Have I felt this way before?", accepted:["Have I felt this way before?"]},
+    {original:"They have told the truth.", transformInstruction:"Make negative.", correct:"They haven't told the truth.", accepted:["They haven't told the truth.","They have not told the truth."]},
+    {original:"He has driven a sports car.", transformInstruction:"Make a question.", correct:"Has he driven a sports car?", accepted:["Has he driven a sports car?"]},
+    {original:"She has kept his secret.", transformInstruction:"Make negative.", correct:"She hasn't kept his secret.", accepted:["She hasn't kept his secret.","She has not kept his secret."]},
+    {original:"We have met before.", transformInstruction:"Make a question.", correct:"Have we met before?", accepted:["Have we met before?"]}
+  ]
+},
+{
+  level:"2nde", topic:"present_perfect", type:"trous",
+  instruction:"Complete using for or since, and the correct present perfect form.",
+  questions:[
+    {sentence:"She ___ (work) here ___ 2019.", answers:["has worked","since"]},
+    {sentence:"They ___ (know) each other ___ ten years.", answers:["have known","for"]},
+    {sentence:"He ___ (live) in Paris ___ he was born.", answers:["has lived","since"]},
+    {sentence:"I ___ (study) English ___ three years.", answers:["have studied","for"]},
+    {sentence:"She ___ (have) this cat ___ a long time.", answers:["has had","for"]},
+    {sentence:"We ___ (be) friends ___ primary school.", answers:["have been","since"]},
+    {sentence:"He ___ (drive) this car ___ 2015.", answers:["has driven","since"]},
+    {sentence:"They ___ (keep) in touch ___ many years.", answers:["have kept","for"]},
+    {sentence:"I ___ (feel) ill ___ yesterday.", answers:["have felt","since"]},
+    {sentence:"She ___ (teach) here ___ five years.", answers:["has taught","for"]}
+  ]
+},
+{
+  level:"2nde", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct option: just, already, yet, ever or never.",
+  questions:[
+    {q:"Have you ___ been to Scotland?", options:["just","already","ever","yet"], correct:2},
+    {q:"She has ___ finished her homework. She's free now.", options:["never","ever","just","yet"], correct:2},
+    {q:"I haven't seen that film ___.", options:["yet","just","already","never"], correct:0},
+    {q:"He has ___ eaten frogs' legs — he refuses!", options:["just","never","already","ever"], correct:1},
+    {q:"They have ___ booked the hotel. They're efficient!", options:["yet","never","already","ever"], correct:2},
+    {q:"___ you tried sushi before?", options:["Have ever","Have never","Have just","Have already"], correct:0},
+    {q:"She has ___ arrived. She's at the door!", options:["yet","never","just","ever"], correct:2},
+    {q:"Have they finished ___?", options:["just","never","already","yet"], correct:3},
+    {q:"I have ___ heard anything so funny!", options:["yet","never","just","already"], correct:1},
+    {q:"He's ___ done it — before you even asked!", options:["yet","never","ever","already"], correct:3}
+  ]
+}
+],
+
+// ============================================================
+// 2NDE - BOTH (6 exercises)
+// ============================================================
+"2nde_both": [
+{
+  level:"2nde", topic:"both", type:"qcm",
+  instruction:"Choose past simple or present perfect.",
+  questions:[
+    {q:"She ___ (speak) at the conference last Tuesday.", options:["has spoken","spoke","have spoken","speaks"], correct:1},
+    {q:"I ___ (find) my keys! They were in my coat.", options:["found","have found","has found","find"], correct:1},
+    {q:"We ___ (leave) home at 8am and arrived at noon.", options:["have left","left","has left","leave"], correct:1},
+    {q:"She ___ (take) a lot of exams since September.", options:["took","has took","have taken","has taken"], correct:3},
+    {q:"He ___ (feel) much better since he started yoga.", options:["felt","feels","has felt","have felt"], correct:2},
+    {q:"They ___ (tell) us the news at dinner last night.", options:["have told","has told","told","tell"], correct:2},
+    {q:"___ you ___ (drive) before? Do you have a licence?", options:["Did / drove","Have / driven","Did / drive","Has / driven"], correct:1},
+    {q:"She ___ (keep) my book for months — I want it back!", options:["kept","has kept","have kept","keep"], correct:1},
+    {q:"We ___ (meet) him when we were on holiday in 2020.", options:["have met","met","has met","meet"], correct:1},
+    {q:"I ___ (think) about your question and I have an answer.", options:["thought","have thought","has thought","think"], correct:1}
+  ]
+},
+{
+  level:"2nde", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect.",
+  questions:[
+    {sentence:"She ___ (speak) at a conference last month.", answers:["spoke"]},
+    {sentence:"I ___ (find) a great solution. Want to hear it?", answers:["have found"]},
+    {sentence:"He ___ (leave) the company in 2021.", answers:["left"]},
+    {sentence:"They ___ (take) three tests already this term.", answers:["have taken"]},
+    {sentence:"I ___ (feel) terrible after eating that shellfish.", answers:["felt"]},
+    {sentence:"She ___ never ___ (tell) a lie in her life.", answers:["has","told"]},
+    {sentence:"He ___ (drive) to work every day last year.", answers:["drove"]},
+    {sentence:"We ___ (keep) in touch since we left school.", answers:["have kept"]},
+    {sentence:"They ___ (meet) the president during their visit.", answers:["met"]},
+    {sentence:"I ___ (think) it was a mistake, but I was wrong.", answers:["thought"]}
+  ]
+},
+{
+  level:"2nde", topic:"both", type:"transform",
+  instruction:"Rewrite the sentence as indicated.",
+  questions:[
+    {original:"She spoke at the meeting.", transformInstruction:"Present perfect, negative.", correct:"She hasn't spoken at the meeting.", accepted:["She hasn't spoken at the meeting.","She has not spoken at the meeting."]},
+    {original:"They have found the answer.", transformInstruction:"Past simple, question.", correct:"Did they find the answer?", accepted:["Did they find the answer?"]},
+    {original:"He left at midnight.", transformInstruction:"Past simple, negative.", correct:"He didn't leave at midnight.", accepted:["He didn't leave at midnight.","He did not leave at midnight."]},
+    {original:"She has taken the exam twice.", transformInstruction:"Present perfect, question.", correct:"Has she taken the exam twice?", accepted:["Has she taken the exam twice?"]},
+    {original:"I felt sick yesterday.", transformInstruction:"Past simple, question.", correct:"Did I feel sick yesterday?", accepted:["Did I feel sick yesterday?"]},
+    {original:"They have told him the truth.", transformInstruction:"Present perfect, negative.", correct:"They haven't told him the truth.", accepted:["They haven't told him the truth.","They have not told him the truth."]},
+    {original:"She drove to London.", transformInstruction:"Past simple, question.", correct:"Did she drive to London?", accepted:["Did she drive to London?"]},
+    {original:"He has kept my secret.", transformInstruction:"Present perfect, negative.", correct:"He hasn't kept my secret.", accepted:["He hasn't kept my secret.","He has not kept my secret."]},
+    {original:"We met in 2019.", transformInstruction:"Past simple, negative.", correct:"We didn't meet in 2019.", accepted:["We didn't meet in 2019.","We did not meet in 2019."]},
+    {original:"I have thought about it.", transformInstruction:"Present perfect, question.", correct:"Have I thought about it?", accepted:["Have I thought about it?"]}
+  ]
+},
+{
+  level:"2nde", topic:"both", type:"ordre",
+  instruction:"Reorder the words. Decide if it is past simple or present perfect.",
+  questions:[
+    {words:["spoke","she","meeting","at","the","last","Tuesday"], correct:"She spoke at the meeting last Tuesday."},
+    {words:["have","they","found","already","solution","a"], correct:"They have already found a solution."},
+    {words:["left","he","did","not","early"], correct:"He did not leave early."},
+    {words:["has","she","taken","exam","the","twice"], correct:"She has taken the exam twice."},
+    {words:["he","felt","better","since","has","started","yoga","he"], correct:"He has felt better since he started yoga."},
+    {words:["told","they","us","news","the","dinner","at","last","night"], correct:"They told us the news at dinner last night."},
+    {words:["have","you","ever","driven","lorry","a","?"], correct:"Have you ever driven a lorry?"},
+    {words:["kept","she","has","book","my","months","for"], correct:"She has kept my book for months."},
+    {words:["met","we","him","holiday","on","in","2020"], correct:"We met him on holiday in 2020."},
+    {words:["have","thought","I","your","about","offer"], correct:"I have thought about your offer."}
+  ]
+},
+{
+  level:"2nde", topic:"both", type:"qcm",
+  instruction:"Which sentence uses the correct tense?",
+  questions:[
+    {q:"I ___ him yesterday at the market.", options:["have seen","saw","has seen","see"], correct:1},
+    {q:"We ___ three countries since January.", options:["visited","have visited","did visit","visit"], correct:1},
+    {q:"She ___ French for six years.", options:["studied","studies","has studied","did study"], correct:2},
+    {q:"They ___ the film last Saturday.", options:["have watched","watched","has watched","watch"], correct:1},
+    {q:"I ___ never ___ to Japan.", options:["did / go","have / been","has / been","did / been"], correct:1},
+    {q:"___ she ___ her driving test yet?", options:["Did / pass","Has / passed","Have / passed","Did / passed"], correct:1},
+    {q:"He ___ his keys when he left the house.", options:["has forgotten","forgot","forgets","have forgotten"], correct:1},
+    {q:"___ you ___ this book? It's amazing!", options:["Did / read","Have / read","Has / read","Did / reads"], correct:1},
+    {q:"She ___ ill since last Monday.", options:["was","has been","is","did be"], correct:1},
+    {q:"We ___ tired after the long journey.", options:["have been","were","has been","are"], correct:1}
+  ]
+},
+{
+  level:"2nde", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense using context clues.",
+  questions:[
+    {sentence:"She ___ (visit) Rome twice. She loves it!", answers:["has visited"]},
+    {sentence:"We ___ (see) a shooting star last night.", answers:["saw"]},
+    {sentence:"He ___ (not/pass) his exam in June. He retook it.", answers:["didn't pass"]},
+    {sentence:"I ___ (study) all morning and I'm exhausted.", answers:["have studied"]},
+    {sentence:"They ___ (build) a new school in our town recently.", answers:["have built"]},
+    {sentence:"She ___ (send) the application two weeks ago.", answers:["sent"]},
+    {sentence:"I ___ never ___ (fly) first class.", answers:["have","flown"]},
+    {sentence:"He ___ (break) his arm when he fell off his bike.", answers:["broke"]},
+    {sentence:"We ___ (choose) our project topic already.", answers:["have chosen"]},
+    {sentence:"She ___ (stand) up to give her speech and everyone listened.", answers:["stood"]}
+  ]
+}
+],
+
+// ============================================================
+// 1ERE - PRETERIT (6 exercises)
+// ============================================================
+"1ere_preterit": [
+{
+  level:"1ere", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form.",
+  questions:[
+    {q:"The scientist ___ (begin) her research in 2010.", options:["beginned","began","begun","begins"], correct:1},
+    {q:"They ___ (choose) the most difficult route.", options:["choosed","chosen","chose","chooses"], correct:2},
+    {q:"She ___ (grow) up near the coast.", options:["growed","grew","grown","grows"], correct:1},
+    {q:"He ___ (hold) the door open for everyone.", options:["holded","held","hold","holds"], correct:1},
+    {q:"The company ___ (lose) a lot of money last year.", options:["losed","lost","lose","loses"], correct:1},
+    {q:"She ___ (break) the world record at the Olympics.", options:["breaked","broke","broken","breaks"], correct:1},
+    {q:"He ___ (fall) in love during his trip abroad.", options:["falled","fallen","fell","falls"], correct:2},
+    {q:"They ___ (build) the bridge in just two years.", options:["builded","built","build","builds"], correct:1},
+    {q:"She ___ (forget) to bring her passport.", options:["forgetted","forgot","forgotten","forgets"], correct:1},
+    {q:"We ___ (send) the documents before the deadline.", options:["sended","sent","send","sends"], correct:1}
+  ]
+},
+{
+  level:"1ere", topic:"preterit", type:"trous",
+  instruction:"Complete with the correct past simple form.",
+  questions:[
+    {sentence:"She ___ (begin) working here straight after university.", answers:["began"]},
+    {sentence:"They ___ (choose) not to accept the offer.", answers:["chose"]},
+    {sentence:"He ___ (grow) his own vegetables for years.", answers:["grew"]},
+    {sentence:"She ___ (hold) a senior position in the company.", answers:["held"]},
+    {sentence:"The team ___ (lose) three games in a row.", answers:["lost"]},
+    {sentence:"He ___ (break) his promise, which shocked everyone.", answers:["broke"]},
+    {sentence:"She ___ (fall) asleep during the lecture.", answers:["fell"]},
+    {sentence:"They ___ (build) a strong business from scratch.", answers:["built"]},
+    {sentence:"I ___ (forget) his name as soon as he left.", answers:["forgot"]},
+    {sentence:"We ___ (send) a formal complaint to the company.", answers:["sent"]}
+  ]
+},
+{
+  level:"1ere", topic:"preterit", type:"transform",
+  instruction:"Rewrite in the form shown.",
+  questions:[
+    {original:"She began her research.", transformInstruction:"Negative.", correct:"She didn't begin her research.", accepted:["She didn't begin her research.","She did not begin her research."]},
+    {original:"They chose the wrong option.", transformInstruction:"Question.", correct:"Did they choose the wrong option?", accepted:["Did they choose the wrong option?"]},
+    {original:"He grew up abroad.", transformInstruction:"Negative.", correct:"He didn't grow up abroad.", accepted:["He didn't grow up abroad.","He did not grow up abroad."]},
+    {original:"She held an important meeting.", transformInstruction:"Question.", correct:"Did she hold an important meeting?", accepted:["Did she hold an important meeting?"]},
+    {original:"The company lost the contract.", transformInstruction:"Negative.", correct:"The company didn't lose the contract.", accepted:["The company didn't lose the contract.","The company did not lose the contract."]},
+    {original:"He broke the rules.", transformInstruction:"Question.", correct:"Did he break the rules?", accepted:["Did he break the rules?"]},
+    {original:"She fell ill during the trip.", transformInstruction:"Negative.", correct:"She didn't fall ill during the trip.", accepted:["She didn't fall ill during the trip.","She did not fall ill during the trip."]},
+    {original:"They built a new office.", transformInstruction:"Question.", correct:"Did they build a new office?", accepted:["Did they build a new office?"]},
+    {original:"I forgot to call him back.", transformInstruction:"Negative.", correct:"I didn't forget to call him back.", accepted:["I didn't forget to call him back.","I did not forget to call him back."]},
+    {original:"We sent the invoice.", transformInstruction:"Question.", correct:"Did we send the invoice?", accepted:["Did we send the invoice?"]}
+  ]
+},
+{
+  level:"1ere", topic:"preterit", type:"ordre",
+  instruction:"Reorder the words.",
+  questions:[
+    {words:["began","she","research","her","in","2010"], correct:"She began her research in 2010."},
+    {words:["chose","they","most","route","difficult","the"], correct:"They chose the most difficult route."},
+    {words:["grew","up","coast","he","near","the"], correct:"He grew up near the coast."},
+    {words:["held","she","position","senior","a"], correct:"She held a senior position."},
+    {words:["did","not","lose","they","contract","the"], correct:"They did not lose the contract."},
+    {words:["broke","record","the","she","world"], correct:"She broke the world record."},
+    {words:["did","he","fall","love","when","in","?"], correct:"When did he fall in love?"},
+    {words:["built","bridge","they","two","in","years"], correct:"They built the bridge in two years."},
+    {words:["forgot","I","passport","my","bring","to"], correct:"I forgot to bring my passport."},
+    {words:["sent","we","deadline","before","documents","the","the"], correct:"We sent the documents before the deadline."}
+  ]
+},
+{
+  level:"1ere", topic:"preterit", type:"trous",
+  instruction:"Complete with past simple, negative or affirmative.",
+  questions:[
+    {sentence:"She ___ (not/choose) the easy path — she worked hard.", answers:["didn't choose"]},
+    {sentence:"The river ___ (rise) dramatically after the storm.", answers:["rose"]},
+    {sentence:"He ___ (not/forget) his lines during the play.", answers:["didn't forget"]},
+    {sentence:"They ___ (sell) their house and moved abroad.", answers:["sold"]},
+    {sentence:"She ___ (not/lose) hope even in difficult times.", answers:["didn't lose"]},
+    {sentence:"The company ___ (grow) rapidly in its first year.", answers:["grew"]},
+    {sentence:"He ___ (not/break) any rules during the competition.", answers:["didn't break"]},
+    {sentence:"They ___ (hold) talks with the government.", answers:["held"]},
+    {sentence:"She ___ (not/send) the email on time.", answers:["didn't send"]},
+    {sentence:"The team ___ (build) a prototype in just two months.", answers:["built"]}
+  ]
+},
+{
+  level:"1ere", topic:"preterit", type:"qcm",
+  instruction:"Choose the option that correctly completes the sentence.",
+  questions:[
+    {q:"The journalist ___ a powerful story that shocked many people.", options:["written","wrote","writes","has wrote"], correct:1},
+    {q:"She ___ back to her hometown after ten years abroad.", options:["came","come","has come","comed"], correct:0},
+    {q:"The government ___ a new law on climate change.", options:["passed","past","has pass","passing"], correct:0},
+    {q:"He ___ everything he could to help the victims.", options:["does","did","done","has do"], correct:1},
+    {q:"They ___ a settlement after months of negotiation.", options:["reached","reach","has reached","reaching"], correct:0},
+    {q:"The speaker ___ the audience for forty minutes.", options:["held","holded","has held","hold"], correct:0},
+    {q:"She ___ her career to focus on raising her family.", options:["gave up","give up","given up","gives up"], correct:0},
+    {q:"He ___ to understand the complexity of the situation.", options:["beginned","begun","began","begins"], correct:2},
+    {q:"The accident ___ when visibility was very poor.", options:["happened","happen","has happened","happening"], correct:0},
+    {q:"They ___ hard to make the project a success.", options:["fought","fight","fighting","has fought"], correct:0}
+  ]
+}
+],
+
+// ============================================================
+// 1ERE - PRESENT PERFECT (6 exercises)
+// ============================================================
+"1ere_present_perfect": [
+{
+  level:"1ere", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form.",
+  questions:[
+    {q:"The company ___ (grow) considerably since its launch.", options:["grew","has grown","have grown","grows"], correct:1},
+    {q:"She ___ (choose) a very demanding career path.", options:["chose","has chose","has chosen","have chosen"], correct:2},
+    {q:"They ___ (build) several new schools in the region.", options:["built","has built","have built","build"], correct:2},
+    {q:"He ___ (break) the record three times this season.", options:["broke","has broke","has broken","have broken"], correct:2},
+    {q:"We ___ (lose) contact since she moved away.", options:["lost","have lost","has lost","lose"], correct:1},
+    {q:"She ___ (hold) the position of CEO for five years.", options:["held","has held","have held","hold"], correct:1},
+    {q:"I ___ (begin) to understand his point of view.", options:["began","has begun","have begun","begin"], correct:2},
+    {q:"They ___ (send) a formal request to the authorities.", options:["sent","has sent","have sent","send"], correct:2},
+    {q:"He ___ (forget) more than he ___ (learn).", options:["has forgotten / has learned","forgot / learned","forgotten / learned","forgets / learns"], correct:0},
+    {q:"___ she ever ___ (fall) in love with someone she just met?", options:["Did / fell","Has / fallen","Have / fallen","Did / fallen"], correct:1}
+  ]
+},
+{
+  level:"1ere", topic:"present_perfect", type:"trous",
+  instruction:"Complete with the present perfect.",
+  questions:[
+    {sentence:"The population ___ (grow) by 20% over the past decade.", answers:["has grown"]},
+    {sentence:"Researchers ___ (choose) a new approach to the problem.", answers:["have chosen"]},
+    {sentence:"The organisation ___ (build) a reputation for excellence.", answers:["has built"]},
+    {sentence:"Several records ___ (break) at this year's championship.", answers:["have been broken"]},
+    {sentence:"We ___ (lose) touch with many former colleagues.", answers:["have lost"]},
+    {sentence:"She ___ (hold) onto her beliefs despite the criticism.", answers:["has held"]},
+    {sentence:"I ___ just ___ (begin) to read his latest novel.", answers:["have","begun"]},
+    {sentence:"The team ___ (send) their report to all stakeholders.", answers:["has sent"]},
+    {sentence:"He ___ (forget) that he promised to call.", answers:["has forgotten"]},
+    {sentence:"Several staff members ___ (fall) ill this week.", answers:["have fallen"]}
+  ]
+},
+{
+  level:"1ere", topic:"present_perfect", type:"transform",
+  instruction:"Transform as shown.",
+  questions:[
+    {original:"The company has grown fast.", transformInstruction:"Negative.", correct:"The company hasn't grown fast.", accepted:["The company hasn't grown fast.","The company has not grown fast."]},
+    {original:"She has chosen her topic.", transformInstruction:"Question.", correct:"Has she chosen her topic?", accepted:["Has she chosen her topic?"]},
+    {original:"They have built a new lab.", transformInstruction:"Negative.", correct:"They haven't built a new lab.", accepted:["They haven't built a new lab.","They have not built a new lab."]},
+    {original:"He has broken the record.", transformInstruction:"Question.", correct:"Has he broken the record?", accepted:["Has he broken the record?"]},
+    {original:"We have lost the data.", transformInstruction:"Negative.", correct:"We haven't lost the data.", accepted:["We haven't lost the data.","We have not lost the data."]},
+    {original:"She has held a press conference.", transformInstruction:"Question.", correct:"Has she held a press conference?", accepted:["Has she held a press conference?"]},
+    {original:"I have begun my research.", transformInstruction:"Negative.", correct:"I haven't begun my research.", accepted:["I haven't begun my research.","I have not begun my research."]},
+    {original:"They have sent an apology.", transformInstruction:"Question.", correct:"Have they sent an apology?", accepted:["Have they sent an apology?"]},
+    {original:"He has forgotten his password.", transformInstruction:"Negative.", correct:"He hasn't forgotten his password.", accepted:["He hasn't forgotten his password.","He has not forgotten his password."]},
+    {original:"She has fallen behind.", transformInstruction:"Question.", correct:"Has she fallen behind?", accepted:["Has she fallen behind?"]}
+  ]
+},
+{
+  level:"1ere", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct present perfect sentence.",
+  questions:[
+    {words:["has","company","grown","the","considerably"], correct:"The company has grown considerably."},
+    {words:["have","they","built","schools","new","several"], correct:"They have built several new schools."},
+    {words:["she","has","not","chosen","yet","topic","her"], correct:"She has not chosen her topic yet."},
+    {words:["he","has","broken","record","three","times","the"], correct:"He has broken the record three times."},
+    {words:["have","we","lost","contact","since","moved","she"], correct:"We have lost contact since she moved."},
+    {words:["she","held","has","position","of","CEO","the"], correct:"She has held the position of CEO."},
+    {words:["have","I","just","begun","my","research"], correct:"I have just begun my research."},
+    {words:["they","sent","have","request","formal","a"], correct:"They have sent a formal request."},
+    {words:["he","forgotten","has","more","than","learned","he","has"], correct:"He has forgotten more than he has learned."},
+    {words:["has","she","ever","fallen","in","love","?"], correct:"Has she ever fallen in love?"}
+  ]
+},
+{
+  level:"1ere", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect using since, for, just, already or yet.",
+  questions:[
+    {sentence:"She ___ (live) in London ___ over a decade.", answers:["has lived","for"]},
+    {sentence:"The technology ___ (change) dramatically ___ the 1990s.", answers:["has changed","since"]},
+    {sentence:"I ___ just ___ (finish) reading the report.", answers:["have","finished"]},
+    {sentence:"He ___ already ___ (submit) his application.", answers:["has","submitted"]},
+    {sentence:"___ they ___ (announce) the results ___?", answers:["Have","announced","yet"]},
+    {sentence:"We ___ (work) on this project ___ six months.", answers:["have worked","for"]},
+    {sentence:"She ___ (hold) this belief ___ she was a student.", answers:["has held","since"]},
+    {sentence:"The team ___ just ___ (discover) an important clue.", answers:["has","discovered"]},
+    {sentence:"He ___ not ___ (respond) to the email ___.", answers:["has","responded","yet"]},
+    {sentence:"They ___ (be) partners ___ the company was founded.", answers:["have been","since"]}
+  ]
+},
+{
+  level:"1ere", topic:"present_perfect", type:"qcm",
+  instruction:"Identify the correct sentence.",
+  questions:[
+    {q:"Which sentence is correct?", options:["She has grew up here.","She has grown up here.","She grew up here already.","She have grown up here."], correct:1},
+    {q:"Which sentence is correct?", options:["They have chose a leader.","They chose a leader already.","They have chosen a leader.","They has chosen a leader."], correct:2},
+    {q:"Which sentence is correct?", options:["He has build a house.","He have built a house.","He has built a house.","He builded a house."], correct:2},
+    {q:"Which sentence is correct?", options:["She has broke the record.","She have broken the record.","She has broken the record.","She broken the record."], correct:2},
+    {q:"Which sentence is correct?", options:["We haven't lost hope.","We didn't have lost hope.","We haven't lose hope.","We have lost not hope."], correct:0},
+    {q:"Which sentence is correct?", options:["Has she held talks?","Have she held talks?","Did she has held talks?","She has hold talks?"], correct:0},
+    {q:"Which sentence is correct?", options:["I haven't began yet.","I haven't begin yet.","I haven't begun yet.","I didn't have begun yet."], correct:2},
+    {q:"Which sentence is correct?", options:["They have send a letter.","They have sended a letter.","They has sent a letter.","They have sent a letter."], correct:3},
+    {q:"Which sentence is correct?", options:["He has forgotten his keys.","He have forgot his keys.","He has forgot his keys.","He forgotten his keys."], correct:0},
+    {q:"Which sentence is correct?", options:["She have fallen asleep.","She has fall asleep.","She has fallen asleep.","She falled asleep."], correct:2}
+  ]
+}
+],
+
+// ============================================================
+// 1ERE - BOTH (6 exercises)
+// ============================================================
+"1ere_both": [
+{
+  level:"1ere", topic:"both", type:"qcm",
+  instruction:"Choose the correct tense.",
+  questions:[
+    {q:"The company ___ (grow) rapidly since it was founded.", options:["grew","has grown","have grown","grows"], correct:1},
+    {q:"She ___ (choose) medicine as her career back in 2018.", options:["has chosen","chose","choose","have chosen"], correct:1},
+    {q:"They ___ (build) three hospitals in the region last decade.", options:["have built","built","has built","build"], correct:1},
+    {q:"He ___ (break) his personal record at yesterday's race.", options:["has broken","have broken","broke","broken"], correct:2},
+    {q:"We ___ (lose) the championship three times so far.", options:["lost","have lost","has lost","lose"], correct:1},
+    {q:"She ___ (hold) office since the last election.", options:["held","has held","have held","hold"], correct:1},
+    {q:"The crisis ___ (begin) when the bank collapsed in 2008.", options:["has begun","began","begun","begins"], correct:1},
+    {q:"They ___ (send) a proposal but haven't received a reply.", options:["sent","have sent","has sent","send"], correct:1},
+    {q:"He ___ (forget) the access codes this morning.", options:["has forgotten","forgot","forgotten","forgets"], correct:0},
+    {q:"Several workers ___ (fall) victim to the disease recently.", options:["fell","has fallen","have fallen","fall"], correct:2}
+  ]
+},
+{
+  level:"1ere", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect.",
+  questions:[
+    {sentence:"Sales ___ (grow) by 30% since the new strategy was launched.", answers:["have grown"]},
+    {sentence:"The board ___ (choose) a new director at last week's meeting.", answers:["chose"]},
+    {sentence:"They ___ (build) the factory in 1985 and it's still running.", answers:["built"]},
+    {sentence:"She ___ (break) her leg while skiing last winter.", answers:["broke"]},
+    {sentence:"The government ___ (lose) the vote on that bill in 2022.", answers:["lost"]},
+    {sentence:"He ___ (hold) the record since 2015.", answers:["has held"]},
+    {sentence:"The conflict ___ (begin) three years ago and continues.", answers:["began"]},
+    {sentence:"I ___ (send) you the file — check your inbox.", answers:["have sent"]},
+    {sentence:"She ___ (forget) more details from her childhood as she ages.", answers:["has forgotten"]},
+    {sentence:"The temperature ___ (fall) significantly since last night.", answers:["has fallen"]}
+  ]
+},
+{
+  level:"1ere", topic:"both", type:"transform",
+  instruction:"Rewrite the sentence as indicated.",
+  questions:[
+    {original:"The company grew rapidly.", transformInstruction:"Present perfect, affirmative.", correct:"The company has grown rapidly.", accepted:["The company has grown rapidly."]},
+    {original:"She has chosen medicine.", transformInstruction:"Past simple, question.", correct:"Did she choose medicine?", accepted:["Did she choose medicine?"]},
+    {original:"They have built new hospitals.", transformInstruction:"Present perfect, negative.", correct:"They haven't built new hospitals.", accepted:["They haven't built new hospitals.","They have not built new hospitals."]},
+    {original:"He broke the record.", transformInstruction:"Past simple, negative.", correct:"He didn't break the record.", accepted:["He didn't break the record.","He did not break the record."]},
+    {original:"We have lost the championship.", transformInstruction:"Present perfect, question.", correct:"Have we lost the championship?", accepted:["Have we lost the championship?"]},
+    {original:"She held the position for ten years.", transformInstruction:"Past simple, question.", correct:"Did she hold the position for ten years?", accepted:["Did she hold the position for ten years?"]},
+    {original:"The crisis began in 2008.", transformInstruction:"Past simple, negative.", correct:"The crisis didn't begin in 2008.", accepted:["The crisis didn't begin in 2008.","The crisis did not begin in 2008."]},
+    {original:"They have sent a proposal.", transformInstruction:"Present perfect, negative.", correct:"They haven't sent a proposal.", accepted:["They haven't sent a proposal.","They have not sent a proposal."]},
+    {original:"He forgot the codes.", transformInstruction:"Past simple, question.", correct:"Did he forget the codes?", accepted:["Did he forget the codes?"]},
+    {original:"Several workers have fallen ill.", transformInstruction:"Present perfect, question.", correct:"Have several workers fallen ill?", accepted:["Have several workers fallen ill?"]}
+  ]
+},
+{
+  level:"1ere", topic:"both", type:"ordre",
+  instruction:"Reorder to form a correct sentence.",
+  questions:[
+    {words:["has","company","grown","since","launch","its","the"], correct:"The company has grown since its launch."},
+    {words:["chose","she","medicine","career","her","as","in","2018"], correct:"She chose medicine as her career in 2018."},
+    {words:["they","have","built","hospitals","three","region","the","in"], correct:"They have built three hospitals in the region."},
+    {words:["broke","he","record","at","race","yesterday's","his"], correct:"He broke his record at yesterday's race."},
+    {words:["we","lost","have","championship","so","far","times","three","the"], correct:"We have lost the championship three times so far."},
+    {words:["has","she","held","office","election","last","since","the"], correct:"She has held office since the last election."},
+    {words:["began","crisis","when","bank","collapsed","the","the","2008","in"], correct:"The crisis began when the bank collapsed in 2008."},
+    {words:["have","they","sent","proposal","a","reply","no","received","but"], correct:"They have sent a proposal but received no reply."},
+    {words:["has","he","forgotten","codes","access","the"], correct:"He has forgotten the access codes."},
+    {words:["have","workers","several","fallen","recently","ill"], correct:"Several workers have fallen ill recently."}
+  ]
+},
+{
+  level:"1ere", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense. Two blanks = auxiliary + past participle.",
+  questions:[
+    {sentence:"The scientist ___ (discover) a new molecule last Tuesday.", answers:["discovered"]},
+    {sentence:"This method ___ (prove) very effective since its introduction.", answers:["has proved"]},
+    {sentence:"The author ___ (write) five novels so far.", answers:["has written"]},
+    {sentence:"He ___ (write) his first novel when he was only nineteen.", answers:["wrote"]},
+    {sentence:"The volcano ___ (erupt) three times over the past century.", answers:["has erupted"]},
+    {sentence:"Temperatures ___ (rise) sharply in the summer of 2022.", answers:["rose"]},
+    {sentence:"Inequality ___ (grow) considerably in recent decades.", answers:["has grown"]},
+    {sentence:"She ___ (choose) not to run for re-election in 2020.", answers:["chose"]},
+    {sentence:"The pandemic ___ (change) the way we work permanently.", answers:["has changed"]},
+    {sentence:"They ___ (lose) almost everything in the flood last year.", answers:["lost"]}
+  ]
+},
+{
+  level:"1ere", topic:"both", type:"qcm",
+  instruction:"Select the option that correctly contrasts past simple and present perfect.",
+  questions:[
+    {q:"Newton ___ the law of gravity in the 17th century.", options:["has discovered","discovered","has been discovering","discovers"], correct:1},
+    {q:"Scientists ___ a new treatment for the disease recently.", options:["developed","have developed","develops","did develop"], correct:1},
+    {q:"The economy ___ since the new policies were introduced.", options:["improved","has improved","improves","did improve"], correct:1},
+    {q:"The bridge ___ in 1889 and is still standing.", options:["has been built","was built","has built","is built"], correct:1},
+    {q:"Researchers ___ their findings at the conference last year.", options:["have presented","presented","presents","has presented"], correct:1},
+    {q:"Living standards ___ dramatically over the past fifty years.", options:["rose","have risen","has risen","rises"], correct:1},
+    {q:"The prime minister ___ her resignation yesterday.", options:["has announced","announced","announces","have announced"], correct:1},
+    {q:"This author ___ over thirty books during her career.", options:["wrote","has written","writes","did write"], correct:1},
+    {q:"Globalisation ___ the world economy since the 1980s.", options:["shaped","has shaped","shapes","did shape"], correct:1},
+    {q:"She ___ several awards before she retired.", options:["has won","won","wins","have won"], correct:1}
+  ]
+}
+],
+
+// ============================================================
+// TLE - PRETERIT (8 exercises)
+// ============================================================
+"Tle_preterit": [
+{
+  level:"Tle", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form in context.",
+  questions:[
+    {q:"The prime minister ___ (seek) to reassure investors.", options:["seeked","sought","seeks","has sought"], correct:1},
+    {q:"The storm ___ (strike) the coast without warning.", options:["striked","struck","stricken","strikes"], correct:1},
+    {q:"She ___ (bear) the responsibilities with remarkable composure.", options:["beared","bore","borne","bears"], correct:1},
+    {q:"He ___ (swear) to tell the truth in court.", options:["sweared","swore","sworn","swears"], correct:1},
+    {q:"The nation ___ (arise) from the crisis stronger than before.", options:["arised","arose","arisen","arises"], correct:1},
+    {q:"They ___ (spread) misinformation through social media.", options:["spreaded","spread","spreads","spreading"], correct:1},
+    {q:"She ___ (withdraw) from the competition due to injury.", options:["withdrawed","withdrew","withdrawn","withdraws"], correct:1},
+    {q:"He ___ (undergo) surgery after the accident.", options:["undergoed","underwent","undergone","undergoes"], correct:1},
+    {q:"The team ___ (overcome) enormous obstacles.", options:["overcomed","overcame","overcome","overcomes"], correct:1},
+    {q:"She ___ (forbid) any discussion of the matter.", options:["forbade","forbid","forbidden","forbids"], correct:0}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"trous",
+  instruction:"Complete with the correct past simple form.",
+  questions:[
+    {sentence:"The minister ___ (seek) parliamentary approval for the bill.", answers:["sought"]},
+    {sentence:"Lightning ___ (strike) the building during the thunderstorm.", answers:["struck"]},
+    {sentence:"She ___ (bear) the consequences of her decisions stoically.", answers:["bore"]},
+    {sentence:"The defendant ___ (swear) he had no knowledge of the crime.", answers:["swore"]},
+    {sentence:"A new movement ___ (arise) in response to the crisis.", answers:["arose"]},
+    {sentence:"The virus ___ (spread) rapidly across the continent.", answers:["spread"]},
+    {sentence:"The ambassador ___ (withdraw) to consult with his government.", answers:["withdrew"]},
+    {sentence:"The patient ___ (undergo) a lengthy operation.", answers:["underwent"]},
+    {sentence:"The athletes ___ (overcome) all expectations to win gold.", answers:["overcame"]},
+    {sentence:"The school ___ (forbid) the use of mobile phones.", answers:["forbade"]}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"transform",
+  instruction:"Rewrite in the form indicated.",
+  questions:[
+    {original:"The minister sought approval.", transformInstruction:"Negative.", correct:"The minister didn't seek approval.", accepted:["The minister didn't seek approval.","The minister did not seek approval."]},
+    {original:"The storm struck the coast.", transformInstruction:"Question.", correct:"Did the storm strike the coast?", accepted:["Did the storm strike the coast?"]},
+    {original:"She bore the responsibility.", transformInstruction:"Negative.", correct:"She didn't bear the responsibility.", accepted:["She didn't bear the responsibility.","She did not bear the responsibility."]},
+    {original:"He swore to tell the truth.", transformInstruction:"Question.", correct:"Did he swear to tell the truth?", accepted:["Did he swear to tell the truth?"]},
+    {original:"A new movement arose.", transformInstruction:"Negative.", correct:"A new movement didn't arise.", accepted:["A new movement didn't arise.","A new movement did not arise."]},
+    {original:"The virus spread quickly.", transformInstruction:"Question.", correct:"Did the virus spread quickly?", accepted:["Did the virus spread quickly?"]},
+    {original:"She withdrew from the race.", transformInstruction:"Negative.", correct:"She didn't withdraw from the race.", accepted:["She didn't withdraw from the race.","She did not withdraw from the race."]},
+    {original:"He underwent surgery.", transformInstruction:"Question.", correct:"Did he undergo surgery?", accepted:["Did he undergo surgery?"]},
+    {original:"They overcame the crisis.", transformInstruction:"Negative.", correct:"They didn't overcome the crisis.", accepted:["They didn't overcome the crisis.","They did not overcome the crisis."]},
+    {original:"She forbade any discussion.", transformInstruction:"Question.", correct:"Did she forbid any discussion?", accepted:["Did she forbid any discussion?"]}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"ordre",
+  instruction:"Reorder to form a correct sentence.",
+  questions:[
+    {words:["sought","minister","parliamentary","the","approval"], correct:"The minister sought parliamentary approval."},
+    {words:["struck","lightning","building","during","storm","the","the"], correct:"Lightning struck the building during the storm."},
+    {words:["bore","she","of","decisions","her","consequences","the"], correct:"She bore the consequences of her decisions."},
+    {words:["did","defendant","swear","the","no","knowledge","have","?"], correct:"Did the defendant swear he had no knowledge?"},
+    {words:["arose","movement","new","response","a","in","to","crisis","the"], correct:"A new movement arose in response to the crisis."},
+    {words:["did","not","spread","virus","the","so","quickly"], correct:"The virus did not spread so quickly."},
+    {words:["withdrew","ambassador","consult","to","government","his","with"], correct:"The ambassador withdrew to consult with his government."},
+    {words:["underwent","operation","patient","a","lengthy","the"], correct:"The patient underwent a lengthy operation."},
+    {words:["overcame","they","expectations","all","win","to","gold"], correct:"They overcame all expectations to win gold."},
+    {words:["forbade","school","use","of","phones","the","mobile","the"], correct:"The school forbade the use of mobile phones."}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"trous",
+  instruction:"Complete with the correct past simple form. Some are negative.",
+  questions:[
+    {sentence:"The court ___ (uphold) the original verdict.", answers:["upheld"]},
+    {sentence:"She ___ (not/forsake) her principles despite the pressure.", answers:["didn't forsake"]},
+    {sentence:"The economy ___ (shrink) by 3% in the final quarter.", answers:["shrank"]},
+    {sentence:"He ___ (not/mislead) the committee intentionally.", answers:["didn't mislead"]},
+    {sentence:"The earthquake ___ (shake) the foundations of the building.", answers:["shook"]},
+    {sentence:"They ___ (not/withdraw) their support until the very end.", answers:["didn't withdraw"]},
+    {sentence:"The author ___ (weave) several storylines into the narrative.", answers:["wove"]},
+    {sentence:"She ___ (not/foresee) the consequences of her decision.", answers:["didn't foresee"]},
+    {sentence:"The committee ___ (bind) all members to confidentiality.", answers:["bound"]},
+    {sentence:"He ___ (not/overlook) a single detail in his research.", answers:["didn't overlook"]}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"qcm",
+  instruction:"Choose the option that best fits the context.",
+  questions:[
+    {q:"The negotiators finally ___ a compromise after three days of talks.", options:["have reached","reached","reach","reaching"], correct:1},
+    {q:"The colonial powers ___ much suffering on local populations.", options:["inflicted","have inflicted","inflict","inflicting"], correct:0},
+    {q:"The invention ___ a revolution in communication.", options:["triggers","has triggered","triggered","triggering"], correct:2},
+    {q:"The rebels ___ control of the capital within weeks.", options:["seize","seized","have seized","seizing"], correct:1},
+    {q:"She ___ her theory in a landmark paper published in 1963.", options:["outlines","outlined","has outlined","outlining"], correct:1},
+    {q:"The treaty ___ a new era of cooperation between the countries.", options:["ushered in","has ushered in","ushers in","ushering in"], correct:0},
+    {q:"The whistleblower ___ classified documents to the press.", options:["leaks","leaked","has leaked","leaking"], correct:1},
+    {q:"The uprising ___ when soldiers opened fire on protesters.", options:["erupted","has erupted","erupts","erupting"], correct:0},
+    {q:"She ___ tirelessly for social justice throughout her life.", options:["fights","fought","has fought","fighting"], correct:1},
+    {q:"The court ___ him not guilty after a lengthy trial.", options:["finds","found","has found","finding"], correct:1}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"trous",
+  instruction:"Complete with the past simple to describe historical events.",
+  questions:[
+    {sentence:"The Wright brothers ___ (make) the first powered flight in 1903.", answers:["made"]},
+    {sentence:"Marie Curie ___ (become) the first woman to win a Nobel Prize.", answers:["became"]},
+    {sentence:"The Berlin Wall ___ (fall) on the 9th of November 1989.", answers:["fell"]},
+    {sentence:"Darwin ___ (publish) his theory of evolution in 1859.", answers:["published"]},
+    {sentence:"Mandela ___ (spend) 27 years in prison before his release.", answers:["spent"]},
+    {sentence:"The suffragettes ___ (fight) for women's right to vote.", answers:["fought"]},
+    {sentence:"Einstein ___ (develop) the theory of general relativity.", answers:["developed"]},
+    {sentence:"The United Nations ___ (come) into existence in 1945.", answers:["came"]},
+    {sentence:"Apartheid ___ (end) in South Africa in the early 1990s.", answers:["ended"]},
+    {sentence:"The first moon landing ___ (take) place in July 1969.", answers:["took"]}
+  ]
+},
+{
+  level:"Tle", topic:"preterit", type:"transform",
+  instruction:"Rewrite as indicated. Maintain the formal register.",
+  questions:[
+    {original:"The court upheld the verdict.", transformInstruction:"Negative.", correct:"The court didn't uphold the verdict.", accepted:["The court didn't uphold the verdict.","The court did not uphold the verdict."]},
+    {original:"The economy shrank last year.", transformInstruction:"Question.", correct:"Did the economy shrink last year?", accepted:["Did the economy shrink last year?"]},
+    {original:"She forsook her principles.", transformInstruction:"Negative.", correct:"She didn't forsake her principles.", accepted:["She didn't forsake her principles.","She did not forsake her principles."]},
+    {original:"He misled the committee.", transformInstruction:"Question.", correct:"Did he mislead the committee?", accepted:["Did he mislead the committee?"]},
+    {original:"The earthquake shook the city.", transformInstruction:"Negative.", correct:"The earthquake didn't shake the city.", accepted:["The earthquake didn't shake the city.","The earthquake did not shake the city."]},
+    {original:"They bound all members to secrecy.", transformInstruction:"Question.", correct:"Did they bind all members to secrecy?", accepted:["Did they bind all members to secrecy?"]},
+    {original:"The author wove complex themes.", transformInstruction:"Negative.", correct:"The author didn't weave complex themes.", accepted:["The author didn't weave complex themes.","The author did not weave complex themes."]},
+    {original:"She foresaw the consequences.", transformInstruction:"Question.", correct:"Did she foresee the consequences?", accepted:["Did she foresee the consequences?"]},
+    {original:"The committee upheld the ban.", transformInstruction:"Negative.", correct:"The committee didn't uphold the ban.", accepted:["The committee didn't uphold the ban.","The committee did not uphold the ban."]},
+    {original:"The rebels seized the capital.", transformInstruction:"Question.", correct:"Did the rebels seize the capital?", accepted:["Did the rebels seize the capital?"]}
+  ]
+}
+],
+
+// ============================================================
+// TLE - PRESENT PERFECT (8 exercises)
+// ============================================================
+"Tle_present_perfect": [
+{
+  level:"Tle", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form.",
+  questions:[
+    {q:"Researchers ___ (seek) a cure for decades.", options:["sought","have sought","has sought","seek"], correct:1},
+    {q:"The virus ___ (strike) communities across the globe.", options:["struck","has struck","have struck","strikes"], correct:1},
+    {q:"She ___ (bear) witness to the atrocities of war.", options:["bore","has bore","has borne","have borne"], correct:2},
+    {q:"Experts ___ (swear) that the data is reliable.", options:["swore","has sworn","have sworn","swear"], correct:2},
+    {q:"New questions ___ (arise) about the ethics of AI.", options:["arose","has arisen","have arisen","arise"], correct:2},
+    {q:"Disinformation ___ (spread) at an alarming rate.", options:["spread","has spread","have spread","spreading"], correct:1},
+    {q:"Several countries ___ (withdraw) from the agreement.", options:["withdrew","has withdrawn","have withdrawn","withdraw"], correct:2},
+    {q:"He ___ (undergo) a complete change of perspective.", options:["underwent","has underwent","has undergone","have undergone"], correct:2},
+    {q:"Humanity ___ (overcome) many crises throughout history.", options:["overcame","has overcome","have overcome","overcomes"], correct:1},
+    {q:"Authorities ___ (forbid) the publication of the report.", options:["forbade","has forbidden","have forbidden","forbid"], correct:2}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"trous",
+  instruction:"Complete with the present perfect.",
+  questions:[
+    {sentence:"Scientists ___ (seek) answers to this question for years.", answers:["have sought"]},
+    {sentence:"The pandemic ___ (strike) the most vulnerable populations hardest.", answers:["has struck"]},
+    {sentence:"She ___ (bear) the burden of proof throughout the trial.", answers:["has borne"]},
+    {sentence:"Several witnesses ___ (swear) they saw the suspect leave.", answers:["have sworn"]},
+    {sentence:"New controversies ___ (arise) following the election.", answers:["have arisen"]},
+    {sentence:"Climate change ___ (spread) to every corner of the globe.", answers:["has spread"]},
+    {sentence:"Many investors ___ (withdraw) their funds from the market.", answers:["have withdrawn"]},
+    {sentence:"The country ___ (undergo) profound social transformation.", answers:["has undergone"]},
+    {sentence:"We ___ (overcome) greater challenges before.", answers:["have overcome"]},
+    {sentence:"The government ___ (forbid) any coverage of the incident.", answers:["has forbidden"]}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"transform",
+  instruction:"Transform the sentence as shown.",
+  questions:[
+    {original:"Researchers have sought a solution.", transformInstruction:"Negative.", correct:"Researchers haven't sought a solution.", accepted:["Researchers haven't sought a solution.","Researchers have not sought a solution."]},
+    {original:"The virus has struck again.", transformInstruction:"Question.", correct:"Has the virus struck again?", accepted:["Has the virus struck again?"]},
+    {original:"She has borne the cost alone.", transformInstruction:"Negative.", correct:"She hasn't borne the cost alone.", accepted:["She hasn't borne the cost alone.","She has not borne the cost alone."]},
+    {original:"Experts have sworn to the data's reliability.", transformInstruction:"Question.", correct:"Have experts sworn to the data's reliability?", accepted:["Have experts sworn to the data's reliability?"]},
+    {original:"New questions have arisen.", transformInstruction:"Negative.", correct:"No new questions have arisen.", accepted:["New questions haven't arisen.","New questions have not arisen.","No new questions have arisen."]},
+    {original:"Disinformation has spread rapidly.", transformInstruction:"Question.", correct:"Has disinformation spread rapidly?", accepted:["Has disinformation spread rapidly?"]},
+    {original:"Several countries have withdrawn.", transformInstruction:"Negative.", correct:"Several countries haven't withdrawn.", accepted:["Several countries haven't withdrawn.","Several countries have not withdrawn."]},
+    {original:"He has undergone a transformation.", transformInstruction:"Question.", correct:"Has he undergone a transformation?", accepted:["Has he undergone a transformation?"]},
+    {original:"Humanity has overcome this before.", transformInstruction:"Negative.", correct:"Humanity hasn't overcome this before.", accepted:["Humanity hasn't overcome this before.","Humanity has not overcome this before."]},
+    {original:"Authorities have forbidden the report.", transformInstruction:"Question.", correct:"Have authorities forbidden the report?", accepted:["Have authorities forbidden the report?"]}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct sentence.",
+  questions:[
+    {words:["have","scientists","sought","decades","for","cure","a"], correct:"Scientists have sought a cure for decades."},
+    {words:["has","pandemic","struck","populations","the","hardest","vulnerable"], correct:"The pandemic has struck the most vulnerable populations hardest."},
+    {words:["she","borne","has","burden","proof","of","the"], correct:"She has borne the burden of proof."},
+    {words:["have","witnesses","sworn","several","saw","they","suspect","the"], correct:"Several witnesses have sworn they saw the suspect."},
+    {words:["controversies","new","have","arisen","election","the","following"], correct:"New controversies have arisen following the election."},
+    {words:["has","disinformation","spread","alarming","at","rate","an"], correct:"Disinformation has spread at an alarming rate."},
+    {words:["have","countries","withdrawn","several","agreement","from","the"], correct:"Several countries have withdrawn from the agreement."},
+    {words:["has","country","undergone","profound","the","transformation"], correct:"The country has undergone profound transformation."},
+    {words:["have","we","overcome","challenges","greater","before"], correct:"We have overcome greater challenges before."},
+    {words:["has","government","the","forbidden","coverage","any"], correct:"The government has forbidden any coverage."}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect using since, for, just, already, yet or never.",
+  questions:[
+    {sentence:"The global temperature ___ (rise) by 1.2°C ___ pre-industrial times.", answers:["has risen","since"]},
+    {sentence:"Scientists ___ (warn) about this for decades but ___ anyone listen ___?", answers:["have warned","has","yet"]},
+    {sentence:"She ___ just ___ (publish) a groundbreaking paper on the subject.", answers:["has","published"]},
+    {sentence:"They ___ already ___ (exhaust) all diplomatic channels.", answers:["have","exhausted"]},
+    {sentence:"The committee ___ not ___ (reach) a consensus ___.", answers:["has","reached","yet"]},
+    {sentence:"Inequality ___ (widen) considerably ___ the 1980s.", answers:["has widened","since"]},
+    {sentence:"Experts ___ (call) for reform ___ years.", answers:["have called","for"]},
+    {sentence:"The organisation ___ (operate) in conflict zones ___ its creation.", answers:["has operated","since"]},
+    {sentence:"He ___ never ___ (bear) such responsibility before.", answers:["has","borne"]},
+    {sentence:"The technology ___ (transform) the sector ___ its introduction.", answers:["has transformed","since"]}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"qcm",
+  instruction:"Identify the grammatically and contextually correct sentence.",
+  questions:[
+    {q:"Which is correct?", options:["Scientists have seeked a cure.","Scientists sought a cure for decades.","Scientists have sought a cure for decades.","Scientists has sought a cure."], correct:2},
+    {q:"Which is correct?", options:["The pandemic has stroke hard.","The pandemic has struck hard.","The pandemic have struck hard.","The pandemic struck hard recently."], correct:1},
+    {q:"Which is correct?", options:["She has bore the burden.","She have borne the burden.","She has borne the burden.","She borne the burden."], correct:2},
+    {q:"Which is correct?", options:["Experts has sworn to it.","Experts have sworn to it.","Experts swore to it recently.","Experts have swear to it."], correct:1},
+    {q:"Which is correct?", options:["New issues have arisen.","New issues have arose.","New issues has arisen.","New issues arisen."], correct:0},
+    {q:"Which is correct?", options:["Disinformation has spreaded.","Disinformation have spread.","Disinformation has spread.","Disinformation spread recently."], correct:2},
+    {q:"Which is correct?", options:["Several countries has withdrawn.","Several countries have withdrawn.","Several countries withdrew recently.","Several countries have withdrawed."], correct:1},
+    {q:"Which is correct?", options:["He has undergoed changes.","He have undergone changes.","He has underwent changes.","He has undergone changes."], correct:3},
+    {q:"Which is correct?", options:["We has overcome this.","We have overcame this.","We have overcome this.","We overcame this already."], correct:2},
+    {q:"Which is correct?", options:["Authorities has forbidden it.","Authorities have forbidden it.","Authorities have forbid it.","Authorities have forbade it."], correct:1}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"trous",
+  instruction:"Complete these sentences from academic or journalistic contexts.",
+  questions:[
+    {sentence:"The findings ___ (challenge) conventional wisdom in the field.", answers:["have challenged"]},
+    {sentence:"Civil society ___ (rise) to confront the challenges of our time.", answers:["has risen"]},
+    {sentence:"The report ___ (shed) light on previously unknown practices.", answers:["has shed"]},
+    {sentence:"Governments around the world ___ (struggle) to contain the crisis.", answers:["have struggled"]},
+    {sentence:"The artist ___ (draw) inspiration from her turbulent childhood.", answers:["has drawn"]},
+    {sentence:"International observers ___ (cast) doubt on the election results.", answers:["have cast"]},
+    {sentence:"The legislation ___ (sweep) away decades of restrictive rules.", answers:["has swept"]},
+    {sentence:"Poverty ___ (breed) resentment in many neglected communities.", answers:["has bred"]},
+    {sentence:"The defendant ___ (maintain) his innocence throughout the trial.", answers:["has maintained"]},
+    {sentence:"New evidence ___ (come) to light that complicates the case.", answers:["has come"]}
+  ]
+},
+{
+  level:"Tle", topic:"present_perfect", type:"transform",
+  instruction:"Rewrite in the form shown, maintaining formal register.",
+  questions:[
+    {original:"The findings challenged conventional wisdom.", transformInstruction:"Present perfect, affirmative.", correct:"The findings have challenged conventional wisdom.", accepted:["The findings have challenged conventional wisdom."]},
+    {original:"She has risen to the challenge.", transformInstruction:"Negative.", correct:"She hasn't risen to the challenge.", accepted:["She hasn't risen to the challenge.","She has not risen to the challenge."]},
+    {original:"The report has shed light on the matter.", transformInstruction:"Question.", correct:"Has the report shed light on the matter?", accepted:["Has the report shed light on the matter?"]},
+    {original:"Governments have struggled to cope.", transformInstruction:"Negative.", correct:"Governments haven't struggled to cope.", accepted:["Governments haven't struggled to cope.","Governments have not struggled to cope."]},
+    {original:"Observers cast doubt on the results.", transformInstruction:"Present perfect, question.", correct:"Have observers cast doubt on the results?", accepted:["Have observers cast doubt on the results?"]},
+    {original:"The legislation has swept away old rules.", transformInstruction:"Negative.", correct:"The legislation hasn't swept away old rules.", accepted:["The legislation hasn't swept away old rules.","The legislation has not swept away old rules."]},
+    {original:"Poverty bred deep resentment.", transformInstruction:"Present perfect, negative.", correct:"Poverty hasn't bred deep resentment.", accepted:["Poverty hasn't bred deep resentment.","Poverty has not bred deep resentment."]},
+    {original:"New evidence has come to light.", transformInstruction:"Question.", correct:"Has new evidence come to light?", accepted:["Has new evidence come to light?"]},
+    {original:"The defendant maintained his innocence.", transformInstruction:"Present perfect, question.", correct:"Has the defendant maintained his innocence?", accepted:["Has the defendant maintained his innocence?"]},
+    {original:"The artist has drawn on her experiences.", transformInstruction:"Negative.", correct:"The artist hasn't drawn on her experiences.", accepted:["The artist hasn't drawn on her experiences.","The artist has not drawn on her experiences."]}
+  ]
+}
+],
+
+// ============================================================
+// TLE - BOTH (8 exercises)
+// ============================================================
+"Tle_both": [
+{
+  level:"Tle", topic:"both", type:"qcm",
+  instruction:"Choose the correct tense: past simple or present perfect.",
+  questions:[
+    {q:"The prime minister ___ (seek) a vote of confidence last week.", options:["has sought","sought","seeks","have sought"], correct:1},
+    {q:"Climate change ___ (strike) fear into many communities since the 1990s.", options:["struck","has struck","have struck","strikes"], correct:1},
+    {q:"She ___ (bear) this burden for nearly a decade now.", options:["bore","has borne","have borne","bears"], correct:1},
+    {q:"The court ___ (swear) in the new judges last Monday.", options:["has sworn","swore","sworn","swears"], correct:1},
+    {q:"New social movements ___ (arise) in response to recent inequalities.", options:["arose","has arisen","have arisen","arise"], correct:2},
+    {q:"The rumour ___ (spread) like wildfire before being denied.", options:["has spread","spread","spreads","spreading"], correct:1},
+    {q:"Three nations ___ (withdraw) from the treaty since it was signed.", options:["withdrew","have withdrawn","has withdrawn","withdraw"], correct:1},
+    {q:"He ___ (undergo) a dramatic shift in opinion recently.", options:["underwent","has undergone","have undergone","undergoes"], correct:1},
+    {q:"The team ___ (overcome) every setback so far this season.", options:["overcame","has overcome","have overcome","overcomes"], correct:1},
+    {q:"The regime ___ (forbid) the use of foreign languages in schools.", options:["forbade","has forbidden","have forbidden","forbids"], correct:0}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect.",
+  questions:[
+    {sentence:"The committee ___ (seek) a compromise but failed last spring.", answers:["sought"]},
+    {sentence:"The disease ___ (strike) over a million people since 2020.", answers:["has struck"]},
+    {sentence:"She ___ (bear) the brunt of the criticism when the report was published.", answers:["bore"]},
+    {sentence:"Several key witnesses ___ (swear) they saw nothing unusual.", answers:["have sworn"]},
+    {sentence:"A new populist movement ___ (arise) in the country last year.", answers:["arose"]},
+    {sentence:"Misinformation ___ (spread) unchecked throughout the campaign.", answers:["spread"]},
+    {sentence:"The country ___ (withdraw) from the alliance in a controversial move last month.", answers:["withdrew"]},
+    {sentence:"The industry ___ (undergo) sweeping changes since digitalisation.", answers:["has undergone"]},
+    {sentence:"The nation ___ (overcome) deeper crises before — this one is not unique.", answers:["has overcome"]},
+    {sentence:"The government ___ (forbid) political gatherings in 1975.", answers:["forbade"]}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"transform",
+  instruction:"Rewrite as indicated, maintaining register.",
+  questions:[
+    {original:"The minister sought a compromise.", transformInstruction:"Present perfect, affirmative.", correct:"The minister has sought a compromise.", accepted:["The minister has sought a compromise."]},
+    {original:"The virus has struck again.", transformInstruction:"Past simple, negative.", correct:"The virus didn't strike again.", accepted:["The virus didn't strike again.","The virus did not strike again."]},
+    {original:"She bore the burden for years.", transformInstruction:"Present perfect, question.", correct:"Has she borne the burden for years?", accepted:["Has she borne the burden for years?"]},
+    {original:"The court has sworn in the judges.", transformInstruction:"Past simple, question.", correct:"Did the court swear in the judges?", accepted:["Did the court swear in the judges?"]},
+    {original:"New movements have arisen.", transformInstruction:"Present perfect, negative.", correct:"No new movements have arisen.", accepted:["No new movements have arisen.","New movements haven't arisen.","New movements have not arisen."]},
+    {original:"The rumour spread quickly.", transformInstruction:"Present perfect, affirmative.", correct:"The rumour has spread quickly.", accepted:["The rumour has spread quickly."]},
+    {original:"Three nations have withdrawn.", transformInstruction:"Past simple, negative.", correct:"Three nations didn't withdraw.", accepted:["Three nations didn't withdraw.","Three nations did not withdraw."]},
+    {original:"He has undergone a transformation.", transformInstruction:"Present perfect, question.", correct:"Has he undergone a transformation?", accepted:["Has he undergone a transformation?"]},
+    {original:"They overcame every setback.", transformInstruction:"Present perfect, affirmative.", correct:"They have overcome every setback.", accepted:["They have overcome every setback."]},
+    {original:"The regime forbade foreign languages.", transformInstruction:"Past simple, question.", correct:"Did the regime forbid foreign languages?", accepted:["Did the regime forbid foreign languages?"]}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"ordre",
+  instruction:"Reorder to form a correct sentence.",
+  questions:[
+    {words:["sought","minister","compromise","the","a","last","week"], correct:"The minister sought a compromise last week."},
+    {words:["has","disease","struck","people","the","over","million","a","since","2020"], correct:"The disease has struck over a million people since 2020."},
+    {words:["bore","she","brunt","criticism","of","the","the"], correct:"She bore the brunt of the criticism."},
+    {words:["have","witnesses","sworn","several","saw","they","nothing"], correct:"Several witnesses have sworn they saw nothing."},
+    {words:["arose","movement","populist","new","a","year","last"], correct:"A new populist movement arose last year."},
+    {words:["has","misinformation","unchecked","spread","throughout","campaign","the"], correct:"Misinformation has spread unchecked throughout the campaign."},
+    {words:["withdrew","country","alliance","from","the","month","last","the"], correct:"The country withdrew from the alliance last month."},
+    {words:["has","industry","undergone","the","sweeping","since","changes","digitalisation"], correct:"The industry has undergone sweeping changes since digitalisation."},
+    {words:["have","overcome","crises","we","before","deeper"], correct:"We have overcome deeper crises before."},
+    {words:["forbade","government","gatherings","political","the","1975","in"], correct:"The government forbade political gatherings in 1975."}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense.",
+  questions:[
+    {sentence:"Globalisation ___ (transform) the world economy over the past four decades.", answers:["has transformed"]},
+    {sentence:"The treaty ___ (come) into force on 1 January 2005.", answers:["came"]},
+    {sentence:"Inequality ___ (widen) sharply in most developed countries since the 1980s.", answers:["has widened"]},
+    {sentence:"The civil war ___ (break) out in 1991 and lasted for years.", answers:["broke"]},
+    {sentence:"Scientists ___ (make) remarkable advances in gene therapy recently.", answers:["have made"]},
+    {sentence:"She ___ (win) the Nobel Prize in 2009 for her work on governance.", answers:["won"]},
+    {sentence:"The organisation ___ (fight) for refugee rights since its foundation.", answers:["has fought"]},
+    {sentence:"The invention of the internet ___ (change) communication forever.", answers:["changed"]},
+    {sentence:"Investment in renewable energy ___ (grow) steadily over the last decade.", answers:["has grown"]},
+    {sentence:"The first free elections ___ (take) place in 1994.", answers:["took"]}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"qcm",
+  instruction:"Select the most appropriate tense for the context.",
+  questions:[
+    {q:"___ you ___ (read) his latest essay? It's extraordinary.", options:["Did / read","Have / read","Has / read","Did / reads"], correct:1},
+    {q:"She ___ (work) on this project for three years before presenting it.", options:["has worked","worked","works","have worked"], correct:1},
+    {q:"The organisation ___ (be) instrumental in shaping modern international law.", options:["was","has been","is","were"], correct:1},
+    {q:"The financial crisis of 2008 ___ (shake) global markets to their core.", options:["has shaken","shook","shakes","shaken"], correct:1},
+    {q:"Human activity ___ (alter) the climate in ways that are now irreversible.", options:["altered","has altered","alters","have altered"], correct:1},
+    {q:"The commission ___ (find) significant irregularities in the accounts last year.", options:["has found","found","finds","finding"], correct:1},
+    {q:"Researchers ___ (identify) over 200 new species in the past decade.", options:["identified","has identified","have identified","identify"], correct:2},
+    {q:"The accord ___ (fail) due to lack of political will when it ___ (be) signed.", options:["has failed / was","failed / was","failed / has been","has failed / has been"], correct:1},
+    {q:"Evidence ___ (emerge) that challenges the official account.", options:["emerged","has emerged","emerges","have emerged"], correct:1},
+    {q:"The artist ___ (refuse) to comment when she ___ (be) approached last year.", options:["refused / was","has refused / was","refused / has been","has refused / has been"], correct:0}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense. Justify your choice with the context.",
+  questions:[
+    {sentence:"The philosopher ___ (challenge) the dominant paradigm throughout his career.", answers:["challenged"]},
+    {sentence:"His ideas ___ (continue) to influence thinkers around the world.", answers:["have continued"]},
+    {sentence:"The committee ___ (not/reach) a decision on the matter so far.", answers:["has not reached"]},
+    {sentence:"The company ___ (go) bankrupt in 2008 after years of mismanagement.", answers:["went"]},
+    {sentence:"Several new vaccines ___ (emerge) in response to the outbreak.", answers:["have emerged"]},
+    {sentence:"She ___ (dedicate) her life to fighting injustice.", answers:["has dedicated"]},
+    {sentence:"The scandal ___ (break) just days before the election.", answers:["broke"]},
+    {sentence:"Pressure from civil society ___ (lead) to significant policy changes.", answers:["has led"]},
+    {sentence:"The author ___ (draw) heavily on personal experience in her debut novel.", answers:["drew"]},
+    {sentence:"Technology ___ (reshape) the labour market beyond recognition.", answers:["has reshaped"]}
+  ]
+},
+{
+  level:"Tle", topic:"both", type:"transform",
+  instruction:"Rewrite each sentence in the tense indicated.",
+  questions:[
+    {original:"Globalisation has transformed the world economy.", transformInstruction:"Past simple, affirmative (add 'in the 20th century').", correct:"Globalisation transformed the world economy in the 20th century.", accepted:["Globalisation transformed the world economy in the 20th century."]},
+    {original:"The treaty came into force in 2005.", transformInstruction:"Present perfect, question.", correct:"Has the treaty come into force?", accepted:["Has the treaty come into force?","Has the treaty come into force in 2005?"]},
+    {original:"Inequality has widened sharply.", transformInstruction:"Negative.", correct:"Inequality hasn't widened sharply.", accepted:["Inequality hasn't widened sharply.","Inequality has not widened sharply."]},
+    {original:"The civil war broke out.", transformInstruction:"Present perfect, question.", correct:"Has a civil war broken out?", accepted:["Has a civil war broken out?","Has the civil war broken out?"]},
+    {original:"Scientists have made remarkable advances.", transformInstruction:"Past simple, affirmative (add 'in the 1950s').", correct:"Scientists made remarkable advances in the 1950s.", accepted:["Scientists made remarkable advances in the 1950s."]},
+    {original:"She won the Nobel Prize.", transformInstruction:"Present perfect, affirmative.", correct:"She has won the Nobel Prize.", accepted:["She has won the Nobel Prize."]},
+    {original:"The organisation has fought for rights.", transformInstruction:"Past simple, question (add 'for many years').", correct:"Did the organisation fight for rights for many years?", accepted:["Did the organisation fight for rights for many years?"]},
+    {original:"Investment has grown steadily.", transformInstruction:"Negative.", correct:"Investment hasn't grown steadily.", accepted:["Investment hasn't grown steadily.","Investment has not grown steadily."]},
+    {original:"Free elections took place in 1994.", transformInstruction:"Present perfect, affirmative.", correct:"Free elections have taken place.", accepted:["Free elections have taken place.","Free elections have taken place since 1994."]},
+    {original:"Human activity has altered the climate.", transformInstruction:"Past simple, negative.", correct:"Human activity didn't alter the climate.", accepted:["Human activity didn't alter the climate.","Human activity did not alter the climate."]}
+  ]
+}
+]
+
+}; // end EXERCISES_DATA
+
+
+// ============================================================
+// IRREGULAR VERBS DATA
+// ============================================================
+const IRREGULAR_VERBS = [
+  {inf:"be",pret:"was/were",pp:"been",fr:"être"},
+  {inf:"become",pret:"became",pp:"become",fr:"devenir"},
+  {inf:"begin",pret:"began",pp:"begun",fr:"commencer"},
+  {inf:"break",pret:"broke",pp:"broken",fr:"casser"},
+  {inf:"bring",pret:"brought",pp:"brought",fr:"apporter"},
+  {inf:"build",pret:"built",pp:"built",fr:"construire"},
+  {inf:"buy",pret:"bought",pp:"bought",fr:"acheter"},
+  {inf:"catch",pret:"caught",pp:"caught",fr:"attraper"},
+  {inf:"choose",pret:"chose",pp:"chosen",fr:"choisir"},
+  {inf:"come",pret:"came",pp:"come",fr:"venir"},
+  {inf:"cut",pret:"cut",pp:"cut",fr:"couper"},
+  {inf:"do",pret:"did",pp:"done",fr:"faire"},
+  {inf:"drink",pret:"drank",pp:"drunk",fr:"boire"},
+  {inf:"drive",pret:"drove",pp:"driven",fr:"conduire"},
+  {inf:"eat",pret:"ate",pp:"eaten",fr:"manger"},
+  {inf:"fall",pret:"fell",pp:"fallen",fr:"tomber"},
+  {inf:"feel",pret:"felt",pp:"felt",fr:"ressentir"},
+  {inf:"find",pret:"found",pp:"found",fr:"trouver"},
+  {inf:"fly",pret:"flew",pp:"flown",fr:"voler"},
+  {inf:"forget",pret:"forgot",pp:"forgotten",fr:"oublier"},
+  {inf:"get",pret:"got",pp:"got/gotten",fr:"obtenir"},
+  {inf:"give",pret:"gave",pp:"given",fr:"donner"},
+  {inf:"go",pret:"went",pp:"gone",fr:"aller"},
+  {inf:"grow",pret:"grew",pp:"grown",fr:"grandir"},
+  {inf:"have",pret:"had",pp:"had",fr:"avoir"},
+  {inf:"hear",pret:"heard",pp:"heard",fr:"entendre"},
+  {inf:"hold",pret:"held",pp:"held",fr:"tenir"},
+  {inf:"keep",pret:"kept",pp:"kept",fr:"garder"},
+  {inf:"know",pret:"knew",pp:"known",fr:"savoir"},
+  {inf:"leave",pret:"left",pp:"left",fr:"partir"},
+  {inf:"let",pret:"let",pp:"let",fr:"laisser"},
+  {inf:"lose",pret:"lost",pp:"lost",fr:"perdre"},
+  {inf:"make",pret:"made",pp:"made",fr:"faire"},
+  {inf:"meet",pret:"met",pp:"met",fr:"rencontrer"},
+  {inf:"put",pret:"put",pp:"put",fr:"mettre"},
+  {inf:"read",pret:"read",pp:"read",fr:"lire"},
+  {inf:"run",pret:"ran",pp:"run",fr:"courir"},
+  {inf:"say",pret:"said",pp:"said",fr:"dire"},
+  {inf:"see",pret:"saw",pp:"seen",fr:"voir"},
+  {inf:"sell",pret:"sold",pp:"sold",fr:"vendre"},
+  {inf:"send",pret:"sent",pp:"sent",fr:"envoyer"},
+  {inf:"show",pret:"showed",pp:"shown",fr:"montrer"},
+  {inf:"sit",pret:"sat",pp:"sat",fr:"s'asseoir"},
+  {inf:"sleep",pret:"slept",pp:"slept",fr:"dormir"},
+  {inf:"speak",pret:"spoke",pp:"spoken",fr:"parler"},
+  {inf:"stand",pret:"stood",pp:"stood",fr:"se lever"},
+  {inf:"take",pret:"took",pp:"taken",fr:"prendre"},
+  {inf:"tell",pret:"told",pp:"told",fr:"raconter"},
+  {inf:"think",pret:"thought",pp:"thought",fr:"penser"},
+  {inf:"write",pret:"wrote",pp:"written",fr:"écrire"}
+];
+const REGULAR_SAMPLE = ["play","work","watch","talk","listen","walk","live","love","study","help","ask","answer","close","open","start","finish","call","visit","clean","cook"];
+const LEVELS = ['CAP','2nde','1ere','Tle'];
+const LEVEL_CSS = {CAP:'cap','2nde':'seconde','1ere':'premiere','Tle':'terminale'};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  currentUser: null,
+  topic: null,
+  exercises: {},   // keyed: "LEVEL_topic" → array
+  sessions: {},
+  passwords: {teacher:'0504', student:'eleve2024'}
+};
+
+function exKey(level, topic){ return level + '_' + topic; }
+
+function loadState(){
+  try {
+    const s = localStorage.getItem('irregularVerbsState2');
+    if(s){
+      const p = JSON.parse(s);
+      const saved = p.exercises || {};
+      // Merge: built-in exercises fill any missing key, teacher additions are preserved
+      state.exercises = {};
+      Object.keys(EXERCISES_DATA).forEach(k => {
+        state.exercises[k] = (saved[k] && saved[k].length > 0) ? saved[k] : EXERCISES_DATA[k];
+      });
+      // Keep any extra teacher-added keys not in EXERCISES_DATA
+      Object.keys(saved).forEach(k => { if(!state.exercises[k]) state.exercises[k]=saved[k]; });
+      // Merge built-in exercises with any teacher-saved ones
+      Object.keys(EXERCISES_DATA).forEach(k => { if(!state.exercises[k] || state.exercises[k].length===0) state.exercises[k]=EXERCISES_DATA[k]; });
+      state.sessions = p.sessions || {};
+      state.passwords = p.passwords || {teacher:'0504',student:'eleve2024'};
+    }
+  } catch(e){}
+  // Seed built-in exercises if state is empty
+  if(!state.exercises || Object.keys(state.exercises).length===0){
+    state.exercises = {};
+    Object.keys(EXERCISES_DATA).forEach(k => { state.exercises[k] = EXERCISES_DATA[k]; });
+  }
+}
+function saveState(){
+  localStorage.setItem('irregularVerbsState2', JSON.stringify({
+    exercises: state.exercises,
+    sessions: state.sessions,
+    passwords: state.passwords
+  }));
+}
+loadState();
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('floatVerbBtn').style.display = (id==='screen-exercises')?'block':'none';
+  window.scrollTo(0,0);
+}
+function goHome(){ state.currentUser=null; showScreen('screen-home'); }
+
+// ============================================================
+// LOGIN
+// ============================================================
+let pendingLoginType=null;
+function openLogin(type){
+  pendingLoginType=type;
+  document.getElementById('loginModalTitle').textContent = type==='teacher'?'🏫 Connexion Professeur':'👤 Accès Élève';
+  document.getElementById('loginModalLabel').textContent = type==='teacher'?'Code professeur':'Code élèves';
+  document.getElementById('loginModalInput').value='';
+  document.getElementById('loginModalError').style.display='none';
+  document.getElementById('loginModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('loginModalInput').focus(),100);
+}
+function closeLoginModal(){ document.getElementById('loginModal').classList.add('hidden'); }
+function submitLogin(){
+  const val = document.getElementById('loginModalInput').value.trim();
+  const err = document.getElementById('loginModalError');
+  if(pendingLoginType==='teacher'){
+    if(val===state.passwords.teacher){ closeLoginModal(); showTeacherPanel(); }
+    else { err.textContent='Code incorrect.'; err.style.display='block'; }
+  } else {
+    if(val===state.passwords.student){ closeLoginModal(); showScreen('screen-student-id'); }
+    else { err.textContent='Code incorrect.'; err.style.display='block'; }
+  }
+}
+
+// ============================================================
+// STUDENT ID
+// ============================================================
+function validateStudentId(){
+  const prenom=(document.getElementById('sidPrenom').value||'').toUpperCase().replace(/[^A-Z]/g,'');
+  const nom=(document.getElementById('sidNom').value||'').toUpperCase().replace(/[^A-Z]/g,'');
+  const id = prenom+'-'+nom;
+  const cls = document.getElementById('studentClassInput').value.trim().toUpperCase();
+  const err = document.getElementById('studentIdError');
+  if(prenom.length!==2||nom.length!==2){ err.textContent='Veuillez saisir exactement 2 lettres dans chaque case.'; err.style.display='block'; return; }
+  if(!cls){ err.textContent='Veuillez entrer votre classe.'; err.style.display='block'; return; }
+  err.style.display='none';
+  state.currentUser = {id, class:cls, level:null};
+  if(!state.sessions[id]) state.sessions[id]={id,class:cls,level:null,history:[],totalCorrect:0,totalWrong:0,lastSeen:new Date().toISOString()};
+  else { state.sessions[id].lastSeen=new Date().toISOString(); state.sessions[id].class=cls; }
+  saveState();
+  document.getElementById('levelBadge').textContent = id+' – '+cls;
+  showScreen('screen-student-level');
+}
+
+// ============================================================
+// LEVEL SELECTION
+// ============================================================
+let selectedLevelEl = null;
+function selectLevel(level, el){
+  if(selectedLevelEl) selectedLevelEl.classList.remove('selected');
+  el.classList.add('selected');
+  selectedLevelEl = el;
+  state.currentUser.level = level;
+  document.getElementById('levelError').style.display='none';
+}
+function confirmLevel(){
+  if(!state.currentUser.level){ document.getElementById('levelError').style.display='block'; return; }
+  state.sessions[state.currentUser.id].level = state.currentUser.level;
+  saveState();
+  showStudentDashboard();
+}
+function changeLevel(){
+  selectedLevelEl=null;
+  document.querySelectorAll('#screen-student-level .level-card').forEach(c=>c.classList.remove('selected'));
+  showScreen('screen-student-level');
+}
+
+// ============================================================
+// STUDENT DASHBOARD
+// ============================================================
+function showStudentDashboard(){
+  const u = state.currentUser;
+  document.getElementById('studentBadge').textContent = u.id+' – '+u.class+' – '+u.level;
+  document.getElementById('scoreLevelBadge').textContent = u.level;
+  const topics = ['preterit','present_perfect','both'];
+  const ids = ['countPret','countPP','countBoth'];
+  topics.forEach((t,i)=>{
+    const k = exKey(u.level,t);
+    document.getElementById(ids[i]).textContent = (state.exercises[k]||[]).length+' exercice(s)';
+  });
+  updateScoreBar();
+  showScreen('screen-student');
+}
+
+function updateScoreBar(){
+  if(!state.currentUser) return;
+  const sess = state.sessions[state.currentUser.id];
+  if(!sess) return;
+  const c=sess.totalCorrect||0, w=sess.totalWrong||0, t=c+w;
+  document.getElementById('scoreTotal').textContent=t;
+  document.getElementById('scoreCorrect').textContent=c;
+  document.getElementById('scoreWrong').textContent=w;
+  document.getElementById('scorePercent').textContent=t>0?Math.round(c/t*100)+'%':'0%';
+}
+
+// ============================================================
+// EXERCISES
+// ============================================================
+function selectTopic(topic){
+  state.topic=topic;
+  const labels={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prétérit / Present Perfect'};
+  document.getElementById('exScreenTitle').textContent='📝 '+labels[topic];
+  renderExercises(topic);
+  showScreen('screen-exercises');
+}
+
+let exAnswers={};
+function renderExercises(topic){
+  const container = document.getElementById('exercisesContainer');
+  const k = exKey(state.currentUser.level, topic);
+  const exList = state.exercises[k]||[];
+  exAnswers={};
+  if(!exList.length){
+    container.innerHTML=`<div class="card"><p style="color:#888;text-align:center;padding:30px">Aucun exercice disponible pour ce thème / niveau.<br>Le professeur n'en a pas encore ajouté.</p></div>`;
+    return;
+  }
+  container.innerHTML = exList.map((ex,i)=>renderExercise(ex,i)).join('');
+}
+
+function renderExercise(ex,i){
+  const bCls={qcm:'qcm',trous:'trous',ordre:'ordre',transform:'transform'}[ex.type]||'qcm';
+  const tCls={preterit:'preterit',present_perfect:'pp',both:'both'}[ex.topic]||'preterit';
+  const tLbl={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prét./PP'}[ex.topic];
+  const tyLbl={qcm:'QCM',trous:'Phrases à trous',ordre:'Remettre en ordre',transform:'Transformation'}[ex.type];
+  const lvCss = LEVEL_CSS[ex.level]||'cap';
+  // Support both single-question (old format) and multi-question (questions[]) format
+  let body='';
+  if(ex.questions && ex.questions.length){
+    body = renderMultiQuestion(ex,i);
+  } else {
+    if(ex.type==='qcm') body=renderQCM(ex,i);
+    else if(ex.type==='trous') body=renderTrous(ex,i);
+    else if(ex.type==='ordre') body=renderOrdre(ex,i);
+    else if(ex.type==='transform') body=renderTransform(ex,i);
+  }
+  return `<div class="exercise-card" id="excard-${i}">
+    <div class="ex-header">
+      <strong>Exercice ${i+1}</strong>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="ex-badge lv-${lvCss}">${ex.level||''}</span>
+        <span class="ex-badge ${tCls}">${tLbl}</span>
+        <span class="ex-badge ${bCls}">${tyLbl}</span>
+      </div>
+    </div>
+    <p style="margin-bottom:14px;font-size:1rem;font-weight:600;color:#1a3a5c">${ex.instruction||''}</p>
+    ${body}
+    <div class="feedback-box" id="fb-${i}" style="display:none"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="checkAnswer(${i})">Vérifier ✓</button>
+      <button class="btn btn-outline btn-sm" onclick="resetExercise(${i})">↺ Recommencer</button>
+      <span id="score-${i}" style="font-size:0.85rem;font-weight:700;color:#1a3a5c"></span>
+    </div>
+  </div>`;
+}
+
+function renderMultiQuestion(ex,i){
+  return ex.questions.map((q,qi)=>renderQuestion(ex,i,q,qi)).join('<hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">');
+}
+
+function renderQuestion(ex,i,q,qi){
+  if(ex.type==='qcm'){
+    return `<div class="q-block" id="qblock-${i}-${qi}" style="margin-bottom:4px">
+      <p style="margin-bottom:10px;font-size:0.95rem"><strong>${qi+1}.</strong> ${q.q}</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${q.options.map((o,oi)=>`<div class="qcm-option" id="qcm-${i}-${qi}-${oi}" onclick="selectQCMq(${i},${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+  if(ex.type==='trous'){
+    let idx=0;
+    const html = q.sentence.replace(/___/g,()=>`<span class="fill-blank"><input type="text" id="trou-${i}-${qi}-${idx++}" placeholder="..." style="width:130px"></span>`);
+    return `<div class="q-block" id="qblock-${i}-${qi}" style="margin-bottom:4px">
+      <p style="font-size:0.95rem;line-height:2.2"><strong>${qi+1}.</strong> ${html}</p>
+    </div>`;
+  }
+  if(ex.type==='ordre'){
+    const words=[...q.words].sort(()=>Math.random()-0.5);
+    return `<div class="q-block" id="qblock-${i}-${qi}" style="margin-bottom:8px">
+      <p style="font-size:0.88rem;color:#666;margin-bottom:6px"><strong>${qi+1}.</strong> Remettez dans l'ordre :</p>
+      <div class="word-order" id="bank-${i}-${qi}">${words.map((w,wi)=>`<span class="word-chip" id="chip-${i}-${qi}-${wi}" onclick="addToZoneQ(${i},${qi},${wi},'${w.replace(/'/g,"\'")}',this)">${w}</span>`).join('')}</div>
+      <div class="drop-zone" id="zone-${i}-${qi}"></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="clearZoneQ(${i},${qi})">↺</button>
+    </div>`;
+  }
+  if(ex.type==='transform'){
+    return `<div class="q-block" id="qblock-${i}-${qi}" style="margin-bottom:8px">
+      <p style="font-size:0.95rem;margin-bottom:6px"><strong>${qi+1}.</strong> <em>${q.transformInstruction}</em></p>
+      <div style="background:#f4f8ff;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-size:0.92rem">${q.original}</div>
+      <input type="text" id="transform-${i}-${qi}" placeholder="Votre réponse...">
+    </div>`;
+  }
+  return '';
+}
+
+function renderQCM(ex,i){
+  return `<div class="qcm-options">${ex.options.map((o,j)=>`<div class="qcm-option" id="qcm-${i}-${j}" onclick="selectQCM(${i},${j})">${o}</div>`).join('')}</div>`;
+}
+function renderTrous(ex,i){
+  let idx=0;
+  const html=ex.sentence.replace(/___/g,()=>`<span class="fill-blank"><input type="text" id="trou-${i}-${idx++}" placeholder="..."></span>`);
+  return `<p style="font-size:1.05rem;line-height:2.2">${html}</p>`;
+}
+function renderOrdre(ex,i){
+  const words=[...ex.words].sort(()=>Math.random()-0.5);
+  return `<p style="color:#666;font-size:0.85rem;margin-bottom:8px">Cliquez sur les mots dans le bon ordre :</p>
+  <div class="word-order" id="bank-${i}">${words.map((w,j)=>`<span class="word-chip" id="chip-${i}-${j}" onclick="addToZone(${i},${j},'${w.replace(/'/g,"\\'")}',this)">${w}</span>`).join('')}</div>
+  <div class="drop-zone" id="zone-${i}"></div>
+  <button class="btn btn-outline btn-sm" onclick="clearZone(${i})">↺ Réinitialiser</button>`;
+}
+function renderTransform(ex,i){
+  return `<div style="background:#f4f8ff;border-radius:8px;padding:14px;margin-bottom:12px">
+    <p style="font-size:0.85rem;color:#666;margin-bottom:4px">Phrase originale :</p>
+    <p style="font-weight:600">${ex.original}</p>
+    <p style="font-size:0.85rem;color:#666;margin-top:8px">Consigne : ${ex.transformInstruction}</p>
+  </div>
+  <input type="text" id="transform-${i}" placeholder="Votre réponse...">`;
+}
+
+function selectQCM(ei,oi){
+  document.querySelectorAll(`[id^="qcm-${ei}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`qcm-${ei}-${oi}`).classList.add('selected');
+  exAnswers[`qcm_${ei}`]=oi;
+}
+function selectQCMq(ei,qi,oi){
+  document.querySelectorAll(`[id^="qcm-${ei}-${qi}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`qcm-${ei}-${qi}-${oi}`).classList.add('selected');
+  if(!exAnswers[`mqcm_${ei}`]) exAnswers[`mqcm_${ei}`]={};
+  exAnswers[`mqcm_${ei}`][qi]=oi;
+}
+let orderZones={};
+function addToZoneQ(ei,qi,wi,word,el){
+  if(!orderZones[`${ei}_${qi}`]) orderZones[`${ei}_${qi}`]=[];
+  orderZones[`${ei}_${qi}`].push({word,wi});
+  el.classList.add('used');
+  const zone=document.getElementById(`zone-${ei}-${qi}`);
+  const s=document.createElement('span');
+  s.className='word-chip remove-chip'; s.textContent=word; s.dataset.wi=wi;
+  s.onclick=function(){ removeFromZoneQ(ei,qi,wi,this); };
+  zone.appendChild(s);
+}
+function removeFromZoneQ(ei,qi,wi,el){
+  const k=`${ei}_${qi}`;
+  orderZones[k]=(orderZones[k]||[]).filter(x=>x.wi!==wi); el.remove();
+  const orig=document.getElementById(`chip-${ei}-${qi}-${wi}`); if(orig) orig.classList.remove('used');
+}
+function clearZoneQ(ei,qi){
+  const k=`${ei}_${qi}`;
+  orderZones[k]=[];
+  document.getElementById(`zone-${ei}-${qi}`).innerHTML='';
+  document.querySelectorAll(`[id^="chip-${ei}-${qi}-"]`).forEach(el=>el.classList.remove('used'));
+}
+function addToZone(ei,ci,word,el){
+  if(!orderZones[ei]) orderZones[ei]=[];
+  orderZones[ei].push({word,ci});
+  el.classList.add('used');
+  const zone=document.getElementById(`zone-${ei}`);
+  const s=document.createElement('span');
+  s.className='word-chip remove-chip'; s.textContent=word; s.dataset.ci=ci;
+  s.onclick=function(){ removeFromZone(ei,ci,this); };
+  zone.appendChild(s);
+}
+function removeFromZone(ei,ci,el){
+  orderZones[ei]=(orderZones[ei]||[]).filter(x=>x.ci!==ci); el.remove();
+  const orig=document.getElementById(`chip-${ei}-${ci}`); if(orig) orig.classList.remove('used');
+}
+function clearZone(ei){
+  orderZones[ei]=[];
+  document.getElementById(`zone-${ei}`).innerHTML='';
+  document.querySelectorAll(`[id^="chip-${ei}-"]`).forEach(el=>el.classList.remove('used'));
+}
+
+// ============================================================
+// CHECK ANSWERS
+// ============================================================
+function checkAnswer(i){
+  const k=exKey(state.currentUser.level,state.topic);
+  const ex=(state.exercises[k]||[])[i]; if(!ex) return;
+  
+  // Multi-question format
+  if(ex.questions && ex.questions.length){
+    checkMultiAnswer(i,ex,k); return;
+  }
+  
+  let correct=false, feedback='';
+  if(ex.type==='qcm'){
+    const sel=exAnswers[`qcm_${i}`];
+    if(sel===undefined){ showFeedback(i,false,'Veuillez sélectionner une réponse.'); return; }
+    correct=(sel===ex.correctIndex);
+    document.querySelectorAll(`[id^="qcm-${i}-"]`).forEach((el,j)=>{
+      el.classList.remove('selected','correct','wrong');
+      if(j===ex.correctIndex) el.classList.add('correct');
+      else if(j===sel&&!correct) el.classList.add('wrong');
+    });
+    feedback=correct?`✅ Correct ! Réponse : <strong>${ex.options[ex.correctIndex]}</strong>`:`❌ Incorrect. La bonne réponse : <strong>${ex.options[ex.correctIndex]}</strong>`;
+  } else if(ex.type==='trous'){
+    const ans=ex.answers||[]; let allOk=true;
+    ans.forEach((a,j)=>{
+      const inp=document.getElementById(`trou-${i}-${j}`); if(!inp) return;
+      const ok=inp.value.trim().toLowerCase()===a.toLowerCase();
+      inp.classList.toggle('correct',ok); inp.classList.toggle('wrong',!ok);
+      if(!ok) allOk=false;
+    });
+    correct=allOk;
+    feedback=correct?`✅ Toutes les réponses sont correctes !`:`❌ Vérifiez les cases en rouge. Réponse(s) : <strong>${ans.join(', ')}</strong>`;
+  } else if(ex.type==='ordre'){
+    const zone=orderZones[i]||[];
+    const userS=zone.map(x=>x.word).join(' ');
+    correct=userS.toLowerCase()===ex.correct.toLowerCase();
+    feedback=correct?`✅ Correct !`:`❌ La bonne phrase : <strong>${ex.correct}</strong>`;
+  } else if(ex.type==='transform'){
+    const inp=document.getElementById(`transform-${i}`);
+    const val=inp?inp.value.trim():'';
+    const accepted=ex.accepted||[ex.correct];
+    correct=accepted.some(a=>val.toLowerCase()===a.toLowerCase());
+    feedback=correct?`✅ Correct !`:`❌ Une réponse possible : <strong>${ex.correct}</strong>`;
+  }
+  showFeedback(i,correct,feedback);
+  recordAnswer(ex,correct);
+}
+
+function checkMultiAnswer(i,ex,k){
+  let correct=0, total=ex.questions.length;
+  ex.questions.forEach((q,qi)=>{
+    let ok=false;
+    if(ex.type==='qcm'){
+      const sel=(exAnswers[`mqcm_${i}`]||{})[qi];
+      if(sel===undefined){ /* unanswered */ }
+      else ok=(sel===q.correct);
+      document.querySelectorAll(`[id^="qcm-${i}-${qi}-"]`).forEach((el,oi)=>{
+        el.classList.remove('selected','correct','wrong');
+        if(oi===q.correct) el.classList.add('correct');
+        else if(oi===sel&&!ok) el.classList.add('wrong');
+      });
+    } else if(ex.type==='trous'){
+      const ans=q.answers||[]; let allOk=true;
+      ans.forEach((a,ai)=>{
+        const inp=document.getElementById(`trou-${i}-${qi}-${ai}`); if(!inp) return;
+        const v=inp.value.trim().toLowerCase();
+        const aoк=v===a.toLowerCase();
+        inp.classList.toggle('correct',aoк); inp.classList.toggle('wrong',!aoк);
+        if(!aoк) allOk=false;
+      });
+      ok=allOk;
+    } else if(ex.type==='ordre'){
+      const zone=orderZones[`${i}_${qi}`]||[];
+      ok=zone.map(x=>x.word).join(' ').toLowerCase()===q.correct.toLowerCase();
+      const zoneEl=document.getElementById(`zone-${i}-${qi}`);
+      if(zoneEl) zoneEl.style.border=ok?'2px solid #27ae60':'2px solid #e74c3c';
+    } else if(ex.type==='transform'){
+      const inp=document.getElementById(`transform-${i}-${qi}`);
+      const val=inp?inp.value.trim():'';
+      const accepted=q.accepted||[q.correct];
+      ok=accepted.some(a=>val.toLowerCase()===a.toLowerCase());
+      if(inp){ inp.style.borderColor=ok?'#27ae60':'#e74c3c'; inp.style.background=ok?'#d5f5e3':'#fadbd8'; }
+    }
+    if(ok) correct++;
+    // Show per-question feedback
+    const qblock=document.getElementById(`qblock-${i}-${qi}`);
+    if(qblock){
+      let hint='';
+      if(!ok){
+        if(ex.type==='qcm') hint=`<small style="color:#e74c3c;display:block;margin-top:4px">✗ Correct: ${q.options[q.correct]}</small>`;
+        else if(ex.type==='trous') hint=`<small style="color:#e74c3c;display:block;margin-top:4px">✗ Answer: ${(q.answers||[]).join(', ')}</small>`;
+        else if(ex.type==='ordre') hint=`<small style="color:#e74c3c;display:block;margin-top:4px">✗ ${q.correct}</small>`;
+        else if(ex.type==='transform') hint=`<small style="color:#e74c3c;display:block;margin-top:4px">✗ ${q.correct}</small>`;
+      } else {
+        hint=`<small style="color:#27ae60;display:block;margin-top:4px">✓ Correct</small>`;
+      }
+      const existing=qblock.querySelector('.q-hint'); if(existing) existing.remove();
+      const d=document.createElement('div'); d.className='q-hint'; d.innerHTML=hint;
+      qblock.appendChild(d);
+    }
+  });
+  const pct=Math.round(correct/total*100);
+  const color=pct>=80?'#27ae60':pct>=50?'#e67e22':'#e74c3c';
+  const fb=document.getElementById(`fb-${i}`);
+  fb.className='feedback-box '+(pct>=50?'ok':'ko');
+  fb.innerHTML=`Score : <strong>${correct}/${total}</strong> (${pct}%) — ${pct>=80?'Excellent !':pct>=50?'Bien, continuez !':'À revoir.'}`;
+  fb.style.display='block';
+  document.getElementById(`score-${i}`).textContent=`${correct}/${total}`;
+  // Record each question
+  const sess=state.sessions[state.currentUser.id];
+  if(sess){
+    ex.questions.forEach((q,qi)=>{
+      let ok=false;
+      if(ex.type==='qcm') ok=((exAnswers[`mqcm_${i}`]||{})[qi]===q.correct);
+      else if(ex.type==='trous') ok=(q.answers||[]).every((_,ai)=>{ const inp=document.getElementById(`trou-${i}-${qi}-${ai}`); return inp&&inp.value.trim().toLowerCase()===(q.answers[ai]||'').toLowerCase(); });
+      else if(ex.type==='ordre') ok=(orderZones[`${i}_${qi}`]||[]).map(x=>x.word).join(' ').toLowerCase()===q.correct.toLowerCase();
+      else if(ex.type==='transform'){ const inp=document.getElementById(`transform-${i}-${qi}`); const accepted=q.accepted||[q.correct]; ok=inp&&accepted.some(a=>inp.value.trim().toLowerCase()===a.toLowerCase()); }
+      sess.history.push({type:ex.type,topic:ex.topic,level:ex.level,correct:ok,timestamp:new Date().toISOString()});
+      if(ok) sess.totalCorrect=(sess.totalCorrect||0)+1;
+      else sess.totalWrong=(sess.totalWrong||0)+1;
+    });
+    saveState(); updateScoreBar();
+  }
+}
+
+function resetExercise(i){
+  // Remove all q-hints
+  document.querySelectorAll(`#excard-${i} .q-hint`).forEach(el=>el.remove());
+  // Reset QCM selections
+  document.querySelectorAll(`[id^="qcm-${i}-"]`).forEach(el=>el.classList.remove('selected','correct','wrong'));
+  // Reset fill inputs
+  document.querySelectorAll(`[id^="trou-${i}-"]`).forEach(inp=>{ inp.value=''; inp.classList.remove('correct','wrong'); inp.style.borderColor=''; inp.style.background=''; });
+  // Reset transform inputs
+  document.querySelectorAll(`[id^="transform-${i}-"]`).forEach(inp=>{ inp.value=''; inp.style.borderColor=''; inp.style.background=''; });
+  // Reset drop zones
+  const k=exKey(state.currentUser.level,state.topic);
+  const ex=(state.exercises[k]||[])[i];
+  if(ex && ex.questions){
+    ex.questions.forEach((_,qi)=>{ 
+      const z=document.getElementById(`zone-${i}-${qi}`); if(z){ z.innerHTML=''; z.style.border=''; }
+      clearZoneQ(i,qi);
+    });
+  } else {
+    clearZone(i);
+  }
+  // Clear answers state
+  delete exAnswers[`qcm_${i}`]; delete exAnswers[`mqcm_${i}`];
+  orderZones[i]=[];
+  // Hide feedback
+  const fb=document.getElementById(`fb-${i}`); if(fb) fb.style.display='none';
+  const sc=document.getElementById(`score-${i}`); if(sc) sc.textContent='';
+}
+function showFeedback(i,ok,msg){
+  const fb=document.getElementById(`fb-${i}`);
+  fb.className=`feedback-box ${ok?'ok':'ko'}`; fb.innerHTML=msg; fb.style.display='block';
+}
+function recordAnswer(ex,correct){
+  if(!state.currentUser) return;
+  const sess=state.sessions[state.currentUser.id]; if(!sess) return;
+  sess.history.push({type:ex.type,topic:ex.topic,level:ex.level,correct,timestamp:new Date().toISOString()});
+  if(correct) sess.totalCorrect=(sess.totalCorrect||0)+1;
+  else sess.totalWrong=(sess.totalWrong||0)+1;
+  saveState(); updateScoreBar();
+}
+
+// ============================================================
+// VERB SEARCH (EN + FR)
+// ============================================================
+function searchVerbs(q){
+  if(!q) return {results:IRREGULAR_VERBS, lang:null};
+  const ql=q.toLowerCase().trim();
+  // Try English first (inf, pret, pp)
+  const enMatches=IRREGULAR_VERBS.filter(v=>v.inf.includes(ql)||v.pret.includes(ql)||v.pp.includes(ql));
+  if(enMatches.length) return {results:enMatches, lang:'en'};
+  // Then French
+  const frMatches=IRREGULAR_VERBS.filter(v=>v.fr.toLowerCase().includes(ql));
+  if(frMatches.length) return {results:frMatches, lang:'fr'};
+  // Try partial match on both
+  const all=IRREGULAR_VERBS.filter(v=>v.inf.includes(ql)||v.pret.includes(ql)||v.pp.includes(ql)||v.fr.toLowerCase().includes(ql));
+  return {results:all, lang:all.length?'both':null};
+}
+
+function renderVerbTable(bodyId, data, lang){
+  const tbody=document.getElementById(bodyId); if(!tbody) return;
+  tbody.innerHTML=data.map(v=>{
+    const enHL=(lang==='en'||lang==='both')?' match-en':'';
+    const frHL=(lang==='fr'||lang==='both')?' match-fr':'';
+    return `<tr class="${enHL||frHL}">
+      <td><strong>${v.inf}</strong></td><td>${v.pret}</td><td>${v.pp}</td><td><em>${v.fr}</em></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterVerbs(){
+  const q=document.getElementById('verbSearch').value;
+  const {results,lang}=searchVerbs(q);
+  renderVerbTable('verbTableBody',results,lang);
+  const info=document.getElementById('verbSearchInfo');
+  if(!q){ info.textContent=''; return; }
+  if(!results.length){ info.innerHTML='<span style="color:#e74c3c">Aucun résultat trouvé.</span>'; return; }
+  if(lang==='en') info.innerHTML=`<span class="search-lang-badge badge-en">🇬🇧 Recherche anglais</span> — ${results.length} résultat(s)`;
+  else if(lang==='fr') info.innerHTML=`<span class="search-lang-badge badge-fr">🇫🇷 Recherche français</span> — ${results.length} résultat(s)`;
+  else info.innerHTML=`${results.length} résultat(s) trouvé(s)`;
+}
+
+function filterModalVerbs(){
+  const q=document.getElementById('modalVerbSearch').value;
+  const {results,lang}=searchVerbs(q);
+  renderVerbTable('modalVerbBody',results,lang);
+  const info=document.getElementById('modalSearchInfo');
+  if(!q){ info.textContent=''; return; }
+  if(!results.length){ info.innerHTML='<span style="color:#e74c3c">Aucun résultat.</span>'; return; }
+  if(lang==='en') info.innerHTML=`<span class="search-lang-badge badge-en">🇬🇧 Anglais</span> — ${results.length} résultat(s)`;
+  else if(lang==='fr') info.innerHTML=`<span class="search-lang-badge badge-fr">🇫🇷 Français</span> — ${results.length} résultat(s)`;
+  else info.innerHTML=`${results.length} résultat(s)`;
+}
+
+function filterTeacherVerbs(){
+  const q=document.getElementById('teacherVerbSearch').value;
+  const {results,lang}=searchVerbs(q);
+  renderVerbTable('teacherVerbTable',results,lang);
+}
+
+function showVerbModal(){
+  renderVerbTable('modalVerbBody',IRREGULAR_VERBS,null);
+  document.getElementById('modalSearchInfo').textContent='';
+  document.getElementById('modalVerbSearch').value='';
+  document.getElementById('verbModal').classList.remove('hidden');
+}
+function closeVerbModal(){ document.getElementById('verbModal').classList.add('hidden'); }
+
+// ============================================================
+// VERB CHECKER (EN + FR)
+// ============================================================
+function checkVerb(){
+  const val=document.getElementById('checkerInput').value.trim().toLowerCase();
+  const result=document.getElementById('checkerResult');
+  if(!val){ result.innerHTML=''; return; }
+  const irr=IRREGULAR_VERBS.find(v=>v.inf===val||v.pret===val||v.pp===val||v.fr.toLowerCase()===val);
+  if(irr){
+    result.innerHTML=`<div class="checker-result irregular">⚡ Verbe <strong>IRRÉGULIER</strong><br>
+      <strong>${irr.inf}</strong> → prétérit : <strong>${irr.pret}</strong> → participe passé : <strong>${irr.pp}</strong> — <em>${irr.fr}</em></div>`;
+  } else if(REGULAR_SAMPLE.includes(val)){
+    result.innerHTML=`<div class="checker-result regular">✅ <strong>${val}</strong> est un verbe <strong>RÉGULIER</strong> : ${val} → ${val.endsWith('e')?val+'d':val+'ed'}</div>`;
+  } else {
+    result.innerHTML=`<div class="checker-result not-found">❓ <strong>${val}</strong> n'est pas dans la liste des verbes irréguliers courants. Probablement <strong>régulier</strong> (ajouter <em>-ed</em>).</div>`;
+  }
+}
+
+// ============================================================
+// TEACHER
+// ============================================================
+function showTeacherPanel(){
+  renderTeacherStats();
+  renderExByLevelTheme();
+  renderVerbTable('teacherVerbTable',IRREGULAR_VERBS,null);
+  showScreen('screen-teacher');
+}
+function switchTeacherTab(tab){
+  ['dashboard','verbs'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display=(t===tab)?'block':'none';
+  });
+  document.querySelectorAll('button.nav-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['dashboard','verbs'][i]===tab);
+  });
+}
+function renderTeacherStats(){
+  const allEx=Object.values(state.exercises).flat();
+  const total=allEx.length;
+  const byLevel={};
+  LEVELS.forEach(l=>{ byLevel[l]=Object.keys(state.exercises).filter(k=>k.startsWith(l+'_')).reduce((a,k)=>a+(state.exercises[k]||[]).length,0); });
+  document.getElementById('teacherStats').innerHTML=`
+    <div class="teacher-stat"><div class="stat-val">${total}</div><div class="stat-lbl">Exercices total</div></div>
+    ${LEVELS.map(l=>`<div class="teacher-stat"><div class="stat-val">${byLevel[l]||0}</div><div class="stat-lbl">${l}</div></div>`).join('')}`;
+}
+function renderExByLevelTheme(){
+  const container=document.getElementById('exByLevelTheme');
+  const topics=['preterit','present_perfect','both'];
+  const tLabels={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prét./PP'};
+  let html='';
+  LEVELS.forEach(level=>{
+    const lvCss=LEVEL_CSS[level];
+    const rows=topics.map(t=>{
+      const k=exKey(level,t);
+      const exs=state.exercises[k]||[];
+      if(!exs.length) return '';
+      return exs.map((ex,i)=>`<div class="ex-list-item">
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="ex-badge ${tLabels[t]==='Prétérit'?'preterit':tLabels[t]==='Present Perfect'?'pp':'both'}">${tLabels[t]}</span>
+          <span class="ex-badge ${ex.type}">${{qcm:'QCM',trous:'Trous',ordre:'Ordre',transform:'Transform.'}[ex.type]}</span>
+        </div>
+        <div class="ex-list-desc">${ex.instruction||'(sans consigne)'}</div>
+        <button class="btn btn-danger btn-sm" onclick="deleteExercise('${k}',${i})">🗑️</button>
+      </div>`).join('');
+    }).filter(Boolean).join('');
+    if(!rows) return;
+    html+=`<div style="margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span class="ex-badge lv-${lvCss}" style="font-size:0.95rem;padding:6px 16px">${level}</span>
+        <span style="color:#888;font-size:0.85rem">${Object.keys(state.exercises).filter(k=>k.startsWith(level+'_')).reduce((a,k)=>a+(state.exercises[k]||[]).length,0)} exercice(s)</span>
+      </div>
+      <div style="border:1px solid #e0e7ef;border-radius:10px;overflow:hidden">${rows}</div>
+    </div>`;
+  });
+  container.innerHTML=html||'<p style="color:#888;padding:20px">Aucun exercice créé pour l\'instant.</p>';
+}
+function deleteExercise(key,idx){
+  if(!confirm('Supprimer cet exercice ?')) return;
+  state.exercises[key].splice(idx,1);
+  saveState(); renderTeacherStats(); renderExByLevelTheme();
+}
+
+// ============================================================
+// PASSWORDS
+// ============================================================
+function openPwdModal(){ document.getElementById('pwdNew').value=''; document.getElementById('pwdConfirm').value=''; document.getElementById('pwdError').style.display='none'; document.getElementById('pwdSuccess').style.display='none'; document.getElementById('pwdModal').classList.remove('hidden'); }
+function closePwdModal(){ document.getElementById('pwdModal').classList.add('hidden'); }
+function submitPwd(){
+  const type=document.getElementById('pwdType').value;
+  const nw=document.getElementById('pwdNew').value.trim();
+  const cf=document.getElementById('pwdConfirm').value.trim();
+  const err=document.getElementById('pwdError');
+  if(!nw){ err.textContent='Saisissez un nouveau code.'; err.style.display='block'; return; }
+  if(nw!==cf){ err.textContent='Les codes ne correspondent pas.'; err.style.display='block'; return; }
+  err.style.display='none'; state.passwords[type]=nw; saveState();
+  document.getElementById('pwdSuccess').style.display='block';
+  setTimeout(closePwdModal,1500);
+}
+
+// ============================================================
+// INJECT EXERCISES (multi-items)
+// ============================================================
+let injectData={level:null,topic:null,type:null,items:[]};
+let itemCount=0;
+
+function selectInjectLevel(level,el){
+  document.querySelectorAll('#inject-step1 .level-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); injectData.level=level;
+  setTimeout(()=>goInjectStep(2),300);
+}
+function selectInjectTopic(topic,el){
+  document.querySelectorAll('#inject-step2 .type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); injectData.topic=topic;
+  setTimeout(()=>goInjectStep(3),300);
+}
+function selectInjectType(type,el){
+  document.querySelectorAll('#inject-step3 .type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); injectData.type=type;
+  setTimeout(()=>{ buildInjectStep4(); goInjectStep(4); },300);
+}
+function goInjectStep(n){
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById(`inject-step${i}`).style.display=i===n?'block':'none';
+    document.getElementById(`istep${i}`).className='inject-step'+(i<n?' done':i===n?' active':'');
+  });
+}
+function backInjectStep(n){ goInjectStep(n); }
+
+function buildInjectStep4(){
+  itemCount=0; injectData.items=[];
+  const tLbl={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prét./PP'}[injectData.topic];
+  const tyLbl={qcm:'QCM',trous:'Phrases à trous',ordre:'Remettre en ordre',transform:'Transformation'}[injectData.type];
+  document.getElementById('inject-context-banner').innerHTML=`Niveau : <strong>${injectData.level}</strong> &nbsp;|&nbsp; Thème : <strong>${tLbl}</strong> &nbsp;|&nbsp; Type : <strong>${tyLbl}</strong>`;
+  document.getElementById('inject-items-container').innerHTML='';
+  addInjectItem();
+}
+
+function addInjectItem(){
+  const idx=itemCount++;
+  const container=document.getElementById('inject-items-container');
+  const div=document.createElement('div');
+  div.className='item-block'; div.id=`item-block-${idx}`;
+  div.innerHTML=`<div class="item-block-header">
+    <span>Exercice ${idx+1}</span>
+    ${idx>0?`<button class="btn-remove-item" onclick="removeInjectItem(${idx})" title="Supprimer">✕</button>`:''}
+  </div>
+  ${buildItemForm(idx)}`;
+  container.appendChild(div);
+}
+
+function removeInjectItem(idx){
+  const el=document.getElementById(`item-block-${idx}`); if(el) el.remove();
+}
+
+function buildItemForm(idx){
+  const type=injectData.type;
+  if(type==='qcm') return `
+    <div class="form-group"><label>Consigne</label><input type="text" id="i${idx}-instruction" placeholder="ex : Choisissez la bonne forme du verbe go"></div>
+    <div class="form-group"><label>Option A</label><input type="text" id="i${idx}-opt0" placeholder="Option A"></div>
+    <div class="form-group"><label>Option B</label><input type="text" id="i${idx}-opt1" placeholder="Option B"></div>
+    <div class="form-group"><label>Option C</label><input type="text" id="i${idx}-opt2" placeholder="Option C"></div>
+    <div class="form-group"><label>Option D (facultatif)</label><input type="text" id="i${idx}-opt3" placeholder="Option D"></div>
+    <div class="form-group"><label>Bonne réponse</label>
+      <select id="i${idx}-correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+    </div>`;
+  if(type==='trous') return `
+    <div class="form-group"><label>Consigne</label><input type="text" id="i${idx}-instruction" placeholder="Complétez avec le bon temps"></div>
+    <div class="form-group"><label>Phrase (utilisez ___ pour les trous)</label><input type="text" id="i${idx}-sentence" placeholder="ex : She ___ (go) to school yesterday."></div>
+    <div class="form-group"><label>Réponse(s) correcte(s) séparées par des virgules</label><input type="text" id="i${idx}-answers" placeholder="ex : went"></div>`;
+  if(type==='ordre') return `
+    <div class="form-group"><label>Consigne</label><input type="text" id="i${idx}-instruction" placeholder="Remettez les mots dans le bon ordre"></div>
+    <div class="form-group"><label>Mots à ordonner (séparés par des espaces)</label><input type="text" id="i${idx}-words" placeholder="ex : yesterday went she school to"></div>
+    <div class="form-group"><label>Phrase correcte</label><input type="text" id="i${idx}-correct-sent" placeholder="ex : She went to school yesterday."></div>`;
+  if(type==='transform') return `
+    <div class="form-group"><label>Consigne</label><input type="text" id="i${idx}-instruction" placeholder="ex : Transformez à la forme négative"></div>
+    <div class="form-group"><label>Consigne de transformation</label><input type="text" id="i${idx}-trans-inst" placeholder="ex : Mettez la phrase à la forme négative du prétérit"></div>
+    <div class="form-group"><label>Phrase originale</label><input type="text" id="i${idx}-original" placeholder="ex : She went to school yesterday."></div>
+    <div class="form-group"><label>Réponse correcte principale</label><input type="text" id="i${idx}-correct-t" placeholder="ex : She didn't go to school yesterday."></div>
+    <div class="form-group"><label>Réponses acceptées (séparées par | )</label><input type="text" id="i${idx}-accepted" placeholder="ex : She didn't go...|She did not go..."></div>`;
+  return '';
+}
+
+function previewExercises(){
+  const g=(id)=>{ const el=document.getElementById(id); return el?el.value.trim():''; };
+  const blocks=document.querySelectorAll('.item-block');
+  const exercises=[];
+  for(const block of blocks){
+    const idx=parseInt(block.id.replace('item-block-',''));
+    let ex={type:injectData.type,topic:injectData.topic,level:injectData.level};
+    if(injectData.type==='qcm'){
+      ex.instruction=g(`i${idx}-instruction`);
+      const opts=[g(`i${idx}-opt0`),g(`i${idx}-opt1`),g(`i${idx}-opt2`),g(`i${idx}-opt3`)].filter(Boolean);
+      ex.options=opts; ex.correctIndex=parseInt(g(`i${idx}-correct`))||0;
+      if(!ex.instruction||opts.length<2){ alert(`Exercice ${idx+1} : consigne et au moins 2 options requis.`); return; }
+    } else if(injectData.type==='trous'){
+      ex.instruction=g(`i${idx}-instruction`);
+      ex.sentence=g(`i${idx}-sentence`);
+      ex.answers=g(`i${idx}-answers`).split(',').map(a=>a.trim());
+      if(!ex.sentence||!ex.answers[0]){ alert(`Exercice ${idx+1} : phrase et réponses requises.`); return; }
+    } else if(injectData.type==='ordre'){
+      ex.instruction=g(`i${idx}-instruction`);
+      ex.words=g(`i${idx}-words`).split(' ').filter(Boolean);
+      ex.correct=g(`i${idx}-correct-sent`);
+      if(!ex.words.length||!ex.correct){ alert(`Exercice ${idx+1} : mots et phrase correcte requis.`); return; }
+    } else if(injectData.type==='transform'){
+      ex.instruction=g(`i${idx}-instruction`);
+      ex.transformInstruction=g(`i${idx}-trans-inst`);
+      ex.original=g(`i${idx}-original`);
+      ex.correct=g(`i${idx}-correct-t`);
+      ex.accepted=g(`i${idx}-accepted`).split('|').map(a=>a.trim()).filter(Boolean);
+      if(!ex.original||!ex.correct){ alert(`Exercice ${idx+1} : phrase originale et réponse requises.`); return; }
+    }
+    exercises.push(ex);
+  }
+  injectData.items=exercises;
+  document.getElementById('generatedJson').textContent=JSON.stringify(exercises,null,2);
+  const prev=document.getElementById('inject-preview');
+  prev.innerHTML=`<div class="alert alert-info" style="margin-bottom:12px">${exercises.length} exercice(s) à intégrer :</div>`
+    +exercises.map((ex,i)=>`<div class="exercise-card" style="margin-bottom:12px">${renderExercise(ex,900+i)}</div>`).join('');
+  goInjectStep(5);
+}
+
+function injectExercises(){
+  if(!injectData.items.length) return;
+  injectData.items.forEach(ex=>{
+    const k=exKey(ex.level,ex.topic);
+    if(!state.exercises[k]) state.exercises[k]=[];
+    state.exercises[k].push(ex);
+  });
+  saveState();
+  document.getElementById('injectSuccess').style.display='block';
+  renderTeacherStats(); renderExByLevelTheme();
+  setTimeout(()=>{
+    document.getElementById('injectSuccess').style.display='none';
+    injectData={level:null,topic:null,type:null,items:[]}; itemCount=0;
+    goInjectStep(1);
+    document.querySelectorAll('.level-card,.type-card').forEach(c=>c.classList.remove('selected'));
+  },2000);
+}
+
+function copyJson(){
+  navigator.clipboard.writeText(document.getElementById('generatedJson').textContent).then(()=>alert('JSON copié !'));
+}
+
+// ============================================================
+// PDF
+// ============================================================
+async function generatePDF(studentIdOverride, doLogout=true){
+  const {jsPDF}=window.jspdf;
+  if(!jsPDF){ alert('Bibliothèque PDF non chargée.'); return; }
+  const userId=studentIdOverride||(state.currentUser&&state.currentUser.id);
+  if(!userId){ goHome(); return; }
+  const sess=state.sessions[userId];
+  if(!sess){ goHome(); return; }
+
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,M=18; let y=20;
+  const blue=[26,58,92],lb=[46,134,193],green=[39,174,96],red=[231,76,60],grey=[240,244,248];
+
+  doc.setFillColor(...blue); doc.rect(0,0,W,38,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont(undefined,'bold');
+  doc.text('Irregular Verbs',M,16);
+  doc.setFontSize(11); doc.setFont(undefined,'normal');
+  doc.text('Rapport de progression pédagogique',M,25);
+  doc.setFontSize(9);
+  doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`,W-M,33,{align:'right'});
+  y=50;
+
+  doc.setFillColor(...grey); doc.roundedRect(M,y,W-M*2,32,3,3,'F');
+  doc.setTextColor(...blue); doc.setFontSize(13); doc.setFont(undefined,'bold');
+  doc.text(`Élève : ${sess.id}`,M+8,y+10);
+  doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(80,80,80);
+  doc.text(`Classe : ${sess.class}`,M+8,y+19);
+  doc.text(`Niveau : ${sess.level||'–'}`,W/2,y+19);
+  doc.text(`Dernière séance : ${new Date(sess.lastSeen).toLocaleDateString('fr-FR')}`,M+8,y+27);
+  y+=40;
+
+  const c=sess.totalCorrect||0,w=sess.totalWrong||0,t=c+w,rate=t>0?Math.round(c/t*100):0;
+  const col=rate>=80?green:rate>=50?[230,126,34]:red;
+  doc.setFillColor(...lb); doc.roundedRect(M,y,W-M*2,22,3,3,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(11); doc.setFont(undefined,'bold');
+  doc.text('Résultats globaux',M+6,y+8);
+  doc.setFontSize(10); doc.setFont(undefined,'normal');
+  doc.text(`${t} réponses | ${c} correctes | ${w} erreurs | Taux : ${rate}%`,M+6,y+16);
+  y+=30;
+
+  doc.setTextColor(...blue); doc.setFontSize(10); doc.setFont(undefined,'bold');
+  doc.text('Taux de réussite :',M,y+5);
+  doc.setFillColor(220,220,220); doc.rect(M+42,y,W-M*2-42,7,'F');
+  doc.setFillColor(...col); doc.rect(M+42,y,Math.max(1,(W-M*2-42)*rate/100),7,'F');
+  doc.setTextColor(...col); doc.text(`${rate}%`,W-M,y+6,{align:'right'});
+  y+=18;
+
+  const topics=['preterit','present_perfect','both'];
+  const tLbls={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prétérit / Present Perfect'};
+  topics.forEach(topic=>{
+    const items=(sess.history||[]).filter(h=>h.topic===topic);
+    if(!items.length) return;
+    const tc=items.filter(h=>h.correct).length,tr=items.length,pr=Math.round(tc/tr*100);
+    if(y>240){doc.addPage();y=20;}
+    doc.setFillColor(...grey); doc.roundedRect(M,y,W-M*2,16,2,2,'F');
+    doc.setTextColor(...blue); doc.setFontSize(11); doc.setFont(undefined,'bold');
+    doc.text(tLbls[topic],M+6,y+10);
+    doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.setTextColor(80,80,80);
+    doc.text(`${tc}/${tr} correctes – ${pr}%`,W-M-6,y+10,{align:'right'});
+    y+=20;
+    items.slice(-15).forEach(h=>{
+      if(y>270){doc.addPage();y=20;}
+      doc.setFillColor(...(h.correct?green:red)); doc.circle(M+4,y+2,2,'F');
+      doc.setTextColor(60,60,60); doc.setFontSize(8.5); doc.setFont(undefined,'normal');
+      const tyLbl={qcm:'QCM',trous:'Trous',ordre:'Ordre',transform:'Transform.'}[h.type]||h.type;
+      const ts=new Date(h.timestamp).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      doc.text(`${tyLbl} – ${h.correct?'✓ Correct':'✗ Incorrect'} – ${ts}`,M+10,y+4);
+      y+=8;
+    });
+    y+=4;
+  });
+
+  if(y>220){doc.addPage();y=20;}
+  doc.setFillColor(253,246,227); doc.roundedRect(M,y,W-M*2,8,2,2,'F');
+  doc.setTextColor(120,80,20); doc.setFontSize(11); doc.setFont(undefined,'bold');
+  doc.text('Conseils personnalisés',M+6,y+6); y+=14;
+  doc.setFontSize(9.5); doc.setFont(undefined,'normal'); doc.setTextColor(60,60,60);
+  const advs=[];
+  if(rate<50) advs.push('• Taux insuffisant : réviser les bases du prétérit et du present perfect.');
+  else if(rate<75) advs.push('• Progrès encourageants ! Continuez à pratiquer.');
+  else advs.push('• Excellent travail ! Approfondissez les nuances prétérit / present perfect.');
+  const pI=(sess.history||[]).filter(h=>h.topic==='preterit');
+  const ppI=(sess.history||[]).filter(h=>h.topic==='present_perfect');
+  if(pI.length&&ppI.length){
+    const pR=Math.round(pI.filter(h=>h.correct).length/pI.length*100);
+    const ppR=Math.round(ppI.filter(h=>h.correct).length/ppI.length*100);
+    if(pR<ppR-20) advs.push('• Point faible : le prétérit. Relire la fiche et pratiquer davantage.');
+    else if(ppR<pR-20) advs.push('• Point faible : le present perfect. Focalisez vos révisions.');
+  }
+  advs.push('• Consultez régulièrement la liste des verbes irréguliers.');
+  advs.forEach(a=>{doc.text(a,M+4,y);y+=8;});
+
+  const pages=doc.internal.getNumberOfPages();
+  for(let p=1;p<=pages;p++){
+    doc.setPage(p); doc.setFillColor(...blue); doc.rect(0,287,W,10,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(7);
+    doc.text('Irregular Verbs – Créé par C. Iemfre',M,293);
+    doc.text(`Page ${p}/${pages}`,W-M,293,{align:'right'});
+  }
+  doc.save(`rapport_${userId}_${new Date().toISOString().slice(0,10)}.pdf`);
+  if(doLogout) goHome();
+}
+
+function logout(){ if(state.currentUser) generatePDF(); else goHome(); }
+
+
+// ============================================================
+// DOWNLOAD UPDATED HTML
+// ============================================================
+function downloadUpdatedHTML(){
+  // Serialize current exercises (built-in + teacher additions)
+  const exJson = JSON.stringify(state.exercises);
+  // Get full page source
+  let source = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  // Replace the EXERCISES_DATA definition with the current state
+  // so the downloaded file is fully self-contained with latest exercises
+  const marker = 'const EXERCISES_DATA = {';
+  const markerEnd = '}; // end EXERCISES_DATA';
+  const startIdx = source.indexOf(marker);
+  const endIdx = source.indexOf(markerEnd);
+  if(startIdx !== -1 && endIdx !== -1){
+    const before = source.slice(0, startIdx);
+    const after = source.slice(endIdx + markerEnd.length);
+    const dateStr = new Date().toLocaleDateString('fr-FR');
+    source = before
+      + '// Downloaded on ' + dateStr + '\n'
+      + 'const EXERCISES_DATA = ' + exJson + ';\n'
+      + '// end EXERCISES_DATA placeholder\n'
+      + after;
+  }
+  const blob = new Blob([source], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'irregular-verbs-' + new Date().toISOString().slice(0,10) + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showDeployModal();
+}
+
+function showDeployModal(){
+  document.getElementById('deployModal').classList.remove('hidden');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  renderVerbTable('verbTableBody',IRREGULAR_VERBS,null);
+  renderVerbTable('teacherVerbTable',IRREGULAR_VERBS,null);
+  document.getElementById('verbsBackBtn').onclick=()=>{ if(state.currentUser) showScreen('screen-student'); else showScreen('screen-home'); };
+  document.getElementById('verbModal').addEventListener('click',function(e){if(e.target===this)closeVerbModal();});
+  document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLoginModal();});
+  document.getElementById('pwdModal').addEventListener('click',function(e){if(e.target===this)closePwdModal();});
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeVerbModal();closeLoginModal();closePwdModal();} });
+}
+init();
+</script>
+
+<!-- DEPLOY MODAL -->
+<div class="modal-overlay hidden" id="deployModal">
+  <div class="modal" style="max-width:600px">
+    <h3>⬇️ HTML téléchargé — Instructions de déploiement</h3>
+    <div class="alert alert-success">Le fichier <strong>irregular-verbs-[date].html</strong> a été téléchargé.</div>
+    <div style="background:#f4f8ff;border-radius:10px;padding:18px;margin:12px 0">
+      <h4 style="color:#1a3a5c;margin-bottom:12px">🚀 Redéployer sur GitHub + Vercel</h4>
+      <ol style="padding-left:18px;line-height:2;color:#444;font-size:0.92rem">
+        <li>Ouvrez votre dépôt GitHub dans votre navigateur</li>
+        <li>Cliquez sur le fichier <code style="background:#eee;padding:2px 6px;border-radius:4px">irregular-verbs.html</code></li>
+        <li>Cliquez sur l'icône ✏️ <strong>Edit</strong> (stylo)</li>
+        <li>Supprimez tout le contenu et collez le contenu du nouveau fichier</li>
+        <li>Cliquez sur <strong>Commit changes</strong></li>
+        <li>Vercel redéploie automatiquement en 1–2 minutes ✅</li>
+      </ol>
+      <p style="color:#888;font-size:0.82rem;margin-top:8px">💡 Alternative : utilisez GitHub Desktop ou <code>git push</code> depuis votre terminal.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('deployModal').classList.add('hidden')">Compris ✓</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
