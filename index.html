@@ -241,6 +241,14 @@ label{display:block;font-weight:600;margin-bottom:5px;color:var(--dark);font-siz
 .rgpd-content p{color:#444;line-height:1.7;margin-bottom:8px;}
 .placeholder-block{background:#fff3cd;border:2px dashed #ffc107;border-radius:8px;padding:18px;text-align:center;color:#856404;margin:14px 0;}
 
+.badge-bts{background:#e8eaf6;color:#283593;}
+.level-card.bts{border-color:#9fa8da;}
+.level-card.bts.selected,.level-card.bts:hover{background:#e8eaf6;border-color:#3949ab;}
+.lv-filiere{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;justify-content:center;}
+.filiere-btn{flex:1;min-width:120px;padding:16px 10px;border-radius:10px;border:3px solid #9fa8da;cursor:pointer;text-align:center;font-weight:800;font-size:1rem;color:#283593;background:white;transition:all .2s;}
+.filiere-btn:hover,.filiere-btn.selected{background:#e8eaf6;border-color:#3949ab;transform:translateY(-2px);}
+.filiere-btn .fi-icon{font-size:1.6rem;display:block;margin-bottom:5px;}
+
 footer{text-align:center;padding:18px;color:rgba(255,255,255,.7);font-size:.83rem;}
 footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
 
@@ -410,6 +418,7 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
       <div class="level-card seconde" onclick="selectLevel('2nde',this)"><span class="lv-icon">📗</span><div class="lv-name">2<sup>nde</sup></div></div>
       <div class="level-card premiere" onclick="selectLevel('1ere',this)"><span class="lv-icon">📙</span><div class="lv-name">1<sup>ère</sup></div></div>
       <div class="level-card terminale" onclick="selectLevel('Tle',this)"><span class="lv-icon">🎓</span><div class="lv-name">Tle</div></div>
+        <div class="level-card bts" onclick="selectLevel('BTS',this)"><span class="lv-icon">🏫</span><div class="lv-name">BTS</div></div>
     </div>
     <div id="levelError" class="alert alert-danger" style="display:none">Veuillez sélectionner un niveau.</div>
     <div style="text-align:center;margin-top:10px">
@@ -418,6 +427,38 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
   </div>
 </div>
 
+
+<!-- ═══════════════════════════════════════════
+     BTS FILIÈRE SELECTION
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-bts-filiere">
+  <div class="nav-bar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-outline btn-sm" onclick="showScreen('screen-student-level')" style="color:white;border-color:white">← Retour</button>
+      <h2>📘 BTS – Choix de la filière</h2>
+      <span class="user-badge" id="btsBadge"></span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>🎯 Choisissez votre filière</h2>
+    <p style="color:#666;margin-bottom:4px;font-size:.92rem">Les exercices sont adaptés au vocabulaire professionnel de votre secteur.</p>
+    <div class="lv-filiere">
+      <div class="filiere-btn" onclick="selectFiliere('MOS',this)">
+        <span class="fi-icon">🛡️</span>MOS<br><small style="font-weight:400;font-size:.72rem;color:#666">Métiers de la sécurité</small>
+      </div>
+      <div class="filiere-btn" onclick="selectFiliere('MCO',this)">
+        <span class="fi-icon">🛒</span>MCO<br><small style="font-weight:400;font-size:.72rem;color:#666">Commerce / vente</small>
+      </div>
+      <div class="filiere-btn" onclick="selectFiliere('NDRC',this)">
+        <span class="fi-icon">📊</span>NDRC<br><small style="font-weight:400;font-size:.72rem;color:#666">Relation client</small>
+      </div>
+    </div>
+    <div id="filiereError" class="alert alert-danger" style="display:none">Veuillez sélectionner une filière.</div>
+    <div style="text-align:center;margin-top:10px">
+      <button class="btn btn-primary btn-lg" onclick="confirmFiliere()">Accéder aux exercices →</button>
+    </div>
+  </div>
+</div>
 <!-- ═══════════════════════════════════════════
      STUDENT DASHBOARD (topic choice)
 ════════════════════════════════════════════ -->
@@ -593,9 +634,9 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
 
   <!-- Tab: Dashboard -->
   <div id="tab-dashboard">
-    <div class="teacher-grid" id="teacherStats"></div>
+    <div class="teacher-grid" id="teacherStats" style="display:none"></div>
     <div class="card">
-      <h2>📋 Exercices par niveau et thème</h2>
+      <h2>📋 Exercices disponibles par niveau / filière</h2>
       <!-- Class filter -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
         <label style="margin:0;white-space:nowrap">Filtrer par niveau :</label>
@@ -605,8 +646,10 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
           <button class="btn btn-outline btn-sm teacher-lv-btn" onclick="filterTeacherLevel('2nde',this)">2nde</button>
           <button class="btn btn-outline btn-sm teacher-lv-btn" onclick="filterTeacherLevel('1ere',this)">1ère</button>
           <button class="btn btn-outline btn-sm teacher-lv-btn" onclick="filterTeacherLevel('Tle',this)">Tle</button>
+          <button class="btn btn-outline btn-sm teacher-lv-btn" onclick="filterTeacherLevel('BTS',this)">BTS</button>
         </div>
       </div>
+      <div id="exSummaryBar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:#f4f8ff;border-radius:8px;font-size:.85rem;color:#1a3a5c"></div>
       <div id="exByLevelTheme"></div>
     </div>
   </div>
@@ -689,7 +732,8 @@ const IRREGULAR_VERBS=[
 ];
 const REGULAR_SAMPLE=["play","work","watch","talk","listen","walk","live","love","study","help","ask","answer","close","open","start","finish","call","visit","clean","cook"];
 const LEVELS=['CAP','2nde','1ere','Tle'];
-const LEVEL_CSS={CAP:'cap','2nde':'seconde','1ere':'premiere','Tle':'terminale'};
+const BTS_FILIERES=['MOS','MCO','NDRC'];
+const LEVEL_CSS={CAP:'cap','2nde':'seconde','1ere':'premiere','Tle':'terminale',BTS_MOS:'bts',BTS_MCO:'bts',BTS_NDRC:'bts'};
 
 const EXERCISES_DATA = {
 
@@ -1871,6 +1915,1305 @@ const EXERCISES_DATA = {
 
 }; // end EXERCISES_DATA
 
+
+// ============================================================
+// BTS DATA
+// ============================================================
+// ============================================================
+// BTS EXERCISES DATA
+// MOS: security/safety vocabulary
+// MCO_NDRC: commerce/sales/work vocabulary (shared)
+// 10 exercises per theme, 15 questions each
+// ============================================================
+
+// ── BTS MOS – PRETERIT (10 exercises) ──────────────────────
+const BTS_MOS_PRETERIT = [
+{
+  level:"BTS_MOS", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form. Context: security and safety sector.",
+  questions:[
+    {q:"The security officer ___ (patrol) the perimeter twice during the night shift.",options:["patrolled","patroled","patrols","was patrol"],correct:0},
+    {q:"The alarm system ___ (trigger) when an intruder entered the building.",options:["triggered","triggerred","triggers","was trigger"],correct:0},
+    {q:"Officers ___ (deploy) to the scene within minutes of the incident.",options:["deployed","deploied","deploys","deploy"],correct:0},
+    {q:"The surveillance team ___ (monitor) all entry points throughout the event.",options:["monitored","monitorred","monitors","monitoring"],correct:0},
+    {q:"The guard ___ (detain) the suspect until police arrived.",options:["detained","detainded","detains","detaining"],correct:0},
+    {q:"The security manager ___ (brief) all staff before the operation began.",options:["briefed","briefd","briefs","briefing"],correct:0},
+    {q:"The CCTV cameras ___ (capture) clear footage of the incident.",options:["captured","captureed","captures","capturing"],correct:0},
+    {q:"The team ___ (respond) immediately to the emergency call.",options:["responded","responeded","responds","responding"],correct:0},
+    {q:"The officer ___ (escort) the VIP from the venue to the vehicle.",options:["escorted","escortted","escorts","escorting"],correct:0},
+    {q:"Authorities ___ (evacuate) the building following the bomb threat.",options:["evacuated","evacuatted","evacuates","evacuating"],correct:0},
+    {q:"The manager ___ (assess) the risk before authorising the operation.",options:["assessed","assesssed","assesses","assessing"],correct:0},
+    {q:"The team ___ (secure) all exits before the inspection began.",options:["secured","secureed","secures","securing"],correct:0},
+    {q:"The officer ___ (report) the suspicious behaviour to the control room.",options:["reported","reportted","reports","reporting"],correct:0},
+    {q:"The company ___ (implement) new security protocols after the breach.",options:["implemented","implementted","implements","implementing"],correct:0},
+    {q:"The guard ___ (challenge) an individual who had no valid ID.",options:["challenged","challengeed","challenges","challenging"],correct:0}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"trous",
+  instruction:"Complete with the past simple. Context: security operations.",
+  questions:[
+    {sentence:"The security team ___ (carry out) a full risk assessment before the event.",answers:["carried out"]},
+    {sentence:"Officers ___ (search) all bags at the entrance.",answers:["searched"]},
+    {sentence:"The control room ___ (receive) an alert about suspicious activity.",answers:["received"]},
+    {sentence:"The supervisor ___ (allocate) posts to each member of the team.",answers:["allocated"]},
+    {sentence:"The guard ___ (refuse) entry to individuals without accreditation.",answers:["refused"]},
+    {sentence:"The team ___ (liaise) with local police throughout the operation.",answers:["liaised"]},
+    {sentence:"The manager ___ (identify) several vulnerabilities in the system.",answers:["identified"]},
+    {sentence:"The officer ___ (file) an incident report at the end of the shift.",answers:["filed"]},
+    {sentence:"The company ___ (train) all new recruits in emergency procedures.",answers:["trained"]},
+    {sentence:"Security staff ___ (maintain) a visible presence throughout the venue.",answers:["maintained"]},
+    {sentence:"The officer ___ (verify) the identity of every visitor.",answers:["verified"]},
+    {sentence:"The team ___ (update) the access control list before the conference.",answers:["updated"]},
+    {sentence:"The guard ___ (notice) that the fire exit had been blocked.",answers:["noticed"]},
+    {sentence:"The manager ___ (coordinate) the response with the emergency services.",answers:["coordinated"]},
+    {sentence:"The agency ___ (provide) a detailed debrief after the operation.",answers:["provided"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"transform",
+  instruction:"Transform each sentence as indicated. Context: security sector.",
+  questions:[
+    {original:"The officer patrolled the area.",transformInstruction:"Make negative.",correct:"The officer didn't patrol the area.",accepted:["The officer didn't patrol the area.","The officer did not patrol the area."]},
+    {original:"The alarm triggered at midnight.",transformInstruction:"Make a question.",correct:"Did the alarm trigger at midnight?",accepted:["Did the alarm trigger at midnight?"]},
+    {original:"The team deployed to the scene.",transformInstruction:"Make negative.",correct:"The team didn't deploy to the scene.",accepted:["The team didn't deploy to the scene.","The team did not deploy to the scene."]},
+    {original:"The guard detained the suspect.",transformInstruction:"Make a question.",correct:"Did the guard detain the suspect?",accepted:["Did the guard detain the suspect?"]},
+    {original:"They evacuated the building.",transformInstruction:"Make negative.",correct:"They didn't evacuate the building.",accepted:["They didn't evacuate the building.","They did not evacuate the building."]},
+    {original:"The manager briefed the staff.",transformInstruction:"Make a question.",correct:"Did the manager brief the staff?",accepted:["Did the manager brief the staff?"]},
+    {original:"The cameras captured the footage.",transformInstruction:"Make negative.",correct:"The cameras didn't capture the footage.",accepted:["The cameras didn't capture the footage.","The cameras did not capture the footage."]},
+    {original:"The officer filed the report.",transformInstruction:"Make a question.",correct:"Did the officer file the report?",accepted:["Did the officer file the report?"]},
+    {original:"They implemented new protocols.",transformInstruction:"Make negative.",correct:"They didn't implement new protocols.",accepted:["They didn't implement new protocols.","They did not implement new protocols."]},
+    {original:"The guard challenged the visitor.",transformInstruction:"Make a question.",correct:"Did the guard challenge the visitor?",accepted:["Did the guard challenge the visitor?"]},
+    {original:"The team secured all exits.",transformInstruction:"Make negative.",correct:"The team didn't secure all exits.",accepted:["The team didn't secure all exits.","The team did not secure all exits."]},
+    {original:"The officer escorted the VIP.",transformInstruction:"Make a question.",correct:"Did the officer escort the VIP?",accepted:["Did the officer escort the VIP?"]},
+    {original:"The company assessed the risk.",transformInstruction:"Make negative.",correct:"The company didn't assess the risk.",accepted:["The company didn't assess the risk.","The company did not assess the risk."]},
+    {original:"They liaised with the police.",transformInstruction:"Make a question.",correct:"Did they liaise with the police?",accepted:["Did they liaise with the police?"]},
+    {original:"The supervisor allocated the posts.",transformInstruction:"Make negative.",correct:"The supervisor didn't allocate the posts.",accepted:["The supervisor didn't allocate the posts.","The supervisor did not allocate the posts."]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"ordre",
+  instruction:"Put the words in the correct order to form a past simple sentence.",
+  questions:[
+    {words:["patrolled","officer","perimeter","the","the","night","during"],correct:"The officer patrolled the perimeter during the night."},
+    {words:["triggered","alarm","the","intruder","when","entered","the"],correct:"The alarm triggered when the intruder entered."},
+    {words:["deployed","officers","scene","to","minutes","within","the"],correct:"Officers deployed to the scene within minutes."},
+    {words:["detained","guard","suspect","the","the","arrival","until","police"],correct:"The guard detained the suspect until the police arrival."},
+    {words:["evacuated","team","building","the","the","following","threat"],correct:"The team evacuated the building following the threat."},
+    {words:["briefed","manager","staff","operation","the","before","all","the"],correct:"The manager briefed all staff before the operation."},
+    {words:["captured","cameras","footage","clear","CCTV","the"],correct:"The CCTV cameras captured clear footage."},
+    {words:["filed","officer","report","end","shift","the","at","of","the","the"],correct:"The officer filed the report at the end of the shift."},
+    {words:["implemented","company","protocols","new","breach","after","the","the"],correct:"The company implemented new protocols after the breach."},
+    {words:["challenged","guard","no","individual","valid","had","who","ID","the","an"],correct:"The guard challenged an individual who had no valid ID."},
+    {words:["secured","team","exits","all","before","began","inspection","the","the"],correct:"The team secured all exits before the inspection began."},
+    {words:["liaised","team","police","local","throughout","the","operation","with"],correct:"The team liaised with local police throughout the operation."},
+    {words:["identified","manager","vulnerabilities","several","system","the","in","the"],correct:"The manager identified several vulnerabilities in the system."},
+    {words:["verified","officer","identity","visitor","every","the","of"],correct:"The officer verified the identity of every visitor."},
+    {words:["provided","agency","debrief","detailed","after","the","a","operation"],correct:"The agency provided a detailed debrief after the operation."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"trous",
+  instruction:"Complete with past simple (affirmative or negative as indicated).",
+  questions:[
+    {sentence:"The officer ___ (not/respond) to the call because he was off duty.",answers:["didn't respond"]},
+    {sentence:"The surveillance system ___ (detect) an anomaly at 02:15.",answers:["detected"]},
+    {sentence:"The team ___ (not/breach) the protocol during the operation.",answers:["didn't breach"]},
+    {sentence:"The guard ___ (intercept) a vehicle attempting to enter without clearance.",answers:["intercepted"]},
+    {sentence:"The manager ___ (not/authorise) access to the restricted area.",answers:["didn't authorise"]},
+    {sentence:"The agency ___ (dispatch) two additional officers to the site.",answers:["dispatched"]},
+    {sentence:"The officer ___ (not/complete) the incident log before leaving.",answers:["didn't complete"]},
+    {sentence:"Staff ___ (undergo) a mandatory security refresher course.",answers:["underwent"]},
+    {sentence:"The team ___ (not/follow) the standard operating procedure.",answers:["didn't follow"]},
+    {sentence:"The guard ___ (confront) the individual causing a disturbance.",answers:["confronted"]},
+    {sentence:"The supervisor ___ (not/debrief) the team after the incident.",answers:["didn't debrief"]},
+    {sentence:"The CCTV operator ___ (zoom in) on the suspicious package.",answers:["zoomed in"]},
+    {sentence:"The officer ___ (not/wear) the correct protective equipment.",answers:["didn't wear"]},
+    {sentence:"The company ___ (conduct) a thorough investigation into the breach.",answers:["conducted"]},
+    {sentence:"The team ___ (not/exceed) the authorised use of force.",answers:["didn't exceed"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"qcm",
+  instruction:"Choose the sentence that uses the correct past simple form.",
+  questions:[
+    {q:"Which is correct?",options:["The officer patroled the area.","The officer patrolled the area.","The officer was patrol the area.","The officer have patrolled the area."],correct:1},
+    {q:"Which is correct?",options:["Did he deployed to the scene?","Did he deploy to the scene?","Did he deploys to the scene?","Has he deploy to the scene?"],correct:1},
+    {q:"Which is correct?",options:["They didn't evacuated the building.","They didn't evacuate the building.","They didn't evacuates the building.","They haven't evacuate the building."],correct:1},
+    {q:"Which is correct?",options:["The alarm triggered last night.","The alarm has triggered last night.","The alarm triggerd last night.","The alarm was trigger last night."],correct:0},
+    {q:"Which is correct?",options:["Did the guard challenged the suspect?","Did the guard challenge the suspect?","Did the guard challenges the suspect?","Has the guard challenge the suspect?"],correct:1},
+    {q:"Which is correct?",options:["The cameras didn't capture the footage.","The cameras didn't captured the footage.","The cameras hasn't captured the footage.","The cameras not capture the footage."],correct:0},
+    {q:"Which is correct?",options:["The manager briefed the team.","The manager briefs the team.","The manager has brief the team.","The manager briefd the team."],correct:0},
+    {q:"Which is correct?",options:["They didn't implemented new protocols.","They didn't implement new protocols.","They haven't implement new protocols.","They not implemented new protocols."],correct:1},
+    {q:"Which is correct?",options:["The officer filed the report yesterday.","The officer has filed the report yesterday.","The officer filed yesterday the report.","The officer filed the report yesterday."],correct:0},
+    {q:"Which is correct?",options:["Did they liaised with the police?","Did they liaise with the police?","Did they liaises with the police?","Have they liaise with the police?"],correct:1},
+    {q:"Which is correct?",options:["The guard secured the exits.","The guard secures the exits.","The guard has secure the exits.","The guard secureed the exits."],correct:0},
+    {q:"Which is correct?",options:["They didn't breach the protocol.","They didn't breached the protocol.","They haven't breach the protocol.","They not breached the protocol."],correct:0},
+    {q:"Which is correct?",options:["The supervisor allocated the posts.","The supervisor allocatted the posts.","The supervisor have allocated the posts.","The supervisor allocates the posts."],correct:0},
+    {q:"Which is correct?",options:["Did the officer escort the VIP?","Did the officer escorted the VIP?","Did the officer escorts the VIP?","Has the officer escort the VIP?"],correct:0},
+    {q:"Which is correct?",options:["The company assessed the risk.","The company has assess the risk.","The company assessd the risk.","The company assess the risk."],correct:0}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"trous",
+  instruction:"Complete using vocabulary from the security sector.",
+  questions:[
+    {sentence:"The officer ___ (hand over) his post to the incoming shift.",answers:["handed over"]},
+    {sentence:"The CCTV system ___ (fail) during the critical hours of the night.",answers:["failed"]},
+    {sentence:"The manager ___ (draw up) a new emergency evacuation plan.",answers:["drew up"]},
+    {sentence:"The team ___ (stand down) once the threat had been neutralised.",answers:["stood down"]},
+    {sentence:"The guard ___ (turn away) several people who lacked valid ID.",answers:["turned away"]},
+    {sentence:"The supervisor ___ (carry out) spot checks throughout the shift.",answers:["carried out"]},
+    {sentence:"The agency ___ (win) the contract for airport security services.",answers:["won"]},
+    {sentence:"The officer ___ (keep) a detailed log of all movements.",answers:["kept"]},
+    {sentence:"The team ___ (run) a simulation exercise to test response times.",answers:["ran"]},
+    {sentence:"The guard ___ (hold) the door open to allow emergency services through.",answers:["held"]},
+    {sentence:"The manager ___ (send) a full incident report to headquarters.",answers:["sent"]},
+    {sentence:"The officer ___ (take) a statement from the witness.",answers:["took"]},
+    {sentence:"The security firm ___ (lose) its licence following a serious breach.",answers:["lost"]},
+    {sentence:"The team ___ (go through) a thorough briefing before the operation.",answers:["went through"]},
+    {sentence:"The guard ___ (speak) to the suspect in a calm and professional manner.",answers:["spoke"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"transform",
+  instruction:"Rewrite in the form indicated. Use security sector vocabulary.",
+  questions:[
+    {original:"The CCTV system failed.",transformInstruction:"Question.",correct:"Did the CCTV system fail?",accepted:["Did the CCTV system fail?"]},
+    {original:"The guard turned away the visitor.",transformInstruction:"Negative.",correct:"The guard didn't turn away the visitor.",accepted:["The guard didn't turn away the visitor.","The guard did not turn away the visitor."]},
+    {original:"The team ran a simulation exercise.",transformInstruction:"Question.",correct:"Did the team run a simulation exercise?",accepted:["Did the team run a simulation exercise?"]},
+    {original:"The officer kept a detailed log.",transformInstruction:"Negative.",correct:"The officer didn't keep a detailed log.",accepted:["The officer didn't keep a detailed log.","The officer did not keep a detailed log."]},
+    {original:"The manager drew up a new plan.",transformInstruction:"Question.",correct:"Did the manager draw up a new plan?",accepted:["Did the manager draw up a new plan?"]},
+    {original:"The firm lost its licence.",transformInstruction:"Negative.",correct:"The firm didn't lose its licence.",accepted:["The firm didn't lose its licence.","The firm did not lose its licence."]},
+    {original:"The officer took a statement.",transformInstruction:"Question.",correct:"Did the officer take a statement?",accepted:["Did the officer take a statement?"]},
+    {original:"The team stood down after the threat.",transformInstruction:"Negative.",correct:"The team didn't stand down after the threat.",accepted:["The team didn't stand down after the threat.","The team did not stand down after the threat."]},
+    {original:"The guard held the door open.",transformInstruction:"Question.",correct:"Did the guard hold the door open?",accepted:["Did the guard hold the door open?"]},
+    {original:"The agency won the contract.",transformInstruction:"Negative.",correct:"The agency didn't win the contract.",accepted:["The agency didn't win the contract.","The agency did not win the contract."]},
+    {original:"The manager sent the incident report.",transformInstruction:"Question.",correct:"Did the manager send the incident report?",accepted:["Did the manager send the incident report?"]},
+    {original:"The officer spoke to the suspect.",transformInstruction:"Negative.",correct:"The officer didn't speak to the suspect.",accepted:["The officer didn't speak to the suspect.","The officer did not speak to the suspect."]},
+    {original:"They went through a full briefing.",transformInstruction:"Question.",correct:"Did they go through a full briefing?",accepted:["Did they go through a full briefing?"]},
+    {original:"The supervisor carried out spot checks.",transformInstruction:"Negative.",correct:"The supervisor didn't carry out spot checks.",accepted:["The supervisor didn't carry out spot checks.","The supervisor did not carry out spot checks."]},
+    {original:"The guard handed over his post.",transformInstruction:"Question.",correct:"Did the guard hand over his post?",accepted:["Did the guard hand over his post?"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"ordre",
+  instruction:"Reorder the words to form a correct past simple sentence.",
+  questions:[
+    {words:["handed","guard","post","his","over","incoming","shift","to","the","the"],correct:"The guard handed over his post to the incoming shift."},
+    {words:["failed","CCTV","system","during","night","the","the"],correct:"The CCTV system failed during the night."},
+    {words:["drew","manager","up","new","evacuation","plan","a"],correct:"The manager drew up a new evacuation plan."},
+    {words:["stood","team","down","threat","neutralised","been","had","once","the"],correct:"The team stood down once the threat had been neutralised."},
+    {words:["turned","guard","away","lacked","who","ID","people","valid"],correct:"The guard turned away people who lacked valid ID."},
+    {words:["carried","supervisor","spot","checks","throughout","shift","out","the"],correct:"The supervisor carried out spot checks throughout the shift."},
+    {words:["won","agency","contract","airport","for","security","the"],correct:"The agency won the contract for airport security."},
+    {words:["kept","officer","detailed","log","movements","a","of","all","the"],correct:"The officer kept a detailed log of all movements."},
+    {words:["ran","team","simulation","exercise","test","times","a","to","response"],correct:"The team ran a simulation exercise to test response times."},
+    {words:["sent","manager","report","full","incident","headquarters","the","to","a"],correct:"The manager sent a full incident report to headquarters."},
+    {words:["took","officer","statement","witness","from","a","the","the"],correct:"The officer took a statement from the witness."},
+    {words:["lost","firm","licence","following","breach","serious","a","its","the"],correct:"The firm lost its licence following a serious breach."},
+    {words:["went","team","through","briefing","thorough","operation","before","a","the"],correct:"The team went through a thorough briefing before the operation."},
+    {words:["spoke","guard","suspect","calm","professional","manner","in","a","and","the","to","the"],correct:"The guard spoke to the suspect in a calm and professional manner."},
+    {words:["held","guard","door","emergency","allow","services","through","to","open","the","the"],correct:"The guard held the door open to allow emergency services through."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"preterit", type:"qcm",
+  instruction:"Choose the best option to complete each sentence. Context: professional security.",
+  questions:[
+    {q:"The security officer ___ his colleagues about the change in patrol routes.",options:["informed","informs","has inform","informing"],correct:0},
+    {q:"The team ___ the perimeter for signs of forced entry.",options:["checked","checks","has check","checking"],correct:0},
+    {q:"The guard ___ access to the unauthorised individual.",options:["denied","denies","has deny","denying"],correct:0},
+    {q:"The manager ___ the incident in the daily report.",options:["documented","documents","has document","documenting"],correct:0},
+    {q:"The officer ___ the suspect's details before releasing him.",options:["recorded","records","has record","recording"],correct:0},
+    {q:"Security staff ___ a clear zone around the VIP at all times.",options:["maintained","maintains","has maintain","maintaining"],correct:0},
+    {q:"The control room ___ the emergency services immediately.",options:["contacted","contacts","has contact","contacting"],correct:0},
+    {q:"The supervisor ___ the use of force as a last resort.",options:["authorised","authorises","has authorise","authorising"],correct:0},
+    {q:"The team ___ a full sweep of the venue before the event.",options:["conducted","conducts","has conduct","conducting"],correct:0},
+    {q:"The officer ___ the visitor to the appropriate meeting room.",options:["directed","directs","has direct","directing"],correct:0},
+    {q:"The guard ___ over to his replacement at the end of his shift.",options:["handed","hands","has hand","handing"],correct:0},
+    {q:"The manager ___ a formal complaint against the agency.",options:["lodged","lodges","has lodge","lodging"],correct:0},
+    {q:"The team ___ in close contact with the operations centre.",options:["remained","remains","has remain","remaining"],correct:0},
+    {q:"The officer ___ the scene for potential hazards.",options:["scanned","scans","has scan","scanning"],correct:0},
+    {q:"The agency ___ its staff according to strict vetting procedures.",options:["recruited","recruits","has recruit","recruiting"],correct:0}
+  ]
+}
+];
+
+// ── BTS MOS – PRESENT PERFECT (10 exercises) ────────────────
+const BTS_MOS_PRESENT_PERFECT = [
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form. Context: security sector.",
+  questions:[
+    {q:"The security team ___ (patrol) this site for over five years.",options:["patrolled","has patrolled","have patrolled","patrols"],correct:2},
+    {q:"The agency ___ (implement) new access control procedures recently.",options:["implemented","has implemented","have implemented","implements"],correct:1},
+    {q:"Officers ___ (respond) to several incidents this week.",options:["responded","has responded","have responded","responds"],correct:2},
+    {q:"The manager ___ (brief) the team on the new protocol.",options:["briefed","has briefed","have briefed","briefs"],correct:1},
+    {q:"The CCTV system ___ (detect) unusual activity near the main gate.",options:["detected","has detected","have detected","detects"],correct:1},
+    {q:"We ___ never ___ (encounter) such a serious security breach before.",options:["have/encountered","has/encountered","did/encounter","have/encounter"],correct:0},
+    {q:"The guard ___ already ___ (file) the incident report.",options:["has/filed","have/filed","did/file","has/filing"],correct:0},
+    {q:"Security personnel ___ (receive) updated training this quarter.",options:["received","has received","have received","receives"],correct:2},
+    {q:"___ the supervisor ___ (authorise) access to the restricted zone?",options:["Did/authorise","Has/authorised","Have/authorised","Did/authorised"],correct:1},
+    {q:"The firm ___ (win) several contracts since it was founded.",options:["won","has won","have won","wins"],correct:1},
+    {q:"They ___ (upgrade) the security infrastructure across all sites.",options:["upgraded","has upgraded","have upgraded","upgrades"],correct:2},
+    {q:"The officer ___ not yet ___ (submit) his report.",options:["has/submitted","have/submitted","did/submit","has/submitting"],correct:0},
+    {q:"___ you ever ___ (deal) with a hostage situation?",options:["Did/deal","Have/dealt","Has/dealt","Did/dealt"],correct:1},
+    {q:"The company ___ (deploy) drones to monitor large events since last year.",options:["deployed","has deployed","have deployed","deploys"],correct:1},
+    {q:"The team ___ just ___ (complete) a full risk assessment of the site.",options:["has/completed","have/completed","did/complete","has/completing"],correct:0}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"trous",
+  instruction:"Complete with the present perfect. Context: security operations.",
+  questions:[
+    {sentence:"The agency ___ (operate) in the private security sector for over a decade.",answers:["has operated"]},
+    {sentence:"Officers ___ (respond) to 15 incidents this month alone.",answers:["have responded"]},
+    {sentence:"The manager ___ just ___ (approve) the new security procedures.",answers:["has","approved"]},
+    {sentence:"We ___ never ___ (face) a breach of this scale before.",answers:["have","faced"]},
+    {sentence:"The CCTV cameras ___ (record) continuous footage since their installation.",answers:["have recorded"]},
+    {sentence:"The team ___ already ___ (complete) two full sweeps of the building.",answers:["has","completed"]},
+    {sentence:"The guard ___ (maintain) his post throughout the entire shift.",answers:["has maintained"]},
+    {sentence:"Security staff ___ (receive) updated instructions for the weekend.",answers:["have received"]},
+    {sentence:"___ the supervisor ___ (sign) off on the patrol schedule yet?",answers:["Has","signed"]},
+    {sentence:"The company ___ (invest) heavily in new surveillance technology.",answers:["has invested"]},
+    {sentence:"Several officers ___ (complete) their firearms recertification this year.",answers:["have completed"]},
+    {sentence:"The agency ___ (not/lose) a single contract since its rebranding.",answers:["has not lost"]},
+    {sentence:"The team ___ (work) closely with law enforcement on this case.",answers:["has worked"]},
+    {sentence:"I ___ (never/encounter) such aggressive behaviour on the job before.",answers:["have never encountered"]},
+    {sentence:"The control room ___ (monitor) the situation around the clock.",answers:["has monitored"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"transform",
+  instruction:"Transform the sentence as shown.",
+  questions:[
+    {original:"The agency has operated here for years.",transformInstruction:"Negative.",correct:"The agency hasn't operated here for years.",accepted:["The agency hasn't operated here for years.","The agency has not operated here for years."]},
+    {original:"Officers have responded to the incident.",transformInstruction:"Question.",correct:"Have officers responded to the incident?",accepted:["Have officers responded to the incident?"]},
+    {original:"The manager has approved the procedures.",transformInstruction:"Negative.",correct:"The manager hasn't approved the procedures.",accepted:["The manager hasn't approved the procedures.","The manager has not approved the procedures."]},
+    {original:"The team has completed the sweep.",transformInstruction:"Question.",correct:"Has the team completed the sweep?",accepted:["Has the team completed the sweep?"]},
+    {original:"They have invested in new technology.",transformInstruction:"Negative.",correct:"They haven't invested in new technology.",accepted:["They haven't invested in new technology.","They have not invested in new technology."]},
+    {original:"The guard has maintained his post.",transformInstruction:"Question.",correct:"Has the guard maintained his post?",accepted:["Has the guard maintained his post?"]},
+    {original:"The company has won several contracts.",transformInstruction:"Negative.",correct:"The company hasn't won several contracts.",accepted:["The company hasn't won several contracts.","The company has not won several contracts."]},
+    {original:"The officer has submitted his report.",transformInstruction:"Question.",correct:"Has the officer submitted his report?",accepted:["Has the officer submitted his report?"]},
+    {original:"They have upgraded the infrastructure.",transformInstruction:"Negative.",correct:"They haven't upgraded the infrastructure.",accepted:["They haven't upgraded the infrastructure.","They have not upgraded the infrastructure."]},
+    {original:"The supervisor has authorised access.",transformInstruction:"Question.",correct:"Has the supervisor authorised access?",accepted:["Has the supervisor authorised access?"]},
+    {original:"The CCTV has detected unusual activity.",transformInstruction:"Negative.",correct:"The CCTV hasn't detected unusual activity.",accepted:["The CCTV hasn't detected unusual activity.","The CCTV has not detected unusual activity."]},
+    {original:"We have never faced such a breach.",transformInstruction:"Question.",correct:"Have we ever faced such a breach?",accepted:["Have we ever faced such a breach?"]},
+    {original:"The control room has monitored the situation.",transformInstruction:"Negative.",correct:"The control room hasn't monitored the situation.",accepted:["The control room hasn't monitored the situation.","The control room has not monitored the situation."]},
+    {original:"The team has worked with law enforcement.",transformInstruction:"Question.",correct:"Has the team worked with law enforcement?",accepted:["Has the team worked with law enforcement?"]},
+    {original:"Several officers have completed recertification.",transformInstruction:"Negative.",correct:"Several officers haven't completed recertification.",accepted:["Several officers haven't completed recertification.","Several officers have not completed recertification."]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct present perfect sentence.",
+  questions:[
+    {words:["has","agency","operated","sector","the","for","decade","a","in","security","private","the"],correct:"The agency has operated in the private security sector for a decade."},
+    {words:["have","officers","responded","incidents","fifteen","month","to","this"],correct:"Officers have responded to fifteen incidents this month."},
+    {words:["has","manager","approved","just","new","procedures","security","the","the"],correct:"The manager has just approved the new security procedures."},
+    {words:["have","never","we","breach","this","scale","faced","of","a"],correct:"We have never faced a breach of this scale."},
+    {words:["has","CCTV","recorded","footage","since","continuous","installation","its","the"],correct:"The CCTV has recorded continuous footage since its installation."},
+    {words:["has","team","already","sweeps","completed","two","full","the"],correct:"The team has already completed two full sweeps."},
+    {words:["have","staff","received","updated","for","instructions","weekend","the","security"],correct:"Security staff have received updated instructions for the weekend."},
+    {words:["has","company","invested","in","new","surveillance","heavily","technology","the"],correct:"The company has invested heavily in new surveillance technology."},
+    {words:["have","officers","several","firearms","recertification","completed","their"],correct:"Several officers have completed their firearms recertification."},
+    {words:["has","agency","not","contract","single","a","since","lost","rebranding","its","the"],correct:"The agency has not lost a single contract since its rebranding."},
+    {words:["has","team","worked","closely","law","enforcement","with","on","case","this","the"],correct:"The team has worked closely with law enforcement on this case."},
+    {words:["has","control","room","situation","around","clock","monitored","the","the","the"],correct:"The control room has monitored the situation around the clock."},
+    {words:["has","officer","not","yet","submitted","his","report","the"],correct:"The officer has not yet submitted his report."},
+    {words:["have","you","dealt","ever","hostage","with","a","situation","?"],correct:"Have you ever dealt with a hostage situation?"},
+    {words:["has","company","deployed","drones","large","monitor","events","to","the"],correct:"The company has deployed drones to monitor large events."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect + since/for/just/already/yet/never/ever.",
+  questions:[
+    {sentence:"The officer ___ (work) at this site ___ three years.",answers:["has worked","for"]},
+    {sentence:"The agency ___ (hold) an ISO certification ___ 2018.",answers:["has held","since"]},
+    {sentence:"I ___ just ___ (receive) the updated access code.",answers:["have","received"]},
+    {sentence:"The team ___ already ___ (conduct) the morning briefing.",answers:["has","conducted"]},
+    {sentence:"___ the guard ___ (complete) his patrol route ___?",answers:["Has","completed","yet"]},
+    {sentence:"The company ___ (never/face) a data breach of this kind.",answers:["has never faced"]},
+    {sentence:"The supervisor ___ (manage) this team ___ the firm was founded.",answers:["has managed","since"]},
+    {sentence:"Officers ___ (respond) to all emergency calls ___ several months.",answers:["have responded","for"]},
+    {sentence:"___ you ever ___ (be) involved in a counter-terrorism operation?",answers:["Have","been"]},
+    {sentence:"The new surveillance system ___ just ___ (be) installed.",answers:["has","been"]},
+    {sentence:"The firm ___ (not/lose) a client ___ it updated its procedures.",answers:["has not lost","since"]},
+    {sentence:"The guard ___ (patrol) the grounds every night ___ six months.",answers:["has patrolled","for"]},
+    {sentence:"The control room operator ___ (monitor) this feed ___ midnight.",answers:["has monitored","since"]},
+    {sentence:"The manager ___ already ___ (brief) the incoming shift.",answers:["has","briefed"]},
+    {sentence:"___ the team ___ (submit) the post-event report ___?",answers:["Has","submitted","yet"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"qcm",
+  instruction:"Identify the correct present perfect sentence.",
+  questions:[
+    {q:"Which is correct?",options:["The agency has operated here for years.","The agency have operated here for years.","The agency has operate here for years.","The agency operated here since years."],correct:0},
+    {q:"Which is correct?",options:["Officers have responded to the incident.","Officers has responded to the incident.","Officers have respond to the incident.","Officers responded to the incident already."],correct:0},
+    {q:"Which is correct?",options:["The manager has approved the procedures.","The manager have approved the procedures.","The manager has approve the procedures.","The manager approved the procedures already."],correct:0},
+    {q:"Which is correct?",options:["Has the team completed the sweep?","Have the team completed the sweep?","Did the team has completed the sweep?","Has the team complete the sweep?"],correct:0},
+    {q:"Which is correct?",options:["They have invested in new technology.","They has invested in new technology.","They have invest in new technology.","They invested in new technology already."],correct:0},
+    {q:"Which is correct?",options:["The officer hasn't submitted his report yet.","The officer haven't submitted his report yet.","The officer hasn't submit his report yet.","The officer didn't submitted his report yet."],correct:0},
+    {q:"Which is correct?",options:["Have you ever dealt with such a situation?","Has you ever dealt with such a situation?","Did you ever have dealt with such a situation?","Have you ever deal with such a situation?"],correct:0},
+    {q:"Which is correct?",options:["The CCTV has detected unusual activity.","The CCTV have detected unusual activity.","The CCTV has detect unusual activity.","The CCTV detected unusual activity already."],correct:0},
+    {q:"Which is correct?",options:["We have never faced a breach like this.","We has never faced a breach like this.","We have never face a breach like this.","We never have faced a breach like this."],correct:0},
+    {q:"Which is correct?",options:["The guard has maintained his post for hours.","The guard have maintained his post for hours.","The guard has maintain his post for hours.","The guard maintained his post since hours."],correct:0},
+    {q:"Which is correct?",options:["They haven't upgraded the system yet.","They haven't upgrade the system yet.","They didn't have upgraded the system yet.","They have not upgraded the system since."],correct:0},
+    {q:"Which is correct?",options:["Has the supervisor authorised access?","Have the supervisor authorised access?","Did the supervisor has authorised access?","Has the supervisor authorise access?"],correct:0},
+    {q:"Which is correct?",options:["The company has won several contracts.","The company have won several contracts.","The company has win several contracts.","The company won several contracts already."],correct:0},
+    {q:"Which is correct?",options:["The team has worked with law enforcement.","The team have worked with law enforcement.","The team has work with law enforcement.","The team worked with law enforcement already."],correct:0},
+    {q:"Which is correct?",options:["Several officers have completed recertification.","Several officers has completed recertification.","Several officers have complete recertification.","Several officers completed recertification already."],correct:0}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect in professional security contexts.",
+  questions:[
+    {sentence:"The security director ___ (oversee) major operations throughout his career.",answers:["has overseen"]},
+    {sentence:"The team ___ (build) a strong reputation for reliability and professionalism.",answers:["has built"]},
+    {sentence:"Officers ___ (undergo) extensive background checks before being hired.",answers:["have undergone"]},
+    {sentence:"The company ___ (develop) a new framework for threat assessment.",answers:["has developed"]},
+    {sentence:"The guard ___ (stand) at this post for twelve consecutive hours.",answers:["has stood"]},
+    {sentence:"Management ___ (seek) to improve communication between shifts.",answers:["has sought"]},
+    {sentence:"The team ___ (overcome) numerous operational challenges this year.",answers:["has overcome"]},
+    {sentence:"The agency ___ (strike) a balance between effectiveness and proportionality.",answers:["has struck"]},
+    {sentence:"Officers ___ (bear) significant responsibility in maintaining public safety.",answers:["have borne"]},
+    {sentence:"The firm ___ (grow) from a small regional agency to a national leader.",answers:["has grown"]},
+    {sentence:"The supervisor ___ (keep) thorough records of all security incidents.",answers:["has kept"]},
+    {sentence:"The team ___ (draw) on years of experience to handle this crisis.",answers:["has drawn"]},
+    {sentence:"The agency ___ (choose) to specialise in high-risk event security.",answers:["has chosen"]},
+    {sentence:"Officers ___ (take) part in joint exercises with the police.",answers:["have taken"]},
+    {sentence:"The manager ___ (write) a comprehensive guide on access control.",answers:["has written"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"transform",
+  instruction:"Rewrite as shown. Security sector context.",
+  questions:[
+    {original:"The director has overseen major operations.",transformInstruction:"Negative.",correct:"The director hasn't overseen major operations.",accepted:["The director hasn't overseen major operations.","The director has not overseen major operations."]},
+    {original:"The team has built a strong reputation.",transformInstruction:"Question.",correct:"Has the team built a strong reputation?",accepted:["Has the team built a strong reputation?"]},
+    {original:"Officers have undergone background checks.",transformInstruction:"Negative.",correct:"Officers haven't undergone background checks.",accepted:["Officers haven't undergone background checks.","Officers have not undergone background checks."]},
+    {original:"The company has developed a new framework.",transformInstruction:"Question.",correct:"Has the company developed a new framework?",accepted:["Has the company developed a new framework?"]},
+    {original:"Management has sought to improve communication.",transformInstruction:"Negative.",correct:"Management hasn't sought to improve communication.",accepted:["Management hasn't sought to improve communication.","Management has not sought to improve communication."]},
+    {original:"The team has overcome numerous challenges.",transformInstruction:"Question.",correct:"Has the team overcome numerous challenges?",accepted:["Has the team overcome numerous challenges?"]},
+    {original:"The agency has struck a balance.",transformInstruction:"Negative.",correct:"The agency hasn't struck a balance.",accepted:["The agency hasn't struck a balance.","The agency has not struck a balance."]},
+    {original:"The firm has grown to a national leader.",transformInstruction:"Question.",correct:"Has the firm grown to a national leader?",accepted:["Has the firm grown to a national leader?"]},
+    {original:"Officers have borne significant responsibility.",transformInstruction:"Negative.",correct:"Officers haven't borne significant responsibility.",accepted:["Officers haven't borne significant responsibility.","Officers have not borne significant responsibility."]},
+    {original:"The supervisor has kept thorough records.",transformInstruction:"Question.",correct:"Has the supervisor kept thorough records?",accepted:["Has the supervisor kept thorough records?"]},
+    {original:"The team has drawn on years of experience.",transformInstruction:"Negative.",correct:"The team hasn't drawn on years of experience.",accepted:["The team hasn't drawn on years of experience.","The team has not drawn on years of experience."]},
+    {original:"The agency has chosen to specialise.",transformInstruction:"Question.",correct:"Has the agency chosen to specialise?",accepted:["Has the agency chosen to specialise?"]},
+    {original:"Officers have taken part in joint exercises.",transformInstruction:"Negative.",correct:"Officers haven't taken part in joint exercises.",accepted:["Officers haven't taken part in joint exercises.","Officers have not taken part in joint exercises."]},
+    {original:"The manager has written a comprehensive guide.",transformInstruction:"Question.",correct:"Has the manager written a comprehensive guide?",accepted:["Has the manager written a comprehensive guide?"]},
+    {original:"The guard has stood at this post for hours.",transformInstruction:"Negative.",correct:"The guard hasn't stood at this post for hours.",accepted:["The guard hasn't stood at this post for hours.","The guard has not stood at this post for hours."]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct present perfect sentence.",
+  questions:[
+    {words:["has","director","overseen","operations","major","career","throughout","his","the"],correct:"The director has overseen major operations throughout his career."},
+    {words:["has","team","built","reputation","strong","for","reliability","a","the"],correct:"The team has built a strong reputation for reliability."},
+    {words:["have","officers","undergone","checks","background","extensive","being","hired","before"],correct:"Officers have undergone extensive background checks before being hired."},
+    {words:["has","company","developed","framework","new","threat","for","assessment","a","the"],correct:"The company has developed a new framework for threat assessment."},
+    {words:["has","management","sought","improve","communication","between","shifts","to"],correct:"Management has sought to improve communication between shifts."},
+    {words:["has","team","overcome","challenges","operational","numerous","year","this","the"],correct:"The team has overcome numerous operational challenges this year."},
+    {words:["has","agency","struck","balance","effectiveness","between","and","proportionality","a","the"],correct:"The agency has struck a balance between effectiveness and proportionality."},
+    {words:["has","firm","grown","small","from","agency","regional","a","to","leader","national","a","the"],correct:"The firm has grown from a small regional agency to a national leader."},
+    {words:["have","officers","borne","responsibility","significant","maintaining","safety","in","public"],correct:"Officers have borne significant responsibility in maintaining public safety."},
+    {words:["has","supervisor","kept","thorough","records","incidents","security","all","of","the"],correct:"The supervisor has kept thorough records of all security incidents."},
+    {words:["has","team","drawn","years","on","experience","of","handle","to","crisis","this","the"],correct:"The team has drawn on years of experience to handle this crisis."},
+    {words:["has","agency","chosen","specialise","high-risk","in","security","event","to","the"],correct:"The agency has chosen to specialise in high-risk event security."},
+    {words:["have","officers","taken","exercises","joint","part","police","with","the","in"],correct:"Officers have taken part in joint exercises with the police."},
+    {words:["has","manager","written","guide","comprehensive","access","control","on","a","the"],correct:"The manager has written a comprehensive guide on access control."},
+    {words:["has","guard","stood","post","this","at","twelve","for","consecutive","hours","the"],correct:"The guard has stood at this post for twelve consecutive hours."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form in a professional context.",
+  questions:[
+    {q:"The agency ___ a reputation for excellence in the security sector.",options:["built","has built","have built","builds"],correct:1},
+    {q:"Officers ___ extensive training in conflict management this year.",options:["received","has received","have received","receives"],correct:2},
+    {q:"The manager ___ a formal review of all incident reports.",options:["conducted","has conducted","have conducted","conducts"],correct:1},
+    {q:"The team ___ its approach based on recent operational feedback.",options:["revised","has revised","have revised","revises"],correct:1},
+    {q:"___ the officer ___ his mandatory safety refresher yet?",options:["Did/complete","Has/completed","Have/completed","Did/completed"],correct:1},
+    {q:"The company ___ its security coverage to three new cities.",options:["extended","has extended","have extended","extends"],correct:1},
+    {q:"We ___ never ___ this level of cooperation with the police before.",options:["have/achieved","has/achieved","did/achieve","have/achieve"],correct:0},
+    {q:"The guard ___ his patrol route three times during the shift.",options:["varied","has varied","have varied","varies"],correct:1},
+    {q:"The control room ___ a new monitoring system this month.",options:["introduced","has introduced","have introduced","introduces"],correct:1},
+    {q:"___ the team ___ all necessary checks before the event?",options:["Did/complete","Has/completed","Have/completed","Did/completed"],correct:2},
+    {q:"The firm ___ the way private security companies are managed.",options:["transformed","has transformed","have transformed","transforms"],correct:1},
+    {q:"Officers ___ their communication procedures following the last incident.",options:["improved","has improved","have improved","improves"],correct:2},
+    {q:"The supervisor ___ a commendation for outstanding performance.",options:["received","has received","have received","receives"],correct:1},
+    {q:"The agency ___ a zero-tolerance policy on misconduct.",options:["enforced","has enforced","have enforced","enforces"],correct:1},
+    {q:"Staff ___ several safety drills in the past three months.",options:["conducted","has conducted","have conducted","conducts"],correct:2}
+  ]
+}
+];
+
+// ── BTS MOS – BOTH (10 exercises) ───────────────────────────
+const BTS_MOS_BOTH = [
+{
+  level:"BTS_MOS", topic:"both", type:"qcm",
+  instruction:"Choose past simple or present perfect. Context: security sector.",
+  questions:[
+    {q:"The agency ___ (operate) in this region since 2010.",options:["operated","has operated","have operated","operates"],correct:1},
+    {q:"The guard ___ (detain) the suspect at 23:45 last night.",options:["has detained","detained","detains","have detained"],correct:1},
+    {q:"Officers ___ (respond) to over 30 incidents this year so far.",options:["responded","has responded","have responded","responds"],correct:2},
+    {q:"The CCTV ___ (capture) the intruder entering the building at 2am.",options:["has captured","captured","captures","have captured"],correct:1},
+    {q:"The team ___ (complete) three full sweeps of the venue already today.",options:["completed","has completed","have completed","completes"],correct:2},
+    {q:"The manager ___ (brief) the staff before the operation last Tuesday.",options:["has briefed","briefed","briefs","have briefed"],correct:1},
+    {q:"We ___ (never/face) a breach of this magnitude.",options:["never faced","have never faced","never have faced","had never faced"],correct:1},
+    {q:"The alarm ___ (trigger) at exactly 03:17 on Saturday morning.",options:["has triggered","triggered","triggers","have triggered"],correct:1},
+    {q:"The company ___ (invest) in new surveillance technology recently.",options:["invested","has invested","have invested","invests"],correct:1},
+    {q:"The officer ___ (file) the incident report two hours ago.",options:["has filed","filed","files","have filed"],correct:1},
+    {q:"Several officers ___ (receive) commendations this quarter.",options:["received","has received","have received","receives"],correct:2},
+    {q:"The guard ___ (challenge) an unauthorised individual at the main gate yesterday.",options:["has challenged","challenged","challenges","have challenged"],correct:1},
+    {q:"The control room ___ (monitor) all access points since midnight.",options:["monitored","has monitored","have monitored","monitors"],correct:1},
+    {q:"The firm ___ (lose) its licence in 2019 after a major incident.",options:["has lost","lost","loses","have lost"],correct:1},
+    {q:"The agency ___ just ___ (launch) a new training programme.",options:["has/launched","have/launched","did/launch","has/launching"],correct:0}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect.",
+  questions:[
+    {sentence:"The team ___ (secure) the perimeter before the event last Saturday.",answers:["secured"]},
+    {sentence:"The agency ___ (grow) considerably since it was founded.",answers:["has grown"]},
+    {sentence:"The officer ___ (not/complete) his patrol when the alarm triggered.",answers:["hadn't completed"]},
+    {sentence:"We ___ (never/deal) with such an aggressive crowd before.",answers:["have never dealt"]},
+    {sentence:"The guard ___ (escort) the VIP to his vehicle at 10pm.",answers:["escorted"]},
+    {sentence:"The company ___ (implement) stricter vetting procedures since the incident.",answers:["has implemented"]},
+    {sentence:"Officers ___ (undergo) refresher training last month.",answers:["underwent"]},
+    {sentence:"The supervisor ___ (not/authorise) access to the server room yet.",answers:["has not authorised"]},
+    {sentence:"The control room ___ (detect) an anomaly at 02:15 last night.",answers:["detected"]},
+    {sentence:"The firm ___ (build) a solid reputation over the past decade.",answers:["has built"]},
+    {sentence:"The guard ___ (turn away) seventeen individuals without valid ID last week.",answers:["turned away"]},
+    {sentence:"The team ___ (work) with the police on three major operations this year.",answers:["has worked"]},
+    {sentence:"The manager ___ (draw up) a new emergency plan in 2022.",answers:["drew up"]},
+    {sentence:"Officers ___ (receive) updated guidelines on the use of force recently.",answers:["have received"]},
+    {sentence:"The CCTV system ___ (fail) twice in the last six months.",answers:["has failed"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"transform",
+  instruction:"Rewrite the sentence in the form indicated.",
+  questions:[
+    {original:"The agency has operated here since 2010.",transformInstruction:"Past simple, question (add 'when').",correct:"When did the agency start operating here?",accepted:["When did the agency start operating here?","When did the agency operate here?"]},
+    {original:"The guard detained the suspect.",transformInstruction:"Present perfect, affirmative.",correct:"The guard has detained the suspect.",accepted:["The guard has detained the suspect."]},
+    {original:"Officers have responded to 30 incidents.",transformInstruction:"Past simple, negative.",correct:"Officers didn't respond to 30 incidents.",accepted:["Officers didn't respond to 30 incidents.","Officers did not respond to 30 incidents."]},
+    {original:"The alarm triggered at 03:17.",transformInstruction:"Present perfect, question.",correct:"Has the alarm triggered?",accepted:["Has the alarm triggered?"]},
+    {original:"The company has invested in new technology.",transformInstruction:"Past simple, question.",correct:"Did the company invest in new technology?",accepted:["Did the company invest in new technology?"]},
+    {original:"We have never faced such a breach.",transformInstruction:"Past simple, affirmative (add 'in 2019').",correct:"We faced such a breach in 2019.",accepted:["We faced such a breach in 2019."]},
+    {original:"The officer filed the report two hours ago.",transformInstruction:"Present perfect, negative.",correct:"The officer hasn't filed the report.",accepted:["The officer hasn't filed the report.","The officer has not filed the report."]},
+    {original:"The firm lost its licence in 2019.",transformInstruction:"Present perfect, question.",correct:"Has the firm lost its licence?",accepted:["Has the firm lost its licence?"]},
+    {original:"The team has completed three sweeps.",transformInstruction:"Past simple, affirmative.",correct:"The team completed three sweeps.",accepted:["The team completed three sweeps."]},
+    {original:"The guard challenged an unauthorised individual.",transformInstruction:"Present perfect, affirmative.",correct:"The guard has challenged an unauthorised individual.",accepted:["The guard has challenged an unauthorised individual."]},
+    {original:"The control room has monitored all access points.",transformInstruction:"Past simple, question.",correct:"Did the control room monitor all access points?",accepted:["Did the control room monitor all access points?"]},
+    {original:"The manager briefed the staff last Tuesday.",transformInstruction:"Present perfect, negative.",correct:"The manager hasn't briefed the staff.",accepted:["The manager hasn't briefed the staff.","The manager has not briefed the staff."]},
+    {original:"The agency has just launched a new programme.",transformInstruction:"Past simple, question.",correct:"Did the agency launch a new programme?",accepted:["Did the agency launch a new programme?"]},
+    {original:"Several officers have received commendations.",transformInstruction:"Past simple, affirmative.",correct:"Several officers received commendations.",accepted:["Several officers received commendations."]},
+    {original:"The CCTV system has failed twice.",transformInstruction:"Past simple, negative.",correct:"The CCTV system didn't fail twice.",accepted:["The CCTV system didn't fail twice.","The CCTV system did not fail twice."]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"ordre",
+  instruction:"Reorder the words. Decide whether it is past simple or present perfect.",
+  questions:[
+    {words:["has","agency","operated","region","this","in","since","2010","the"],correct:"The agency has operated in this region since 2010."},
+    {words:["detained","guard","suspect","at","last","night","the","23:45","the"],correct:"The guard detained the suspect at 23:45 last night."},
+    {words:["have","officers","responded","incidents","thirty","over","this","to","year"],correct:"Officers have responded to over thirty incidents this year."},
+    {words:["captured","CCTV","intruder","the","entering","at","2am","building","the","the"],correct:"The CCTV captured the intruder entering the building at 2am."},
+    {words:["has","company","invested","surveillance","in","new","recently","technology","the"],correct:"The company has invested in new surveillance technology recently."},
+    {words:["briefed","manager","staff","operation","before","Tuesday","last","the","the"],correct:"The manager briefed the staff before the operation last Tuesday."},
+    {words:["have","never","we","breach","magnitude","this","faced","of","a"],correct:"We have never faced a breach of this magnitude."},
+    {words:["triggered","alarm","at","03:17","Saturday","on","morning","the"],correct:"The alarm triggered at 03:17 on Saturday morning."},
+    {words:["has","firm","built","reputation","solid","over","decade","past","a","the","the"],correct:"The firm has built a solid reputation over the past decade."},
+    {words:["filed","officer","report","incident","two","ago","hours","the","the"],correct:"The officer filed the incident report two hours ago."},
+    {words:["have","officers","received","commendations","several","quarter","this"],correct:"Several officers have received commendations this quarter."},
+    {words:["challenged","guard","individual","unauthorised","gate","at","main","yesterday","an","the","the"],correct:"The guard challenged an unauthorised individual at the main gate yesterday."},
+    {words:["has","control","monitored","access","points","all","midnight","since","room","the"],correct:"The control room has monitored all access points since midnight."},
+    {words:["lost","firm","licence","its","2019","in","incident","major","after","a","the"],correct:"The firm lost its licence in 2019 after a major incident."},
+    {words:["has","agency","just","launched","training","new","programme","a","the"],correct:"The agency has just launched a new training programme."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense using context clues.",
+  questions:[
+    {sentence:"Since the new manager ___ (take over), the team's performance ___ (improve) significantly.",answers:["took over","has improved"]},
+    {sentence:"The guard ___ (stand) at his post for six hours before his replacement ___ (arrive).",answers:["had stood","arrived"]},
+    {sentence:"The agency ___ (win) its first major contract in 2015 and ___ (expand) ever since.",answers:["won","has expanded"]},
+    {sentence:"Last night, the control room ___ (receive) an alert and immediately ___ (dispatch) officers.",answers:["received","dispatched"]},
+    {sentence:"We ___ (not/face) a situation like this before — the protocols ___ (not/cover) it.",answers:["have not faced","do not cover"]},
+    {sentence:"The officer ___ (patrol) the area three times before noticing the breach.",answers:["patrolled"]},
+    {sentence:"Since the upgrade, the surveillance system ___ (not/fail) once.",answers:["has not failed"]},
+    {sentence:"The manager ___ (brief) the team at 08:00 and the operation ___ (begin) at 09:00.",answers:["briefed","began"]},
+    {sentence:"The agency ___ (build) an excellent reputation, which is why it ___ (win) so many contracts.",answers:["has built","has won"]},
+    {sentence:"The officer ___ (detain) the suspect yesterday, but he ___ (release) him this morning.",answers:["detained","has released"]},
+    {sentence:"We ___ (never/experience) a power failure of this duration before.",answers:["have never experienced"]},
+    {sentence:"The team ___ (conduct) a briefing yesterday, but the manager ___ (already/update) the plan.",answers:["conducted","had already updated"]},
+    {sentence:"Since the new access control system ___ (be) installed, no breaches ___ (occur).",answers:["was","have occurred"]},
+    {sentence:"The guard ___ (challenge) over fifty individuals last week, all without incident.",answers:["challenged"]},
+    {sentence:"The supervisor ___ (not/sign) off on the report yet, even though it ___ (be) submitted yesterday.",answers:["has not signed","was"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"qcm",
+  instruction:"Select the sentence that uses the correct tense.",
+  questions:[
+    {q:"The agency ___ in this sector since its foundation.",options:["operated","has operated","operates","did operate"],correct:1},
+    {q:"The alarm ___ at exactly 3am last Saturday.",options:["has triggered","triggered","triggers","did triggered"],correct:1},
+    {q:"We ___ never encountered a breach of this scale.",options:["have","has","did","had"],correct:0},
+    {q:"The officer ___ the report two hours ago.",options:["has filed","filed","files","did filed"],correct:1},
+    {q:"The company ___ its security coverage to new regions recently.",options:["extended","has extended","extends","did extended"],correct:1},
+    {q:"The guard ___ an intruder attempting to scale the fence last night.",options:["has spotted","spotted","spots","did spotted"],correct:1},
+    {q:"Officers ___ to over thirty incidents this month.",options:["responded","has responded","have responded","responds"],correct:2},
+    {q:"The firm ___ its licence in 2019.",options:["has lost","lost","loses","did lost"],correct:1},
+    {q:"The control room ___ all access points since midnight.",options:["monitored","has monitored","monitors","did monitor"],correct:1},
+    {q:"The team ___ a thorough briefing before last week's event.",options:["has received","received","receives","have received"],correct:1},
+    {q:"The agency ___ just launched a new training initiative.",options:["have","has","did","was"],correct:1},
+    {q:"The manager ___ the new protocols in March last year.",options:["has introduced","introduced","introduces","did introduced"],correct:1},
+    {q:"Several officers ___ commendations so far this year.",options:["received","has received","have received","receives"],correct:2},
+    {q:"The guard ___ at his post for twelve hours now.",options:["stood","has stood","stands","did stand"],correct:1},
+    {q:"The CCTV system ___ twice in the last six months.",options:["failed","has failed","fails","did failed"],correct:1}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"trous",
+  instruction:"Complete these sentences from security sector reports and briefings.",
+  questions:[
+    {sentence:"The incident ___ (occur) at 22:47 and officers ___ (arrive) within eight minutes.",answers:["occurred","arrived"]},
+    {sentence:"Since the new protocols ___ (be) introduced, response times ___ (improve) by 30%.",answers:["were","have improved"]},
+    {sentence:"The guard ___ (challenge) the individual and ___ (request) identification.",answers:["challenged","requested"]},
+    {sentence:"The agency ___ (not/receive) any formal complaints since it ___ (revise) its procedures.",answers:["has not received","revised"]},
+    {sentence:"Officers ___ (conduct) over 200 patrols this quarter.",answers:["have conducted"]},
+    {sentence:"The supervisor ___ (brief) the outgoing shift at 18:00 yesterday.",answers:["briefed"]},
+    {sentence:"The company ___ (invest) in body-worn cameras, which ___ (transform) accountability.",answers:["has invested","has transformed"]},
+    {sentence:"The control room operator ___ (notice) the anomaly and ___ (alert) the patrol team.",answers:["noticed","alerted"]},
+    {sentence:"We ___ (work) with this client for three years and ___ (never/have) a serious incident.",answers:["have worked","have never had"]},
+    {sentence:"The officer ___ (take) a statement from the witness after the incident.",answers:["took"]},
+    {sentence:"Since the upgrade, the system ___ (not/produce) any false alarms.",answers:["has not produced"]},
+    {sentence:"The team ___ (deploy) to the site at 07:00 and ___ (begin) the sweep immediately.",answers:["deployed","began"]},
+    {sentence:"The agency ___ (build) strong relationships with local authorities over the years.",answers:["has built"]},
+    {sentence:"The guard ___ (turn away) an unauthorised vehicle that ___ (attempt) to enter the compound.",answers:["turned away","attempted"]},
+    {sentence:"The manager ___ (not/yet/approve) the revised emergency plan.",answers:["has not yet approved"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"transform",
+  instruction:"Rewrite each sentence as indicated. Security sector context.",
+  questions:[
+    {original:"The agency operated here since 2010.",transformInstruction:"Correct and rewrite using present perfect.",correct:"The agency has operated here since 2010.",accepted:["The agency has operated here since 2010."]},
+    {original:"The guard has detained the suspect last night.",transformInstruction:"Correct and rewrite using past simple.",correct:"The guard detained the suspect last night.",accepted:["The guard detained the suspect last night."]},
+    {original:"Officers have responded to 30 incidents last month.",transformInstruction:"Correct and rewrite using past simple.",correct:"Officers responded to 30 incidents last month.",accepted:["Officers responded to 30 incidents last month."]},
+    {original:"The CCTV captured clear footage.",transformInstruction:"Present perfect, negative.",correct:"The CCTV hasn't captured clear footage.",accepted:["The CCTV hasn't captured clear footage.","The CCTV has not captured clear footage."]},
+    {original:"We never face such a breach before.",transformInstruction:"Correct and rewrite using present perfect.",correct:"We have never faced such a breach before.",accepted:["We have never faced such a breach before."]},
+    {original:"The manager briefed the staff.",transformInstruction:"Present perfect, question.",correct:"Has the manager briefed the staff?",accepted:["Has the manager briefed the staff?"]},
+    {original:"The firm lost its licence.",transformInstruction:"Present perfect, affirmative.",correct:"The firm has lost its licence.",accepted:["The firm has lost its licence."]},
+    {original:"The company has invested in new technology last year.",transformInstruction:"Correct and rewrite using past simple.",correct:"The company invested in new technology last year.",accepted:["The company invested in new technology last year."]},
+    {original:"The officer files the incident report.",transformInstruction:"Past simple, affirmative.",correct:"The officer filed the incident report.",accepted:["The officer filed the incident report."]},
+    {original:"The control room monitored the situation.",transformInstruction:"Present perfect, affirmative.",correct:"The control room has monitored the situation.",accepted:["The control room has monitored the situation."]},
+    {original:"Has the guard challenged an intruder last night?",transformInstruction:"Correct and rewrite using past simple.",correct:"Did the guard challenge an intruder last night?",accepted:["Did the guard challenge an intruder last night?"]},
+    {original:"The agency has launched a new programme.",transformInstruction:"Past simple, question.",correct:"Did the agency launch a new programme?",accepted:["Did the agency launch a new programme?"]},
+    {original:"Several officers have received commendations.",transformInstruction:"Past simple, affirmative.",correct:"Several officers received commendations.",accepted:["Several officers received commendations."]},
+    {original:"The supervisor has not signed the report yet.",transformInstruction:"Past simple, negative.",correct:"The supervisor didn't sign the report.",accepted:["The supervisor didn't sign the report.","The supervisor did not sign the report."]},
+    {original:"The team completed three sweeps.",transformInstruction:"Present perfect, question.",correct:"Has the team completed three sweeps?",accepted:["Has the team completed three sweeps?"]}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"ordre",
+  instruction:"Reorder. Choose the correct tense based on context clues.",
+  questions:[
+    {words:["has","agency","operated","sector","in","this","since","foundation","its","the"],correct:"The agency has operated in this sector since its foundation."},
+    {words:["triggered","alarm","at","exactly","3am","Saturday","last","the"],correct:"The alarm triggered at exactly 3am last Saturday."},
+    {words:["have","officers","responded","incidents","thirty","over","month","to","this"],correct:"Officers have responded to over thirty incidents this month."},
+    {words:["filed","officer","report","incident","ago","hours","two","the","the"],correct:"The officer filed the incident report two hours ago."},
+    {words:["has","company","extended","coverage","new","regions","security","to","its","the"],correct:"The company has extended its security coverage to new regions."},
+    {words:["spotted","guard","intruder","attempting","fence","scale","to","last","night","the","the","an"],correct:"The guard spotted an intruder attempting to scale the fence last night."},
+    {words:["has","firm","built","reputation","excellent","years","an","over","the"],correct:"The firm has built an excellent reputation over the years."},
+    {words:["lost","firm","licence","2019","in","incident","a","after","major","its","the"],correct:"The firm lost its licence in 2019 after a major incident."},
+    {words:["has","control","room","access","monitored","all","midnight","since","points","the"],correct:"The control room has monitored all access points since midnight."},
+    {words:["received","team","briefing","thorough","event","before","last","week's","a","the"],correct:"The team received a thorough briefing before last week's event."},
+    {words:["has","agency","just","training","launched","new","initiative","a","the"],correct:"The agency has just launched a new training initiative."},
+    {words:["introduced","manager","protocols","new","March","last","year","in","the"],correct:"The manager introduced the new protocols in March last year."},
+    {words:["have","officers","commendations","far","so","received","year","this","several"],correct:"Several officers have received commendations so far this year."},
+    {words:["stood","guard","post","his","at","twelve","for","hours","now","has","the"],correct:"The guard has stood at his post for twelve hours now."},
+    {words:["has","CCTV","failed","twice","in","months","six","last","system","the"],correct:"The CCTV system has failed twice in the last six months."}
+  ]
+},
+{
+  level:"BTS_MOS", topic:"both", type:"qcm",
+  instruction:"Choose the correct option. Pay attention to the time expressions.",
+  questions:[
+    {q:"The officer ___ the intruder at 2am this morning.",options:["has spotted","spotted","spots","have spotted"],correct:1},
+    {q:"The agency ___ three contracts since January.",options:["won","has won","wins","did win"],correct:1},
+    {q:"The guard ___ at his post since 06:00.",options:["stood","has stood","stands","did stand"],correct:1},
+    {q:"The team ___ the operation yesterday without incident.",options:["has completed","completed","completes","have completed"],correct:1},
+    {q:"We ___ never lost a client due to a security failure.",options:["have","has","did","had"],correct:0},
+    {q:"The company ___ its procedures after the 2019 incident.",options:["has revised","revised","revises","have revised"],correct:1},
+    {q:"Officers ___ to every call within the target response time this quarter.",options:["responded","has responded","have responded","responds"],correct:2},
+    {q:"The supervisor ___ off on the report at the end of last shift.",options:["has signed","signed","signs","have signed"],correct:1},
+    {q:"The control room ___ activity near the east gate for the past hour.",options:["monitored","has monitored","monitors","have monitored"],correct:1},
+    {q:"The agency ___ its headquarters from London to Birmingham last year.",options:["has moved","moved","moves","have moved"],correct:1},
+    {q:"___ the officer ___ the incident log before the handover?",options:["Has/completed","Did/complete","Have/completed","Did/completed"],correct:1},
+    {q:"Several guards ___ their certificates in the last training session.",options:["renewed","has renewed","have renewed","renews"],correct:0},
+    {q:"The firm ___ the most awarded agency in the region for three consecutive years.",options:["was","has been","have been","is"],correct:1},
+    {q:"The CCTV system ___ perfectly since the maintenance last week.",options:["functioned","has functioned","functions","have functioned"],correct:1},
+    {q:"The guard ___ the access list before his shift began.",options:["has checked","checked","checks","have checked"],correct:1}
+  ]
+}
+];
+
+
+// ── BTS MCO/NDRC – PRETERIT (10 exercises) ──────────────────
+const BTS_MCO_PRETERIT = [
+{
+  level:"BTS_MCO", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple form. Context: commerce, sales and business.",
+  questions:[
+    {q:"The sales representative ___ (negotiate) a significant discount for the client.",options:["negotiated","negotiatted","negotiates","was negotiate"],correct:0},
+    {q:"The company ___ (launch) its new product range at the trade fair.",options:["launched","launchd","launches","was launch"],correct:0},
+    {q:"The manager ___ (exceed) his quarterly sales targets by 20%.",options:["exceeded","exceedd","exceeds","was exceed"],correct:0},
+    {q:"The team ___ (close) the deal after three weeks of negotiation.",options:["closed","closd","closes","was close"],correct:0},
+    {q:"The customer ___ (complain) about the delivery delay.",options:["complained","complaind","complains","was complain"],correct:0},
+    {q:"The HR department ___ (recruit) five new sales advisors last month.",options:["recruited","recruitd","recruits","was recruit"],correct:0},
+    {q:"The company ___ (achieve) record turnover in the last financial year.",options:["achieved","achievd","achieves","was achieve"],correct:0},
+    {q:"The marketing team ___ (develop) a targeted social media campaign.",options:["developed","developped","develops","was develop"],correct:0},
+    {q:"The supplier ___ (deliver) the order three days late.",options:["delivered","deliverd","delivers","was deliver"],correct:0},
+    {q:"The retail chain ___ (open) ten new outlets across the country.",options:["opened","opend","opens","was open"],correct:0},
+    {q:"The sales director ___ (present) the annual results to the board.",options:["presented","presentted","presents","was present"],correct:0},
+    {q:"The company ___ (sign) a three-year distribution agreement.",options:["signed","signd","signs","was sign"],correct:0},
+    {q:"The store manager ___ (train) all new staff in customer service.",options:["trained","traind","trains","was train"],correct:0},
+    {q:"The team ___ (analyse) the market data to identify new opportunities.",options:["analysed","analyseed","analyses","was analyse"],correct:0},
+    {q:"The client ___ (place) an order worth €50,000.",options:["placed","placeed","places","was place"],correct:0}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"trous",
+  instruction:"Complete with the past simple. Context: sales and commerce.",
+  questions:[
+    {sentence:"The sales rep ___ (meet) the client for the first time at the trade show.",answers:["met"]},
+    {sentence:"The company ___ (make) a significant profit in the third quarter.",answers:["made"]},
+    {sentence:"The team ___ (go through) the contract terms in detail with the buyer.",answers:["went through"]},
+    {sentence:"The manager ___ (take) a decision to cut prices to remain competitive.",answers:["took"]},
+    {sentence:"The firm ___ (lose) a major account due to poor after-sales service.",answers:["lost"]},
+    {sentence:"The director ___ (give) a presentation to potential investors.",answers:["gave"]},
+    {sentence:"The HR manager ___ (find) it difficult to retain experienced staff.",answers:["found"]},
+    {sentence:"The supplier ___ (send) a revised quote following the negotiation.",answers:["sent"]},
+    {sentence:"The sales team ___ (run) a series of product demonstrations.",answers:["ran"]},
+    {sentence:"The store manager ___ (choose) to extend opening hours during the holidays.",answers:["chose"]},
+    {sentence:"The company ___ (build) strong relationships with its key clients.",answers:["built"]},
+    {sentence:"The team leader ___ (hold) a weekly review of individual performance.",answers:["held"]},
+    {sentence:"The assistant ___ (write) up the minutes of the commercial meeting.",answers:["wrote"]},
+    {sentence:"The buyer ___ (think) the price was too high and asked for a discount.",answers:["thought"]},
+    {sentence:"The sales director ___ (speak) to each team member about their targets.",answers:["spoke"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"transform",
+  instruction:"Transform the sentence as indicated. Sales and business context.",
+  questions:[
+    {original:"The company launched a new product.",transformInstruction:"Negative.",correct:"The company didn't launch a new product.",accepted:["The company didn't launch a new product.","The company did not launch a new product."]},
+    {original:"The rep negotiated a discount.",transformInstruction:"Question.",correct:"Did the rep negotiate a discount?",accepted:["Did the rep negotiate a discount?"]},
+    {original:"The team closed the deal.",transformInstruction:"Negative.",correct:"The team didn't close the deal.",accepted:["The team didn't close the deal.","The team did not close the deal."]},
+    {original:"The client complained about the delay.",transformInstruction:"Question.",correct:"Did the client complain about the delay?",accepted:["Did the client complain about the delay?"]},
+    {original:"The firm lost a major account.",transformInstruction:"Negative.",correct:"The firm didn't lose a major account.",accepted:["The firm didn't lose a major account.","The firm did not lose a major account."]},
+    {original:"The manager exceeded his targets.",transformInstruction:"Question.",correct:"Did the manager exceed his targets?",accepted:["Did the manager exceed his targets?"]},
+    {original:"The supplier delivered the order late.",transformInstruction:"Negative.",correct:"The supplier didn't deliver the order late.",accepted:["The supplier didn't deliver the order late.","The supplier did not deliver the order late."]},
+    {original:"The director gave a presentation.",transformInstruction:"Question.",correct:"Did the director give a presentation?",accepted:["Did the director give a presentation?"]},
+    {original:"The company signed the agreement.",transformInstruction:"Negative.",correct:"The company didn't sign the agreement.",accepted:["The company didn't sign the agreement.","The company did not sign the agreement."]},
+    {original:"The team ran product demonstrations.",transformInstruction:"Question.",correct:"Did the team run product demonstrations?",accepted:["Did the team run product demonstrations?"]},
+    {original:"The HR manager found it difficult to retain staff.",transformInstruction:"Negative.",correct:"The HR manager didn't find it difficult to retain staff.",accepted:["The HR manager didn't find it difficult to retain staff.","The HR manager did not find it difficult to retain staff."]},
+    {original:"The manager took a decision to cut prices.",transformInstruction:"Question.",correct:"Did the manager take a decision to cut prices?",accepted:["Did the manager take a decision to cut prices?"]},
+    {original:"The buyer thought the price was too high.",transformInstruction:"Negative.",correct:"The buyer didn't think the price was too high.",accepted:["The buyer didn't think the price was too high.","The buyer did not think the price was too high."]},
+    {original:"The assistant wrote up the minutes.",transformInstruction:"Question.",correct:"Did the assistant write up the minutes?",accepted:["Did the assistant write up the minutes?"]},
+    {original:"The chain opened ten new outlets.",transformInstruction:"Negative.",correct:"The chain didn't open ten new outlets.",accepted:["The chain didn't open ten new outlets.","The chain did not open ten new outlets."]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"ordre",
+  instruction:"Reorder the words to form a correct past simple sentence.",
+  questions:[
+    {words:["negotiated","rep","discount","significant","the","client","for","a","sales","the"],correct:"The sales rep negotiated a significant discount for the client."},
+    {words:["launched","company","product","range","new","fair","trade","at","the","the","its"],correct:"The company launched its new product range at the trade fair."},
+    {words:["exceeded","manager","targets","quarterly","by","the","20%","his"],correct:"The manager exceeded his quarterly targets by 20%."},
+    {words:["closed","team","deal","weeks","after","three","negotiation","of","the","the"],correct:"The team closed the deal after three weeks of negotiation."},
+    {words:["complained","customer","delivery","about","delay","the","the"],correct:"The customer complained about the delivery delay."},
+    {words:["recruited","HR","advisors","five","sales","new","department","the","last","month"],correct:"The HR department recruited five new sales advisors last month."},
+    {words:["achieved","company","turnover","record","last","year","financial","the","the"],correct:"The company achieved record turnover in the last financial year."},
+    {words:["developed","team","campaign","targeted","social","media","marketing","a","the"],correct:"The marketing team developed a targeted social media campaign."},
+    {words:["delivered","supplier","order","days","three","late","the"],correct:"The supplier delivered the order three days late."},
+    {words:["opened","chain","outlets","ten","new","across","retail","country","the","the"],correct:"The retail chain opened ten new outlets across the country."},
+    {words:["presented","director","results","annual","board","to","the","the","sales"],correct:"The sales director presented the annual results to the board."},
+    {words:["signed","company","distribution","three-year","agreement","a","the"],correct:"The company signed a three-year distribution agreement."},
+    {words:["trained","manager","staff","new","service","customer","all","in","store","the"],correct:"The store manager trained all new staff in customer service."},
+    {words:["analysed","team","data","market","identify","to","opportunities","new","the"],correct:"The team analysed the market data to identify new opportunities."},
+    {words:["placed","client","order","worth","€50,000","an","the"],correct:"The client placed an order worth €50,000."}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"trous",
+  instruction:"Complete using past simple (affirmative or negative as shown).",
+  questions:[
+    {sentence:"The sales manager ___ (not/accept) the client's initial offer.",answers:["didn't accept"]},
+    {sentence:"The company ___ (expand) into three new European markets.",answers:["expanded"]},
+    {sentence:"The team ___ (not/reach) its annual target due to supply chain issues.",answers:["didn't reach"]},
+    {sentence:"The buyer ___ (request) a product demonstration before signing the contract.",answers:["requested"]},
+    {sentence:"The director ___ (not/approve) the proposed advertising budget.",answers:["didn't approve"]},
+    {sentence:"The rep ___ (follow up) on all leads within 24 hours.",answers:["followed up"]},
+    {sentence:"The company ___ (not/renew) its contract with the logistics provider.",answers:["didn't renew"]},
+    {sentence:"The store ___ (reduce) its prices by 15% during the summer sales.",answers:["reduced"]},
+    {sentence:"The assistant ___ (not/process) the refund request in time.",answers:["didn't process"]},
+    {sentence:"The team ___ (exceed) its monthly target for the third consecutive month.",answers:["exceeded"]},
+    {sentence:"The supplier ___ (not/honour) the delivery deadline.",answers:["didn't honour"]},
+    {sentence:"The manager ___ (conduct) a full review of the customer satisfaction data.",answers:["conducted"]},
+    {sentence:"The company ___ (not/retain) its market leader position that year.",answers:["didn't retain"]},
+    {sentence:"The sales rep ___ (build) a loyal customer base through excellent service.",answers:["built"]},
+    {sentence:"The board ___ (not/approve) the merger at the shareholders' meeting.",answers:["didn't approve"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct past simple sentence. Commerce and business context.",
+  questions:[
+    {q:"Which is correct?",options:["The rep negotiated a deal.","The rep has negotiate a deal.","The rep negotiatted a deal.","The rep was negotiate a deal."],correct:0},
+    {q:"Which is correct?",options:["Did the team close the deal?","Did the team closed the deal?","Has the team close the deal?","Did the team closes the deal?"],correct:0},
+    {q:"Which is correct?",options:["The supplier didn't deliver on time.","The supplier didn't delivered on time.","The supplier hasn't deliver on time.","The supplier not delivered on time."],correct:0},
+    {q:"Which is correct?",options:["The firm achieved record turnover.","The firm has achieve record turnover.","The firm achievedd record turnover.","The firm was achieve record turnover."],correct:0},
+    {q:"Which is correct?",options:["Did the client place an order?","Did the client placed an order?","Has the client place an order?","Did the client places an order?"],correct:0},
+    {q:"Which is correct?",options:["The manager didn't exceed his targets.","The manager didn't exceeded his targets.","The manager hasn't exceed his targets.","The manager not exceeded his targets."],correct:0},
+    {q:"Which is correct?",options:["The team ran product demos.","The team runned product demos.","The team has run product demos.","The team was run product demos."],correct:0},
+    {q:"Which is correct?",options:["Did the director give a presentation?","Did the director gave a presentation?","Has the director give a presentation?","Did the director gives a presentation?"],correct:0},
+    {q:"Which is correct?",options:["The company signed the contract.","The company has sign the contract.","The company signd the contract.","The company was sign the contract."],correct:0},
+    {q:"Which is correct?",options:["The buyer thought the price was too high.","The buyer thinked the price was too high.","The buyer has thought the price was too high.","The buyer was think the price was too high."],correct:0},
+    {q:"Which is correct?",options:["The HR manager found it hard to retain staff.","The HR manager finded it hard to retain staff.","The HR manager has find it hard to retain staff.","The HR manager was find it hard to retain staff."],correct:0},
+    {q:"Which is correct?",options:["The chain opened ten new outlets.","The chain openned ten new outlets.","The chain has open ten new outlets.","The chain was open ten new outlets."],correct:0},
+    {q:"Which is correct?",options:["The assistant wrote the minutes.","The assistant writed the minutes.","The assistant has write the minutes.","The assistant was write the minutes."],correct:0},
+    {q:"Which is correct?",options:["The company lost a major client.","The company losed a major client.","The company has lose a major client.","The company was lose a major client."],correct:0},
+    {q:"Which is correct?",options:["The manager held a weekly review.","The manager holded a weekly review.","The manager has hold a weekly review.","The manager was hold a weekly review."],correct:0}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"trous",
+  instruction:"Complete these sentences from professional commerce contexts.",
+  questions:[
+    {sentence:"The company ___ (carry out) a full audit of its distribution network.",answers:["carried out"]},
+    {sentence:"The sales team ___ (draw up) a detailed action plan for the next quarter.",answers:["drew up"]},
+    {sentence:"The manager ___ (put forward) a proposal to restructure the sales force.",answers:["put forward"]},
+    {sentence:"The rep ___ (follow up) with the prospect after the initial meeting.",answers:["followed up"]},
+    {sentence:"The company ___ (take on) three new members of staff in the sales department.",answers:["took on"]},
+    {sentence:"The board ___ (turn down) the proposed acquisition.",answers:["turned down"]},
+    {sentence:"The firm ___ (stand out) from its competitors through exceptional service.",answers:["stood out"]},
+    {sentence:"The director ___ (set up) a new customer loyalty scheme.",answers:["set up"]},
+    {sentence:"The rep ___ (bring in) over €200,000 of new business last year.",answers:["brought in"]},
+    {sentence:"The company ___ (give up) its position in the budget segment.",answers:["gave up"]},
+    {sentence:"The manager ___ (break into) the Asian market for the first time.",answers:["broke into"]},
+    {sentence:"The team ___ (come up with) an innovative solution to the distribution problem.",answers:["came up with"]},
+    {sentence:"The buyer ___ (go back) to the supplier with a counteroffer.",answers:["went back"]},
+    {sentence:"The firm ___ (make up) for the late delivery with a discount on the next order.",answers:["made up"]},
+    {sentence:"The HR director ___ (take over) from the outgoing department head.",answers:["took over"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"transform",
+  instruction:"Rewrite the sentence as indicated. Business and commerce context.",
+  questions:[
+    {original:"The company carried out a full audit.",transformInstruction:"Question.",correct:"Did the company carry out a full audit?",accepted:["Did the company carry out a full audit?"]},
+    {original:"The manager put forward a proposal.",transformInstruction:"Negative.",correct:"The manager didn't put forward a proposal.",accepted:["The manager didn't put forward a proposal.","The manager did not put forward a proposal."]},
+    {original:"The board turned down the acquisition.",transformInstruction:"Question.",correct:"Did the board turn down the acquisition?",accepted:["Did the board turn down the acquisition?"]},
+    {original:"The firm stood out from competitors.",transformInstruction:"Negative.",correct:"The firm didn't stand out from competitors.",accepted:["The firm didn't stand out from competitors.","The firm did not stand out from competitors."]},
+    {original:"The rep brought in new business.",transformInstruction:"Question.",correct:"Did the rep bring in new business?",accepted:["Did the rep bring in new business?"]},
+    {original:"The director set up a loyalty scheme.",transformInstruction:"Negative.",correct:"The director didn't set up a loyalty scheme.",accepted:["The director didn't set up a loyalty scheme.","The director did not set up a loyalty scheme."]},
+    {original:"The company broke into the Asian market.",transformInstruction:"Question.",correct:"Did the company break into the Asian market?",accepted:["Did the company break into the Asian market?"]},
+    {original:"The team came up with a solution.",transformInstruction:"Negative.",correct:"The team didn't come up with a solution.",accepted:["The team didn't come up with a solution.","The team did not come up with a solution."]},
+    {original:"The HR director took over the department.",transformInstruction:"Question.",correct:"Did the HR director take over the department?",accepted:["Did the HR director take over the department?"]},
+    {original:"The company gave up its market position.",transformInstruction:"Negative.",correct:"The company didn't give up its market position.",accepted:["The company didn't give up its market position.","The company did not give up its market position."]},
+    {original:"The sales team drew up an action plan.",transformInstruction:"Question.",correct:"Did the sales team draw up an action plan?",accepted:["Did the sales team draw up an action plan?"]},
+    {original:"The buyer went back with a counteroffer.",transformInstruction:"Negative.",correct:"The buyer didn't go back with a counteroffer.",accepted:["The buyer didn't go back with a counteroffer.","The buyer did not go back with a counteroffer."]},
+    {original:"The firm made up for the late delivery.",transformInstruction:"Question.",correct:"Did the firm make up for the late delivery?",accepted:["Did the firm make up for the late delivery?"]},
+    {original:"The company took on three new staff.",transformInstruction:"Negative.",correct:"The company didn't take on three new staff.",accepted:["The company didn't take on three new staff.","The company did not take on three new staff."]},
+    {original:"The rep followed up after the meeting.",transformInstruction:"Question.",correct:"Did the rep follow up after the meeting?",accepted:["Did the rep follow up after the meeting?"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"ordre",
+  instruction:"Reorder the words to form a correct sentence. Commerce context.",
+  questions:[
+    {words:["carried","company","audit","full","distribution","of","network","its","out","the","a"],correct:"The company carried out a full audit of its distribution network."},
+    {words:["drew","team","plan","detailed","action","up","quarter","next","for","a","the","sales","the"],correct:"The sales team drew up a detailed action plan for the next quarter."},
+    {words:["put","manager","proposal","forward","restructure","to","force","sales","the","a","the"],correct:"The manager put forward a proposal to restructure the sales force."},
+    {words:["followed","rep","prospect","up","after","initial","meeting","with","the","the"],correct:"The rep followed up with the prospect after the initial meeting."},
+    {words:["took","company","staff","new","three","department","sales","on","in","the","the"],correct:"The company took on three new staff in the sales department."},
+    {words:["turned","board","proposed","acquisition","down","the","the"],correct:"The board turned down the proposed acquisition."},
+    {words:["stood","firm","competitors","from","exceptional","through","service","out","the"],correct:"The firm stood out from competitors through exceptional service."},
+    {words:["set","director","customer","new","loyalty","scheme","up","a"],correct:"The director set up a new customer loyalty scheme."},
+    {words:["brought","rep","business","new","€200,000","over","in","last","year","of","the"],correct:"The rep brought in over €200,000 of new business last year."},
+    {words:["broke","company","Asian","market","into","first","for","time","the","the"],correct:"The company broke into the Asian market for the first time."},
+    {words:["came","team","with","solution","up","innovative","an","distribution","problem","to","the"],correct:"The team came up with an innovative solution to the distribution problem."},
+    {words:["went","buyer","supplier","back","with","counteroffer","to","a","the","the"],correct:"The buyer went back to the supplier with a counteroffer."},
+    {words:["made","firm","delivery","late","with","discount","up","for","a","the","the"],correct:"The firm made up for the late delivery with a discount."},
+    {words:["took","HR","director","outgoing","from","over","department","head","the","the"],correct:"The HR director took over from the outgoing department head."},
+    {words:["gave","company","position","budget","segment","up","its","in","the","the"],correct:"The company gave up its position in the budget segment."}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"preterit", type:"qcm",
+  instruction:"Choose the correct option to complete the sentence professionally.",
+  questions:[
+    {q:"The sales rep ___ a strong case for the new pricing strategy.",options:["made","maked","has make","making"],correct:0},
+    {q:"The company ___ its market share by 5% last year.",options:["increased","has increase","increaseed","increasing"],correct:0},
+    {q:"The team ___ all complaints within the agreed timeframe.",options:["resolved","has resolve","resolveed","resolving"],correct:0},
+    {q:"The buyer ___ the contract conditions after lengthy discussions.",options:["accepted","has accept","acceptted","accepting"],correct:0},
+    {q:"The firm ___ a significant investment in digital marketing.",options:["made","maked","has make","making"],correct:0},
+    {q:"The rep ___ the features and benefits of each product.",options:["demonstrated","has demonstrate","demonstratted","demonstrating"],correct:0},
+    {q:"The manager ___ the underperforming member of the team.",options:["coached","has coach","coachd","coaching"],correct:0},
+    {q:"The company ___ an exclusive partnership with a leading distributor.",options:["secured","has secure","secureed","securing"],correct:0},
+    {q:"The team ___ its approach to better address customer needs.",options:["adapted","has adapt","adaptted","adapting"],correct:0},
+    {q:"The director ___ a merger between the two divisions.",options:["oversaw","has oversee","overseed","overseeing"],correct:0},
+    {q:"The rep ___ regular reports on his pipeline to management.",options:["submitted","has submit","submittted","submitting"],correct:0},
+    {q:"The HR team ___ a new onboarding programme for sales staff.",options:["introduced","has introduce","introducted","introducing"],correct:0},
+    {q:"The company ___ a significant drop in sales in the final quarter.",options:["experienced","has experience","experienceed","experiencing"],correct:0},
+    {q:"The supplier ___ a 10% reduction in unit costs.",options:["offered","has offer","offerred","offering"],correct:0},
+    {q:"The assistant ___ all customer correspondence promptly.",options:["handled","has handle","handeld","handling"],correct:0}
+  ]
+}
+];
+
+// ── BTS MCO/NDRC – PRESENT PERFECT (10 exercises) ───────────
+const BTS_MCO_PRESENT_PERFECT = [
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form. Business and commerce context.",
+  questions:[
+    {q:"The company ___ (expand) into five new markets since 2020.",options:["expanded","has expanded","have expanded","expands"],correct:1},
+    {q:"The sales team ___ (exceed) its annual targets for the third year running.",options:["exceeded","has exceeded","have exceeded","exceeds"],correct:1},
+    {q:"We ___ (develop) a new customer loyalty programme recently.",options:["developed","has developed","have developed","develops"],correct:2},
+    {q:"The manager ___ (negotiate) better terms with the main supplier.",options:["negotiated","has negotiated","have negotiated","negotiates"],correct:1},
+    {q:"___ the company ___ (sign) the distribution agreement yet?",options:["Did/sign","Has/signed","Have/signed","Did/signed"],correct:1},
+    {q:"The HR department ___ (recruit) twelve new staff since January.",options:["recruited","has recruited","have recruited","recruits"],correct:2},
+    {q:"We ___ never ___ (lose) a client due to poor service.",options:["have/lost","has/lost","did/lose","have/lose"],correct:0},
+    {q:"The rep ___ already ___ (close) three deals this week.",options:["has/closed","have/closed","did/close","has/closing"],correct:0},
+    {q:"The firm ___ (build) a solid reputation in the B2B sector.",options:["built","has built","have built","builds"],correct:1},
+    {q:"The marketing team ___ just ___ (launch) a new campaign.",options:["has/launched","have/launched","did/launch","has/launching"],correct:0},
+    {q:"The director ___ (make) several important strategic decisions recently.",options:["made","has made","have made","makes"],correct:1},
+    {q:"___ you ever ___ (attend) an international trade fair?",options:["Did/attend","Have/attended","Has/attended","Did/attended"],correct:1},
+    {q:"The company ___ (achieve) ISO certification after years of effort.",options:["achieved","has achieved","have achieved","achieves"],correct:1},
+    {q:"Turnover ___ (increase) by 15% since the restructuring.",options:["increased","has increased","have increased","increases"],correct:1},
+    {q:"The team ___ (not/receive) feedback on the proposal yet.",options:["didn't receive","hasn't received","haven't received","don't receive"],correct:2}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"trous",
+  instruction:"Complete with the present perfect. Business context.",
+  questions:[
+    {sentence:"The sales manager ___ (exceed) her personal best this quarter.",answers:["has exceeded"]},
+    {sentence:"We ___ (just/launch) a new B2B platform for our trade clients.",answers:["have just launched"]},
+    {sentence:"The team ___ (not/receive) the signed contract from the client yet.",answers:["has not received"]},
+    {sentence:"The company ___ (expand) its product range significantly since last year.",answers:["has expanded"]},
+    {sentence:"I ___ (attend) three international trade fairs this year.",answers:["have attended"]},
+    {sentence:"The firm ___ (build) a reputation for reliability and innovation.",answers:["has built"]},
+    {sentence:"The HR department ___ (recruit) over thirty staff since the restructuring.",answers:["has recruited"]},
+    {sentence:"The rep ___ already ___ (contact) all prospects on the list.",answers:["has","contacted"]},
+    {sentence:"Management ___ (take) the decision to outsource customer service.",answers:["has taken"]},
+    {sentence:"We ___ (never/lose) a client due to a quality issue.",answers:["have never lost"]},
+    {sentence:"The director ___ (make) several visits to the main client this month.",answers:["has made"]},
+    {sentence:"The marketing team ___ (develop) a new visual identity for the brand.",answers:["has developed"]},
+    {sentence:"Turnover ___ (increase) by 20% since the new strategy was implemented.",answers:["has increased"]},
+    {sentence:"___ the company ___ (achieve) its sustainability targets yet?",answers:["Has","achieved"]},
+    {sentence:"The supplier ___ (offer) better terms following the last negotiation.",answers:["has offered"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"transform",
+  instruction:"Transform the sentence as shown. Commerce context.",
+  questions:[
+    {original:"The company has expanded into new markets.",transformInstruction:"Negative.",correct:"The company hasn't expanded into new markets.",accepted:["The company hasn't expanded into new markets.","The company has not expanded into new markets."]},
+    {original:"The team has exceeded its targets.",transformInstruction:"Question.",correct:"Has the team exceeded its targets?",accepted:["Has the team exceeded its targets?"]},
+    {original:"We have developed a loyalty programme.",transformInstruction:"Negative.",correct:"We haven't developed a loyalty programme.",accepted:["We haven't developed a loyalty programme.","We have not developed a loyalty programme."]},
+    {original:"The firm has built a solid reputation.",transformInstruction:"Question.",correct:"Has the firm built a solid reputation?",accepted:["Has the firm built a solid reputation?"]},
+    {original:"The rep has closed three deals.",transformInstruction:"Negative.",correct:"The rep hasn't closed three deals.",accepted:["The rep hasn't closed three deals.","The rep has not closed three deals."]},
+    {original:"The HR team has recruited twelve staff.",transformInstruction:"Question.",correct:"Has the HR team recruited twelve staff?",accepted:["Has the HR team recruited twelve staff?"]},
+    {original:"We have never lost a client.",transformInstruction:"Question.",correct:"Have we ever lost a client?",accepted:["Have we ever lost a client?"]},
+    {original:"The marketing team has launched a campaign.",transformInstruction:"Negative.",correct:"The marketing team hasn't launched a campaign.",accepted:["The marketing team hasn't launched a campaign.","The marketing team has not launched a campaign."]},
+    {original:"Turnover has increased by 15%.",transformInstruction:"Question.",correct:"Has turnover increased by 15%?",accepted:["Has turnover increased by 15%?"]},
+    {original:"The company has achieved ISO certification.",transformInstruction:"Negative.",correct:"The company hasn't achieved ISO certification.",accepted:["The company hasn't achieved ISO certification.","The company has not achieved ISO certification."]},
+    {original:"The manager has negotiated better terms.",transformInstruction:"Question.",correct:"Has the manager negotiated better terms?",accepted:["Has the manager negotiated better terms?"]},
+    {original:"The team has not received feedback.",transformInstruction:"Question.",correct:"Has the team received feedback?",accepted:["Has the team received feedback?"]},
+    {original:"The director has made strategic decisions.",transformInstruction:"Negative.",correct:"The director hasn't made strategic decisions.",accepted:["The director hasn't made strategic decisions.","The director has not made strategic decisions."]},
+    {original:"The supplier has offered better terms.",transformInstruction:"Question.",correct:"Has the supplier offered better terms?",accepted:["Has the supplier offered better terms?"]},
+    {original:"Management has taken the decision.",transformInstruction:"Negative.",correct:"Management hasn't taken the decision.",accepted:["Management hasn't taken the decision.","Management has not taken the decision."]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct present perfect sentence.",
+  questions:[
+    {words:["has","company","expanded","markets","new","into","since","2020","five","the"],correct:"The company has expanded into five new markets since 2020."},
+    {words:["has","team","exceeded","targets","annual","its","running","year","third","for","sales","the"],correct:"The sales team has exceeded its annual targets for the third year running."},
+    {words:["have","we","developed","loyalty","new","customer","programme","a"],correct:"We have developed a new customer loyalty programme."},
+    {words:["has","manager","negotiated","terms","better","supplier","main","with","the","the"],correct:"The manager has negotiated better terms with the main supplier."},
+    {words:["has","firm","built","reputation","solid","sector","B2B","in","a","the","the"],correct:"The firm has built a solid reputation in the B2B sector."},
+    {words:["has","marketing","just","launched","new","campaign","team","a","the"],correct:"The marketing team has just launched a new campaign."},
+    {words:["have","we","never","client","due","service","poor","to","lost","a"],correct:"We have never lost a client due to poor service."},
+    {words:["has","rep","already","deals","three","this","week","closed","the"],correct:"The rep has already closed three deals this week."},
+    {words:["has","company","achieved","certification","ISO","effort","years","after","of","the"],correct:"The company has achieved ISO certification after years of effort."},
+    {words:["has","turnover","increased","by","15%","since","restructuring","the"],correct:"Turnover has increased by 15% since the restructuring."},
+    {words:["has","HR","recruited","twelve","new","staff","January","since","department","the"],correct:"The HR department has recruited twelve new staff since January."},
+    {words:["has","director","made","decisions","strategic","several","recently","the"],correct:"The director has made several strategic decisions recently."},
+    {words:["have","you","ever","fair","trade","international","an","attended","?"],correct:"Have you ever attended an international trade fair?"},
+    {words:["has","team","not","feedback","received","proposal","on","yet","the"],correct:"The team has not received feedback on the proposal yet."},
+    {words:["has","supplier","offered","terms","better","following","negotiation","last","the"],correct:"The supplier has offered better terms following the last negotiation."}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect + since / for / just / already / yet / never / ever.",
+  questions:[
+    {sentence:"The company ___ (work) with this supplier ___ over ten years.",answers:["has worked","for"]},
+    {sentence:"Sales ___ (increase) steadily ___ the new pricing strategy was adopted.",answers:["have increased","since"]},
+    {sentence:"The manager ___ just ___ (approve) the marketing budget.",answers:["has","approved"]},
+    {sentence:"The rep ___ already ___ (contact) all clients on the priority list.",answers:["has","contacted"]},
+    {sentence:"___ the buyer ___ (sign) the contract ___?",answers:["Has","signed","yet"]},
+    {sentence:"We ___ (never/miss) a delivery deadline with this client.",answers:["have never missed"]},
+    {sentence:"The company ___ (hold) the market leader position ___ its launch.",answers:["has held","since"]},
+    {sentence:"The team ___ (achieve) its quarterly targets ___ three years.",answers:["has achieved","for"]},
+    {sentence:"___ you ever ___ (negotiate) a contract in a foreign language?",answers:["Have","negotiated"]},
+    {sentence:"The director ___ just ___ (return) from a sales trip to Asia.",answers:["has","returned"]},
+    {sentence:"The firm ___ (not/receive) payment from the client ___.",answers:["has not received","yet"]},
+    {sentence:"The HR manager ___ (manage) the sales team ___ the previous director left.",answers:["has managed","since"]},
+    {sentence:"We ___ (partner) with this distributor ___ five years.",answers:["have partnered","for"]},
+    {sentence:"The company ___ (introduce) several new products ___ the beginning of the year.",answers:["has introduced","since"]},
+    {sentence:"The team ___ already ___ (begin) the client onboarding process.",answers:["has","begun"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"qcm",
+  instruction:"Identify the correct present perfect sentence. Business context.",
+  questions:[
+    {q:"Which is correct?",options:["The company has expanded its range.","The company have expanded its range.","The company has expand its range.","The company expanded its range already."],correct:0},
+    {q:"Which is correct?",options:["The rep has closed three deals.","The rep have closed three deals.","The rep has close three deals.","The rep closed three deals already."],correct:0},
+    {q:"Which is correct?",options:["Has the firm built a reputation?","Have the firm built a reputation?","Did the firm has built a reputation?","Has the firm build a reputation?"],correct:0},
+    {q:"Which is correct?",options:["We have never lost a client.","We has never lost a client.","We have never lose a client.","We never have lost a client."],correct:0},
+    {q:"Which is correct?",options:["Turnover has increased by 15%.","Turnover have increased by 15%.","Turnover has increase by 15%.","Turnover increased by 15% already."],correct:0},
+    {q:"Which is correct?",options:["The manager hasn't signed the contract yet.","The manager haven't signed the contract yet.","The manager hasn't sign the contract yet.","The manager didn't signed the contract yet."],correct:0},
+    {q:"Which is correct?",options:["Have you ever attended a trade fair?","Has you ever attended a trade fair?","Did you ever have attended a trade fair?","Have you ever attend a trade fair?"],correct:0},
+    {q:"Which is correct?",options:["The company has achieved ISO certification.","The company have achieved ISO certification.","The company has achieve ISO certification.","The company achieved ISO certification already."],correct:0},
+    {q:"Which is correct?",options:["The HR team has recruited twelve staff.","The HR team have recruited twelve staff.","The HR team has recruit twelve staff.","The HR team recruited twelve staff already."],correct:0},
+    {q:"Which is correct?",options:["The director has made several decisions.","The director have made several decisions.","The director has make several decisions.","The director made several decisions already."],correct:0},
+    {q:"Which is correct?",options:["We haven't received feedback yet.","We haven't receive feedback yet.","We didn't have received feedback yet.","We have not received feedback since."],correct:0},
+    {q:"Which is correct?",options:["Has the supplier offered better terms?","Have the supplier offered better terms?","Did the supplier has offered better terms?","Has the supplier offer better terms?"],correct:0},
+    {q:"Which is correct?",options:["Management has taken the decision.","Management have taken the decision.","Management has take the decision.","Management took the decision already."],correct:0},
+    {q:"Which is correct?",options:["The marketing team has launched a campaign.","The marketing team have launched a campaign.","The marketing team has launch a campaign.","The marketing team launched a campaign already."],correct:0},
+    {q:"Which is correct?",options:["The team has exceeded its targets.","The team have exceeded its targets.","The team has exceed its targets.","The team exceeded its targets already."],correct:0}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"trous",
+  instruction:"Complete with present perfect in professional business contexts.",
+  questions:[
+    {sentence:"The director ___ (oversee) significant growth in the company's client portfolio.",answers:["has overseen"]},
+    {sentence:"The team ___ (build) lasting relationships with key decision-makers.",answers:["has built"]},
+    {sentence:"Staff members ___ (undergo) intensive training in digital sales techniques.",answers:["have undergone"]},
+    {sentence:"The company ___ (develop) an innovative approach to customer retention.",answers:["has developed"]},
+    {sentence:"The sales manager ___ (stand) by her team through a difficult quarter.",answers:["has stood"]},
+    {sentence:"Management ___ (seek) to reduce costs while maintaining quality.",answers:["has sought"]},
+    {sentence:"The firm ___ (overcome) significant competitive pressure in recent years.",answers:["has overcome"]},
+    {sentence:"The agency ___ (strike) several favourable deals on behalf of its clients.",answers:["has struck"]},
+    {sentence:"The team ___ (bear) the consequences of a poor sales strategy last year.",answers:["has borne"]},
+    {sentence:"The company ___ (grow) from a small start-up to an industry leader.",answers:["has grown"]},
+    {sentence:"The manager ___ (keep) careful records of all client interactions.",answers:["has kept"]},
+    {sentence:"The team ___ (draw) on its collective experience to win back lost clients.",answers:["has drawn"]},
+    {sentence:"The firm ___ (choose) to invest in people rather than technology.",answers:["has chosen"]},
+    {sentence:"Staff ___ (take) part in regular professional development workshops.",answers:["have taken"]},
+    {sentence:"The director ___ (write) a white paper on the future of retail commerce.",answers:["has written"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"transform",
+  instruction:"Transform as shown. Professional commerce and sales context.",
+  questions:[
+    {original:"The director has overseen significant growth.",transformInstruction:"Negative.",correct:"The director hasn't overseen significant growth.",accepted:["The director hasn't overseen significant growth.","The director has not overseen significant growth."]},
+    {original:"The team has built lasting relationships.",transformInstruction:"Question.",correct:"Has the team built lasting relationships?",accepted:["Has the team built lasting relationships?"]},
+    {original:"Staff have undergone intensive training.",transformInstruction:"Negative.",correct:"Staff haven't undergone intensive training.",accepted:["Staff haven't undergone intensive training.","Staff have not undergone intensive training."]},
+    {original:"The company has developed a new approach.",transformInstruction:"Question.",correct:"Has the company developed a new approach?",accepted:["Has the company developed a new approach?"]},
+    {original:"Management has sought to reduce costs.",transformInstruction:"Negative.",correct:"Management hasn't sought to reduce costs.",accepted:["Management hasn't sought to reduce costs.","Management has not sought to reduce costs."]},
+    {original:"The firm has overcome competitive pressure.",transformInstruction:"Question.",correct:"Has the firm overcome competitive pressure?",accepted:["Has the firm overcome competitive pressure?"]},
+    {original:"The agency has struck favourable deals.",transformInstruction:"Negative.",correct:"The agency hasn't struck favourable deals.",accepted:["The agency hasn't struck favourable deals.","The agency has not struck favourable deals."]},
+    {original:"The company has grown considerably.",transformInstruction:"Question.",correct:"Has the company grown considerably?",accepted:["Has the company grown considerably?"]},
+    {original:"The manager has kept careful records.",transformInstruction:"Negative.",correct:"The manager hasn't kept careful records.",accepted:["The manager hasn't kept careful records.","The manager has not kept careful records."]},
+    {original:"The team has drawn on collective experience.",transformInstruction:"Question.",correct:"Has the team drawn on collective experience?",accepted:["Has the team drawn on collective experience?"]},
+    {original:"The firm has chosen to invest in people.",transformInstruction:"Negative.",correct:"The firm hasn't chosen to invest in people.",accepted:["The firm hasn't chosen to invest in people.","The firm has not chosen to invest in people."]},
+    {original:"Staff have taken part in workshops.",transformInstruction:"Question.",correct:"Have staff taken part in workshops?",accepted:["Have staff taken part in workshops?"]},
+    {original:"The team has borne the consequences.",transformInstruction:"Negative.",correct:"The team hasn't borne the consequences.",accepted:["The team hasn't borne the consequences.","The team has not borne the consequences."]},
+    {original:"The director has written a white paper.",transformInstruction:"Question.",correct:"Has the director written a white paper?",accepted:["Has the director written a white paper?"]},
+    {original:"The sales manager has stood by her team.",transformInstruction:"Negative.",correct:"The sales manager hasn't stood by her team.",accepted:["The sales manager hasn't stood by her team.","The sales manager has not stood by her team."]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"ordre",
+  instruction:"Reorder to form a correct present perfect sentence.",
+  questions:[
+    {words:["has","director","overseen","growth","significant","portfolio","client","company's","the","the"],correct:"The director has overseen significant growth in the company's client portfolio."},
+    {words:["has","team","built","relationships","lasting","decision-makers","key","with","the"],correct:"The team has built lasting relationships with key decision-makers."},
+    {words:["have","staff","undergone","training","intensive","techniques","digital","sales","in","members"],correct:"Staff members have undergone intensive training in digital sales techniques."},
+    {words:["has","company","developed","approach","innovative","retention","customer","an","to","the"],correct:"The company has developed an innovative approach to customer retention."},
+    {words:["has","management","sought","reduce","costs","while","quality","maintaining","to"],correct:"Management has sought to reduce costs while maintaining quality."},
+    {words:["has","firm","overcome","pressure","competitive","significant","years","recent","in","the"],correct:"The firm has overcome significant competitive pressure in recent years."},
+    {words:["has","agency","struck","deals","favourable","behalf","clients","its","several","on","of","the"],correct:"The agency has struck several favourable deals on behalf of its clients."},
+    {words:["has","company","grown","start-up","small","from","a","leader","industry","an","to","the"],correct:"The company has grown from a small start-up to an industry leader."},
+    {words:["has","manager","kept","records","careful","interactions","client","all","of","the"],correct:"The manager has kept careful records of all client interactions."},
+    {words:["has","team","drawn","experience","collective","win","back","clients","lost","its","on","to","the"],correct:"The team has drawn on its collective experience to win back lost clients."},
+    {words:["has","firm","chosen","invest","people","rather","technology","than","to","in","the"],correct:"The firm has chosen to invest in people rather than technology."},
+    {words:["have","staff","taken","development","regular","professional","workshops","part","in"],correct:"Staff have taken part in regular professional development workshops."},
+    {words:["has","team","borne","consequences","poor","strategy","sales","of","a","the","the"],correct:"The team has borne the consequences of a poor sales strategy."},
+    {words:["has","director","written","paper","white","future","on","retail","commerce","of","a","the","the"],correct:"The director has written a white paper on the future of retail commerce."},
+    {words:["has","sales","stood","team","through","difficult","manager","her","by","quarter","a"],correct:"The sales manager has stood by her team through a difficult quarter."}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"present_perfect", type:"qcm",
+  instruction:"Choose the correct present perfect form in a professional context.",
+  questions:[
+    {q:"The firm ___ its commercial offering to meet changing client needs.",options:["adapted","has adapted","have adapted","adapts"],correct:1},
+    {q:"The team ___ every challenge it has faced this year.",options:["overcome","has overcome","have overcome","overcomes"],correct:1},
+    {q:"___ the manager ___ the revised proposal to the board?",options:["Did/present","Has/presented","Have/presented","Did/presented"],correct:1},
+    {q:"The company ___ its digital transformation strategy.",options:["accelerated","has accelerated","have accelerated","accelerates"],correct:1},
+    {q:"We ___ never ___ this level of client satisfaction before.",options:["have/achieved","has/achieved","did/achieve","have/achieve"],correct:0},
+    {q:"The sales director ___ the commercial roadmap for the next five years.",options:["defined","has defined","have defined","defines"],correct:1},
+    {q:"The HR department ___ a new competency framework for sales roles.",options:["introduced","has introduced","have introduced","introduces"],correct:1},
+    {q:"___ the team ___ all outstanding invoices yet?",options:["Did/chase","Has/chased","Have/chased","Did/chased"],correct:2},
+    {q:"The company ___ the way B2B relationships are managed.",options:["transformed","has transformed","have transformed","transforms"],correct:1},
+    {q:"Staff ___ several upskilling modules this quarter.",options:["completed","has completed","have completed","completes"],correct:2},
+    {q:"The rep ___ a commendation for outstanding performance.",options:["received","has received","have received","receives"],correct:1},
+    {q:"The firm ___ a strict client confidentiality policy.",options:["maintained","has maintained","have maintained","maintains"],correct:1},
+    {q:"The commercial team ___ a new CRM platform to manage leads.",options:["adopted","has adopted","have adopted","adopts"],correct:1},
+    {q:"The director ___ a benchmark study comparing key competitors.",options:["commissioned","has commissioned","have commissioned","commissions"],correct:1},
+    {q:"Staff ___ significant progress in meeting the company's diversity targets.",options:["made","has made","have made","makes"],correct:2}
+  ]
+}
+];
+
+// ── BTS MCO/NDRC – BOTH (10 exercises) ──────────────────────
+const BTS_MCO_BOTH = [
+{
+  level:"BTS_MCO", topic:"both", type:"qcm",
+  instruction:"Choose past simple or present perfect. Commerce and business context.",
+  questions:[
+    {q:"The company ___ (expand) into five new markets since its launch.",options:["expanded","has expanded","have expanded","expands"],correct:1},
+    {q:"The rep ___ (negotiate) the contract last Thursday.",options:["has negotiated","negotiated","negotiates","have negotiated"],correct:1},
+    {q:"Sales ___ (increase) by 20% since the new strategy was implemented.",options:["increased","has increased","have increased","increases"],correct:2},
+    {q:"The team ___ (close) its biggest deal of the year last month.",options:["has closed","closed","closes","have closed"],correct:1},
+    {q:"We ___ (never/lose) a client due to a quality problem.",options:["never lost","have never lost","never have lost","had never lost"],correct:1},
+    {q:"The director ___ (give) a presentation at last week's conference.",options:["has given","gave","gives","have given"],correct:1},
+    {q:"The firm ___ (build) a strong reputation since its rebranding.",options:["built","has built","have built","builds"],correct:1},
+    {q:"The HR manager ___ (recruit) twelve new staff in January.",options:["has recruited","recruited","recruits","have recruited"],correct:1},
+    {q:"The marketing team ___ just ___ (launch) a new campaign.",options:["has/launched","have/launched","did/launch","has/launching"],correct:0},
+    {q:"Turnover ___ (fall) sharply in Q2 last year.",options:["has fallen","fell","falls","have fallen"],correct:1},
+    {q:"The company ___ (achieve) record sales in the last quarter.",options:["achieved","has achieved","have achieved","achieves"],correct:1},
+    {q:"The supplier ___ (not/deliver) the goods yet.",options:["didn't deliver","hasn't delivered","haven't delivered","doesn't deliver"],correct:1},
+    {q:"The team ___ (exceed) its target for the fifth month running.",options:["exceeded","has exceeded","have exceeded","exceeds"],correct:1},
+    {q:"The manager ___ (not/sign) the contract last week.",options:["hasn't signed","didn't sign","doesn't sign","haven't signed"],correct:1},
+    {q:"___ the buyer ___ (receive) the revised quotation yet?",options:["Did/receive","Has/received","Have/received","Did/received"],correct:1}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"trous",
+  instruction:"Complete with past simple or present perfect.",
+  questions:[
+    {sentence:"The company ___ (launch) its new product range at last year's trade fair.",answers:["launched"]},
+    {sentence:"Sales ___ (grow) by 25% since the new pricing model was introduced.",answers:["have grown"]},
+    {sentence:"The rep ___ (close) the deal after three weeks of negotiation last month.",answers:["closed"]},
+    {sentence:"We ___ (never/face) such intense competition before.",answers:["have never faced"]},
+    {sentence:"The manager ___ (exceed) her targets every month this year.",answers:["has exceeded"]},
+    {sentence:"The HR department ___ (recruit) over twenty new staff in January.",answers:["recruited"]},
+    {sentence:"The firm ___ (build) strong relationships with its B2B clients since 2018.",answers:["has built"]},
+    {sentence:"Turnover ___ (fall) sharply during the pandemic.",answers:["fell"]},
+    {sentence:"The marketing team ___ just ___ (develop) a new campaign for the summer.",answers:["has","developed"]},
+    {sentence:"The supplier ___ (not/deliver) on time, which damaged the relationship.",answers:["didn't deliver"]},
+    {sentence:"The director ___ (make) several important decisions since taking the role.",answers:["has made"]},
+    {sentence:"The buyer ___ (accept) our offer at the meeting last Tuesday.",answers:["accepted"]},
+    {sentence:"The company ___ (achieve) its sustainability targets for the first time.",answers:["has achieved"]},
+    {sentence:"The team ___ (miss) its quarterly target in Q3 last year.",answers:["missed"]},
+    {sentence:"Staff ___ (receive) updated training in customer management this month.",answers:["have received"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"transform",
+  instruction:"Rewrite the sentence as indicated. Commerce and sales context.",
+  questions:[
+    {original:"The company has expanded into new markets.",transformInstruction:"Past simple, question.",correct:"Did the company expand into new markets?",accepted:["Did the company expand into new markets?"]},
+    {original:"The rep negotiated the contract.",transformInstruction:"Present perfect, affirmative.",correct:"The rep has negotiated the contract.",accepted:["The rep has negotiated the contract."]},
+    {original:"Sales have increased by 20%.",transformInstruction:"Past simple, negative.",correct:"Sales didn't increase by 20%.",accepted:["Sales didn't increase by 20%.","Sales did not increase by 20%."]},
+    {original:"The team closed its biggest deal.",transformInstruction:"Present perfect, question.",correct:"Has the team closed its biggest deal?",accepted:["Has the team closed its biggest deal?"]},
+    {original:"We have never lost a client.",transformInstruction:"Past simple, question.",correct:"Did we ever lose a client?",accepted:["Did we ever lose a client?"]},
+    {original:"The director gave a presentation.",transformInstruction:"Present perfect, negative.",correct:"The director hasn't given a presentation.",accepted:["The director hasn't given a presentation.","The director has not given a presentation."]},
+    {original:"The firm has built a strong reputation.",transformInstruction:"Past simple, question.",correct:"Did the firm build a strong reputation?",accepted:["Did the firm build a strong reputation?"]},
+    {original:"The supplier didn't deliver on time.",transformInstruction:"Present perfect, negative.",correct:"The supplier hasn't delivered on time.",accepted:["The supplier hasn't delivered on time.","The supplier has not delivered on time."]},
+    {original:"The marketing team has launched a campaign.",transformInstruction:"Past simple, affirmative.",correct:"The marketing team launched a campaign.",accepted:["The marketing team launched a campaign."]},
+    {original:"Turnover fell sharply last year.",transformInstruction:"Present perfect, question.",correct:"Has turnover fallen sharply?",accepted:["Has turnover fallen sharply?"]},
+    {original:"The company achieved record sales.",transformInstruction:"Present perfect, affirmative.",correct:"The company has achieved record sales.",accepted:["The company has achieved record sales."]},
+    {original:"The manager has not signed the contract.",transformInstruction:"Past simple, question.",correct:"Did the manager sign the contract?",accepted:["Did the manager sign the contract?"]},
+    {original:"The team has exceeded its target.",transformInstruction:"Past simple, affirmative.",correct:"The team exceeded its target.",accepted:["The team exceeded its target."]},
+    {original:"Staff have received updated training.",transformInstruction:"Past simple, affirmative.",correct:"Staff received updated training.",accepted:["Staff received updated training."]},
+    {original:"The buyer accepted the offer.",transformInstruction:"Present perfect, question.",correct:"Has the buyer accepted the offer?",accepted:["Has the buyer accepted the offer?"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"ordre",
+  instruction:"Reorder the words. Choose the correct tense from context.",
+  questions:[
+    {words:["has","company","expanded","markets","new","into","since","launch","its","five","the"],correct:"The company has expanded into five new markets since its launch."},
+    {words:["negotiated","rep","contract","last","Thursday","the","the"],correct:"The rep negotiated the contract last Thursday."},
+    {words:["have","sales","increased","by","20%","since","strategy","new","implemented","was","the"],correct:"Sales have increased by 20% since the new strategy was implemented."},
+    {words:["closed","team","deal","biggest","year","last","of","month","its","the","the"],correct:"The team closed its biggest deal of the year last month."},
+    {words:["have","never","we","client","due","quality","lost","problem","a","to","a"],correct:"We have never lost a client due to a quality problem."},
+    {words:["gave","director","presentation","at","conference","week's","last","a","the"],correct:"The director gave a presentation at last week's conference."},
+    {words:["has","firm","built","relationships","strong","B2B","clients","since","rebranding","with","its","its","the"],correct:"The firm has built strong relationships with its B2B clients since its rebranding."},
+    {words:["fell","turnover","sharply","pandemic","during","the"],correct:"Turnover fell sharply during the pandemic."},
+    {words:["has","marketing","just","campaign","new","summer","developed","for","team","a","the","the"],correct:"The marketing team has just developed a new campaign for the summer."},
+    {words:["didn't","supplier","deliver","time","on","damaged","which","relationship","the","the"],correct:"The supplier didn't deliver on time, which damaged the relationship."},
+    {words:["has","director","made","decisions","important","since","role","taking","several","the"],correct:"The director has made several important decisions since taking the role."},
+    {words:["accepted","buyer","offer","meeting","Tuesday","last","at","our","the"],correct:"The buyer accepted our offer at the meeting last Tuesday."},
+    {words:["has","company","achieved","targets","sustainability","its","first","for","time","the","the"],correct:"The company has achieved its sustainability targets for the first time."},
+    {words:["missed","team","target","quarterly","Q3","its","last","year","in","the"],correct:"The team missed its quarterly target in Q3 last year."},
+    {words:["have","staff","received","training","updated","management","customer","month","this","in"],correct:"Staff have received updated training in customer management this month."}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense. Two blanks = auxiliary + past participle.",
+  questions:[
+    {sentence:"Since the new manager ___ (join) the team, performance ___ (improve) significantly.",answers:["joined","has improved"]},
+    {sentence:"The firm ___ (lose) three clients last year but ___ (win) five new ones since.",answers:["lost","has won"]},
+    {sentence:"The buyer ___ (request) a discount last week, and the manager ___ (agree) to 5%.",answers:["requested","agreed"]},
+    {sentence:"Since the rebrand, the company ___ (attract) a younger target audience.",answers:["has attracted"]},
+    {sentence:"The rep ___ (not/meet) the client yet, although she ___ (call) several times.",answers:["has not met","has called"]},
+    {sentence:"The supplier ___ (increase) prices twice last year, which ___ (affect) our margins.",answers:["increased","affected"]},
+    {sentence:"We ___ (work) with this partner ___ 2017, and we ___ (never/have) a serious problem.",answers:["have worked","have never had"]},
+    {sentence:"The director ___ (present) the strategy at the last board meeting and ___ (receive) approval.",answers:["presented","received"]},
+    {sentence:"The company ___ (not/respond) to the proposal yet, which is unusual.",answers:["has not responded"]},
+    {sentence:"Sales ___ (exceed) the target in Q1, but they ___ (fall) back in Q2.",answers:["exceeded","fell"]},
+    {sentence:"Since the CRM was introduced, the team ___ (manage) client relationships more effectively.",answers:["has managed"]},
+    {sentence:"The HR manager ___ (hire) two sales advisors last month and ___ (already/start) onboarding them.",answers:["hired","has already started"]},
+    {sentence:"The company ___ (invest) in digital tools, which ___ (transform) the customer experience.",answers:["has invested","has transformed"]},
+    {sentence:"The team ___ (not/close) the deal yet, although negotiations ___ (begin) three weeks ago.",answers:["has not closed","began"]},
+    {sentence:"The buyer ___ (visit) the factory in 2022 and ___ (be) impressed ever since.",answers:["visited","has been"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"qcm",
+  instruction:"Select the correct tense for each sentence. Business and commerce context.",
+  questions:[
+    {q:"The company ___ a new product range at last year's trade fair.",options:["has launched","launched","launches","have launched"],correct:1},
+    {q:"Sales ___ by 25% since the new pricing model was introduced.",options:["grew","have grown","grows","did grow"],correct:1},
+    {q:"The rep ___ the deal after three weeks of negotiation last month.",options:["has closed","closed","closes","have closed"],correct:1},
+    {q:"The firm ___ strong relationships with its B2B clients since 2018.",options:["built","has built","builds","have built"],correct:1},
+    {q:"The supplier ___ on time, which damaged the relationship.",options:["hasn't delivered","didn't deliver","doesn't deliver","haven't delivered"],correct:1},
+    {q:"The director ___ several important decisions since taking the role.",options:["made","has made","makes","have made"],correct:1},
+    {q:"The buyer ___ our offer at the meeting last Tuesday.",options:["has accepted","accepted","accepts","have accepted"],correct:1},
+    {q:"The team ___ its quarterly target in Q3 last year.",options:["has missed","missed","misses","have missed"],correct:1},
+    {q:"The marketing team ___ a new campaign for the summer.",options:["has just developed","just developed","just develops","have just developed"],correct:0},
+    {q:"Turnover ___ sharply during the pandemic.",options:["has fallen","fell","falls","have fallen"],correct:1},
+    {q:"The company ___ its sustainability targets for the first time.",options:["achieved","has achieved","achieves","have achieved"],correct:1},
+    {q:"Staff ___ updated training in customer management this month.",options:["received","has received","have received","receives"],correct:2},
+    {q:"The HR department ___ twelve new staff in January.",options:["has recruited","recruited","recruits","have recruited"],correct:1},
+    {q:"We ___ never faced such intense competition before.",options:["did","have","has","had"],correct:1},
+    {q:"The manager ___ its targets every month this year.",options:["exceeded","has exceeded","exceeds","have exceeded"],correct:1}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"trous",
+  instruction:"Complete with the correct tense in business report style.",
+  questions:[
+    {sentence:"The company ___ (carry out) a full review of its commercial strategy last spring.",answers:["carried out"]},
+    {sentence:"Since then, several improvements ___ (be) made to the client management process.",answers:["have been"]},
+    {sentence:"In Q1, the sales team ___ (exceed) its targets by 18%.",answers:["exceeded"]},
+    {sentence:"The firm ___ (invest) in a new CRM platform which ___ (already/improve) efficiency.",answers:["has invested","has already improved"]},
+    {sentence:"The director ___ (present) the annual results to shareholders last week.",answers:["presented"]},
+    {sentence:"Since the restructuring, staff turnover ___ (fall) by 30%.",answers:["has fallen"]},
+    {sentence:"The company ___ (launch) three new products in the past eighteen months.",answers:["has launched"]},
+    {sentence:"Last year, the firm ___ (lose) two major clients due to pricing issues.",answers:["lost"]},
+    {sentence:"However, management ___ (take) steps to address this and ___ (win) back one of them.",answers:["has taken","has won"]},
+    {sentence:"The marketing department ___ (develop) a new brand identity last year.",answers:["developed"]},
+    {sentence:"This ___ (have) a positive impact on brand recognition since its launch.",answers:["has had"]},
+    {sentence:"The HR team ___ (recruit) twelve new sales advisors this year.",answers:["has recruited"]},
+    {sentence:"The company ___ (not/yet/expand) into the Asian market, but ___ (begin) preliminary talks.",answers:["has not yet expanded","has begun"]},
+    {sentence:"In Q2, turnover ___ (exceed) the forecast by 10%.",answers:["exceeded"]},
+    {sentence:"The firm ___ (build) a strong brand reputation which ___ (contribute) to growth.",answers:["has built","has contributed"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"transform",
+  instruction:"Rewrite each sentence as indicated. Professional business context.",
+  questions:[
+    {original:"The company launched a product range last year.",transformInstruction:"Present perfect, affirmative.",correct:"The company has launched a product range.",accepted:["The company has launched a product range."]},
+    {original:"Sales have grown by 25%.",transformInstruction:"Past simple, question.",correct:"Did sales grow by 25%?",accepted:["Did sales grow by 25%?"]},
+    {original:"The rep closed the deal last month.",transformInstruction:"Present perfect, negative.",correct:"The rep hasn't closed the deal.",accepted:["The rep hasn't closed the deal.","The rep has not closed the deal."]},
+    {original:"The firm built strong relationships.",transformInstruction:"Present perfect, question.",correct:"Has the firm built strong relationships?",accepted:["Has the firm built strong relationships?"]},
+    {original:"The supplier has not delivered yet.",transformInstruction:"Past simple, negative.",correct:"The supplier didn't deliver.",accepted:["The supplier didn't deliver.","The supplier did not deliver."]},
+    {original:"The director has made important decisions.",transformInstruction:"Past simple, question.",correct:"Did the director make important decisions?",accepted:["Did the director make important decisions?"]},
+    {original:"The buyer accepted the offer.",transformInstruction:"Present perfect, question.",correct:"Has the buyer accepted the offer?",accepted:["Has the buyer accepted the offer?"]},
+    {original:"The team has exceeded its target.",transformInstruction:"Past simple, negative.",correct:"The team didn't exceed its target.",accepted:["The team didn't exceed its target.","The team did not exceed its target."]},
+    {original:"Turnover fell sharply.",transformInstruction:"Present perfect, affirmative.",correct:"Turnover has fallen sharply.",accepted:["Turnover has fallen sharply."]},
+    {original:"The company has achieved its targets.",transformInstruction:"Past simple, question.",correct:"Did the company achieve its targets?",accepted:["Did the company achieve its targets?"]},
+    {original:"Staff received updated training.",transformInstruction:"Present perfect, affirmative.",correct:"Staff have received updated training.",accepted:["Staff have received updated training."]},
+    {original:"The HR department recruited twelve staff.",transformInstruction:"Present perfect, negative.",correct:"The HR department hasn't recruited twelve staff.",accepted:["The HR department hasn't recruited twelve staff.","The HR department has not recruited twelve staff."]},
+    {original:"We have never faced such competition.",transformInstruction:"Past simple, question.",correct:"Did we ever face such competition?",accepted:["Did we ever face such competition?"]},
+    {original:"The manager has exceeded her targets.",transformInstruction:"Past simple, affirmative.",correct:"The manager exceeded her targets.",accepted:["The manager exceeded her targets."]},
+    {original:"The marketing team launched a campaign.",transformInstruction:"Present perfect, question.",correct:"Has the marketing team launched a campaign?",accepted:["Has the marketing team launched a campaign?"]}
+  ]
+},
+{
+  level:"BTS_MCO", topic:"both", type:"ordre",
+  instruction:"Reorder to form a correct sentence. Business context.",
+  questions:[
+    {words:["has","company","expanded","markets","into","since","its","launch","new","the"],correct:"The company has expanded into new markets since its launch."},
+    {words:["negotiated","rep","contract","terms","last","month","the","the"],correct:"The rep negotiated the contract terms last month."},
+    {words:["have","sales","grown","25%","by","pricing","new","since","model","was","introduced","the"],correct:"Sales have grown by 25% since the new pricing model was introduced."},
+    {words:["closed","team","deal","biggest","year","its","last","month","of","the","the"],correct:"The team closed its biggest deal of the year last month."},
+    {words:["has","firm","built","relationships","strong","clients","its","B2B","2018","since","with","the"],correct:"The firm has built strong relationships with its B2B clients since 2018."},
+    {words:["didn't","supplier","deliver","time","on","which","relationship","damaged","the"],correct:"The supplier didn't deliver on time, which damaged the relationship."},
+    {words:["has","director","made","decisions","important","since","role","taking","the"],correct:"The director has made important decisions since taking the role."},
+    {words:["accepted","buyer","offer","meeting","Tuesday","last","at","our","the"],correct:"The buyer accepted our offer at the meeting last Tuesday."},
+    {words:["has","marketing","just","campaign","new","summer","developed","for","team","a","the","the"],correct:"The marketing team has just developed a new campaign for the summer."},
+    {words:["fell","turnover","sharply","during","pandemic","the"],correct:"Turnover fell sharply during the pandemic."},
+    {words:["has","company","achieved","targets","sustainability","its","time","first","for","the","the"],correct:"The company has achieved its sustainability targets for the first time."},
+    {words:["have","staff","received","training","updated","management","customer","this","month","in"],correct:"Staff have received updated training in customer management this month."},
+    {words:["has","team","exceeded","target","its","month","running","fifth","for","the","the"],correct:"The team has exceeded its target for the fifth month running."},
+    {words:["didn't","manager","sign","contract","last","week","the"],correct:"The manager didn't sign the contract last week."},
+    {words:["have","we","never","client","quality","due","to","lost","problem","a","a"],correct:"We have never lost a client due to a quality problem."}
+  ]
+}
+];
+
+// 10th exercise for BTS_MCO_BOTH
+BTS_MCO_BOTH.push({
+  level:"BTS_MCO", topic:"both", type:"qcm",
+  instruction:"Choose the correct tense. Pay attention to time expressions and context.",
+  questions:[
+    {q:"The company ___ its commercial strategy completely since the new CEO arrived.",options:["revised","has revised","revises","have revised"],correct:1},
+    {q:"The sales director ___ three new clients at last month's trade fair.",options:["has signed","signed","signs","have signed"],correct:1},
+    {q:"Staff turnover ___ by 40% since the new HR policies were introduced.",options:["fell","has fallen","falls","have fallen"],correct:1},
+    {q:"The buyer ___ the terms of the contract at yesterday's meeting.",options:["has disputed","disputed","disputes","have disputed"],correct:1},
+    {q:"The firm ___ two new distribution centres in the last twelve months.",options:["opened","has opened","opens","have opened"],correct:1},
+    {q:"We ___ never offered such competitive pricing before.",options:["have","has","did","had"],correct:0},
+    {q:"The rep ___ every client on her list since the beginning of the month.",options:["contacted","has contacted","contacts","have contacted"],correct:1},
+    {q:"The manager ___ the team's performance targets at the Q3 review.",options:["revised","has revised","revises","have revised"],correct:0},
+    {q:"The company ___ record online sales during the last promotional campaign.",options:["achieved","has achieved","achieves","have achieved"],correct:0},
+    {q:"___ the legal department ___ the new contract terms yet?",options:["Did/validate","Has/validated","Have/validated","Did/validated"],correct:1},
+    {q:"The HR team ___ a new performance appraisal system last quarter.",options:["has introduced","introduced","introduces","have introduced"],correct:1},
+    {q:"Profits ___ steadily since the company adopted a leaner cost structure.",options:["grew","have grown","grows","have grew"],correct:1},
+    {q:"The assistant ___ the client's complaint to the relevant department.",options:["forwarded","has forwarded","forwards","have forwarded"],correct:0},
+    {q:"The firm ___ its after-sales service rating significantly this year.",options:["improved","has improved","improves","have improved"],correct:1},
+    {q:"The board ___ its decision to expand into the Asian market last week.",options:["has confirmed","confirmed","confirms","have confirmed"],correct:1}
+  ]
+});
+
+
 // ============================================================
 // STATE
 // ============================================================
@@ -1890,6 +3233,29 @@ let orderZones={};
 let exAnswers={};
 
 function exKey(level,topic){ return level+'_'+topic; }
+function currentExKey(topic){
+  const lk = (state.currentUser&&state.currentUser.levelKey)||state.currentUser.level;
+  return lk+'_'+topic;
+}
+
+
+function seedBTSExercises(){
+  const btsMap = {
+    'BTS_MOS_preterit': BTS_MOS_PRETERIT,
+    'BTS_MOS_present_perfect': BTS_MOS_PRESENT_PERFECT,
+    'BTS_MOS_both': BTS_MOS_BOTH,
+    'BTS_MCO_preterit': BTS_MCO_PRETERIT,
+    'BTS_MCO_present_perfect': BTS_MCO_PRESENT_PERFECT,
+    'BTS_MCO_both': BTS_MCO_BOTH,
+    'BTS_NDRC_preterit': BTS_MCO_PRETERIT,
+    'BTS_NDRC_present_perfect': BTS_MCO_PRESENT_PERFECT,
+    'BTS_NDRC_both': BTS_MCO_BOTH
+  };
+  Object.keys(btsMap).forEach(k=>{
+    if(!state.exercises[k]||state.exercises[k].length===0)
+      state.exercises[k]=btsMap[k];
+  });
+}
 
 function loadState(){
   try{
@@ -1913,6 +3279,8 @@ function loadState(){
     state.exercises={};
     Object.keys(EXERCISES_DATA).forEach(k=>{ state.exercises[k]=EXERCISES_DATA[k]; });
   }
+  // Always seed BTS exercises (they are not in EXERCISES_DATA)
+  seedBTSExercises();
 }
 function saveState(){
   localStorage.setItem('irregularVerbsV3',JSON.stringify({
@@ -1993,20 +3361,59 @@ function validateStudentId(){
   showScreen('screen-student-level');
 }
 
+
+// ============================================================
+// BTS FILIÈRE LOGIC
+// ============================================================
+let selectedFiliereEl = null;
+
+function selectFiliere(filiere, el){
+  if(selectedFiliereEl) selectedFiliereEl.classList.remove('selected');
+  el.classList.add('selected');
+  selectedFiliereEl = el;
+  state.currentUser.filiere = filiere;
+  document.getElementById('filiereError').style.display='none';
+}
+
+function confirmFiliere(){
+  if(!state.currentUser.filiere){
+    document.getElementById('filiereError').style.display='block'; return;
+  }
+  // Set the effective level key: BTS_MOS, BTS_MCO, or BTS_NDRC
+  state.currentUser.levelKey = 'BTS_' + state.currentUser.filiere;
+  state.sessions[state.currentUser.id].filiere = state.currentUser.filiere;
+  state.sessions[state.currentUser.id].levelKey = state.currentUser.levelKey;
+  saveState();
+  showStudentDashboard();
+}
+
 let selectedLevelEl=null;
 function selectLevel(level,el){
   if(selectedLevelEl) selectedLevelEl.classList.remove('selected');
   el.classList.add('selected'); selectedLevelEl=el;
   state.currentUser.level=level;
+  state.currentUser.levelKey=level; // default; BTS overrides in confirmFiliere
   document.getElementById('levelError').style.display='none';
 }
 function confirmLevel(){
   if(!state.currentUser.level){ document.getElementById('levelError').style.display='block'; return; }
   state.sessions[state.currentUser.id].level=state.currentUser.level;
-  saveState(); showStudentDashboard();
+  saveState();
+  if(state.currentUser.level==='BTS'){
+    // Show filière selection
+    state.currentUser.filiere=null;
+    selectedFiliereEl=null;
+    document.querySelectorAll('.filiere-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('btsBadge').textContent=state.currentUser.id+' – BTS';
+    showScreen('screen-bts-filiere');
+  } else {
+    state.currentUser.levelKey=state.currentUser.level;
+    showStudentDashboard();
+  }
 }
 function changeLevel(){
-  selectedLevelEl=null;
+  selectedLevelEl=null; selectedFiliereEl=null;
+  state.currentUser.filiere=null; state.currentUser.levelKey=null;
   document.querySelectorAll('#screen-student-level .level-card').forEach(c=>c.classList.remove('selected'));
   showScreen('screen-student-level');
 }
@@ -2016,10 +3423,12 @@ function changeLevel(){
 // ============================================================
 function showStudentDashboard(){
   const u=state.currentUser;
-  document.getElementById('studentBadge').textContent=u.id+' – '+u.class+' – '+u.level;
-  document.getElementById('scoreLvl').textContent=u.level;
+  const lk=u.levelKey||u.level;
+  const displayLvl=u.level==='BTS'?'BTS '+u.filiere:u.level;
+  document.getElementById('studentBadge').textContent=u.id+' – '+u.class+' – '+displayLvl;
+  document.getElementById('scoreLvl').textContent=displayLvl;
   ['preterit','present_perfect','both'].forEach((t,i)=>{
-    const k=exKey(u.level,t);
+    const k=exKey(lk,t);
     const total=(state.exercises[k]||[]).length;
     const done=getSessionProgress(u.id,k);
     const ids=['cntPret','cntPP','cntBoth'];
@@ -2050,7 +3459,9 @@ function selectTopic(topic){
   state.topic=topic;
   const labels={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prétérit / Present Perfect'};
   document.getElementById('exScreenTitle').textContent='📝 '+labels[topic];
-  document.getElementById('exBadge').textContent=state.currentUser.id+' – '+state.currentUser.level;
+  const lk=state.currentUser.levelKey||state.currentUser.level;
+  const displayLvl=state.currentUser.level==='BTS'?'BTS '+state.currentUser.filiere:state.currentUser.level;
+  document.getElementById('exBadge').textContent=state.currentUser.id+' – '+displayLvl;
   document.getElementById('rulesBackBtn').onclick=()=>showScreen('screen-exercises');
   currentExIdx=0; orderZones={}; exAnswers={};
   buildProgressTracker();
@@ -2062,7 +3473,7 @@ function selectTopic(topic){
 // PROGRESS TRACKER
 // ============================================================
 function buildProgressTracker(){
-  const k=exKey(state.currentUser.level,state.topic);
+  const k=exKey(state.currentUser.levelKey||state.currentUser.level,state.topic);
   const exList=state.exercises[k]||[];
   const sess=state.sessions[state.currentUser.id];
   const prog=(sess.exProgress&&sess.exProgress[k])||{};
@@ -2089,7 +3500,7 @@ function buildProgressTracker(){
 }
 
 function showProgressModal(){
-  const k=exKey(state.currentUser.level,state.topic);
+  const k=exKey(state.currentUser.levelKey||state.currentUser.level,state.topic);
   const exList=state.exercises[k]||[];
   const sess=state.sessions[state.currentUser.id];
   const prog=(sess&&sess.exProgress&&sess.exProgress[k])||{};
@@ -2118,7 +3529,7 @@ function showProgressModal(){
 // EXERCISE NAVIGATION
 // ============================================================
 function goToExercise(idx){
-  const k=exKey(state.currentUser.level,state.topic);
+  const k=exKey(state.currentUser.levelKey||state.currentUser.level,state.topic);
   const exList=state.exercises[k]||[];
   if(idx<0||idx>=exList.length) return;
 
@@ -2330,7 +3741,7 @@ function selectQCMq(idx,qi,oi){
 // VALIDATE EXERCISE
 // ============================================================
 function validateExercise(idx){
-  const k=exKey(state.currentUser.level,state.topic);
+  const k=exKey(state.currentUser.levelKey||state.currentUser.level,state.topic);
   const ex=(state.exercises[k]||[])[idx];
   if(!ex||!ex.questions) return;
   const questions=ex.questions;
@@ -2492,26 +3903,40 @@ function switchTeacherTab(tab){
     el.classList.toggle('active',['dashboard','verbs'][i]===tab);
   });
 }
-function renderTeacherStats(){
-  const allEx=Object.values(state.exercises).flat();
-  const byLevel={};
-  LEVELS.forEach(l=>{ byLevel[l]=Object.keys(state.exercises).filter(k=>k.startsWith(l+'_')).reduce((a,k)=>a+(state.exercises[k]||[]).length,0); });
-  document.getElementById('teacherStats').innerHTML=`
-    <div class="teacher-stat"><div class="stat-val">${allEx.length}</div><div class="stat-lbl">Total exercices</div></div>
-    ${LEVELS.map(l=>`<div class="teacher-stat"><div class="stat-val">${byLevel[l]||0}</div><div class="stat-lbl">${l}</div></div>`).join('')}`;
-}
+function renderTeacherStats(){ /* stats hidden, exercises shown per level */ }
 function filterTeacherLevel(level,btn){
   teacherLevelFilter=level;
   document.querySelectorAll('.teacher-lv-btn').forEach(b=>b.classList.remove('btn-primary'));
   if(btn) btn.classList.add('btn-primary');
   renderExByLevelTheme();
 }
+// BTS display name map
+const LVL_DISPLAY={'CAP':'CAP','2nde':'2nde','1ere':'1ère','Tle':'Tle','BTS_MOS':'BTS MOS','BTS_MCO':'BTS MCO','BTS_NDRC':'BTS NDRC'};
 function renderExByLevelTheme(){
+  // Build summary
+  const allLvls2=['CAP','2nde','1ere','Tle','BTS_MOS','BTS_MCO','BTS_NDRC'];
+  const summaryEl=document.getElementById('exSummaryBar');
+  if(summaryEl){
+    const parts=allLvls2.map(l=>{
+      const cnt=Object.keys(state.exercises).filter(k=>k.startsWith(l+'_')).reduce((a,k)=>a+(state.exercises[k]||[]).length,0);
+      return cnt>0?`<strong>${LVL_DISPLAY[l]||l}</strong> : ${cnt} ex.`:'';
+    }).filter(Boolean);
+    const total=Object.values(state.exercises).reduce((a,v)=>a+v.length,0);
+    summaryEl.innerHTML=`📊 Total : <strong>${total} exercices</strong> &nbsp;|&nbsp; `+parts.join(' &nbsp;|&nbsp; ');
+  }
+
   const container=document.getElementById('exByLevelTheme');
   const topics=['preterit','present_perfect','both'];
   const tLabels={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prét./PP'};
   const tBadge={preterit:'pret',present_perfect:'pp',both:'both'};
-  const lvList=teacherLevelFilter==='all'?LEVELS:[teacherLevelFilter];
+  const allLevels=['CAP','2nde','1ere','Tle','BTS_MOS','BTS_MCO','BTS_NDRC'];
+  const lvList=teacherLevelFilter==='all'?allLevels:
+    teacherLevelFilter==='BTS'?['BTS_MOS','BTS_MCO','BTS_NDRC']:
+    teacherLevelFilter==='CAP'?['CAP']:
+    teacherLevelFilter==='2nde'?['2nde']:
+    teacherLevelFilter==='1ere'?['1ere']:
+    teacherLevelFilter==='Tle'?['Tle']:
+    [teacherLevelFilter];
   let html='';
   lvList.forEach(level=>{
     const lvCss=LEVEL_CSS[level];
@@ -2530,7 +3955,7 @@ function renderExByLevelTheme(){
     if(!rows.length) return;
     html+=`<div style="margin-bottom:18px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span class="badge badge-${lvCss}" style="font-size:.92rem;padding:5px 14px">${level}</span>
+        <span class="badge badge-${lvCss}" style="font-size:.92rem;padding:5px 14px">${LVL_DISPLAY[level]||level}</span>
         <span style="color:#888;font-size:.83rem">${rows.length} exercice(s)</span>
       </div>
       <div style="border:1px solid #e0e7ef;border-radius:10px;overflow:hidden">${rows.join('')}</div>
@@ -2597,10 +4022,10 @@ async function generatePDF(studentIdOverride,doLogout=true){
   // Per exercise details
   const topics=['preterit','present_perfect','both'];
   const tLabels={preterit:'Prétérit',present_perfect:'Present Perfect',both:'Prétérit / Present Perfect'};
-  const level=sess.level||'CAP';
+  const level=sess.levelKey||sess.level||'CAP';
 
   topics.forEach(topic=>{
-    const k=exKey(level,topic);
+    const k=exKey(level,topic);  // level is already sess.levelKey||sess.level
     const exList=state.exercises[k]||[];
     const prog=(sess.exProgress&&sess.exProgress[k])||{};
     const doneExs=exList.filter((_,i)=>(prog[i]||{}).done);
