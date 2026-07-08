@@ -691,6 +691,8 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
 </div>
 
 <!-- MODAL: LOGIN -->
+
+<!-- MODAL: LOGIN -->
 <div class="modal-overlay hidden" id="loginModal">
   <div class="modal">
     <h3 id="loginModalTitle">Connexion</h3>
@@ -702,24 +704,6 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeLoginModal()">Annuler</button>
       <button class="btn btn-primary" onclick="submitLogin()">Valider</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: PASSWORD -->
-<div class="modal-overlay hidden" id="pwdModal">
-  <div class="modal">
-    <h3>🔑 Modifier le code d'accès</h3>
-    <div class="form-group"><label>Type</label>
-      <select id="pwdType"><option value="teacher">Code professeur</option><option value="student">Code élèves</option></select>
-    </div>
-    <div class="form-group"><label>Nouveau code</label><input type="password" id="pwdNew"></div>
-    <div class="form-group"><label>Confirmer</label><input type="password" id="pwdConfirm"></div>
-    <div id="pwdError" class="alert alert-danger" style="display:none"></div>
-    <div id="pwdSuccess" class="alert alert-success" style="display:none">Code modifié !</div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closePwdModal()">Annuler</button>
-      <button class="btn btn-primary" onclick="submitPwd()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1023,7 +1007,7 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
   <div class="nav-bar">
     <h2>🏫 Interface Professeur</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-outline btn-sm" style="color:white;border-color:white" onclick="openPwdModal()">🔑 Codes</button>
+      
       <button class="btn btn-danger btn-sm" onclick="goHome()">Déconnexion</button>
     </div>
   </div>
@@ -1036,6 +1020,9 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
   <div id="tab-dashboard">
     <div class="teacher-grid" id="teacherStats" style="display:none"></div>
     <div class="card">
+      <div class="alert alert-info" style="margin-bottom:16px;font-size:.92rem">
+        🔑 <strong>Code d'accès élèves (par défaut) :</strong> <span style="font-family:monospace;font-size:1.1rem;font-weight:800;letter-spacing:2px">VERBESIRREGULIERS</span>
+      </div>
       <h2>📋 Exercices disponibles par niveau / filière</h2>
       <!-- Class filter -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
@@ -1082,14 +1069,15 @@ footer a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;}
     </div>
   </div>
   <div class="card rgpd-content">
-    <h1>Politique de confidentialité & RGPD</h1>
-    <div class="placeholder-block"><p>📝 <strong>Page en cours de rédaction</strong></p></div>
-    <h2>Données collectées</h2>
-    <p>Identifiant élève (initiales), classe, niveau, et résultats aux exercices.</p>
-    <h2>Stockage</h2>
-    <p>Toutes les données sont stockées localement dans votre navigateur (localStorage). Aucune transmission à un serveur externe.</p>
-    <h2>Contact</h2>
-    <div class="placeholder-block"><p>Coordonnées du responsable de traitement – à compléter</p></div>
+    <h1>Protection des données personnelles</h1>
+    <p>Cette application est un outil pédagogique développé pour un usage en classe.</p>
+    <ul style="margin:16px 0;padding-left:20px;line-height:2;color:#444">
+      <li>Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</li>
+      <li>Aucun cookie tiers, aucun traceur publicitaire, aucun appel à une API externe n'est utilisé.</li>
+      <li>Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom (utilisées uniquement pour générer un identifiant au format XX-YY, sans jamais collecter votre identité complète), ainsi que vos réponses aux exercices.</li>
+      <li>Ces données ne sont jamais sauvegardées : elles disparaissent automatiquement si vous rechargez ou fermez la page. Pensez à télécharger votre PDF de résultats avant de quitter l'application.</li>
+      <li>Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</li>
+    </ul>
   </div>
 </div>
 
@@ -3622,7 +3610,7 @@ let state={
   topic:null,
   exercises:{},
   sessions:{},  // keyed by studentId
-  passwords:{teacher:'0504',student:'eleve2024'}
+  passwords:{teacher:'0504',student:'VERBESIRREGULIERS'}
 };
 
 // currentExIdx = which exercise in the list we're viewing
@@ -3663,7 +3651,9 @@ function loadState(){
     if(s){
       const p=JSON.parse(s);
       state.sessions=p.sessions||{};
-      state.passwords=p.passwords||{teacher:'0504',student:'eleve2024'};
+      state.passwords=p.passwords||{teacher:'0504',student:'VERBESIRREGULIERS'};
+      // Force student password — always use the hardcoded value
+      state.passwords.student='VERBESIRREGULIERS';
       // Load teacher-added exercises, merge with built-in
       const saved=p.exercises||{};
       state.exercises={};
@@ -3727,23 +3717,6 @@ function submitLogin(){
     else{ err.textContent='Code incorrect.'; err.style.display='block'; }
   }
 }
-function openPwdModal(){ document.getElementById('pwdNew').value=''; document.getElementById('pwdConfirm').value=''; document.getElementById('pwdError').style.display='none'; document.getElementById('pwdSuccess').style.display='none'; document.getElementById('pwdModal').classList.remove('hidden'); }
-function closePwdModal(){ document.getElementById('pwdModal').classList.add('hidden'); }
-function submitPwd(){
-  const type=document.getElementById('pwdType').value;
-  const nw=document.getElementById('pwdNew').value.trim();
-  const cf=document.getElementById('pwdConfirm').value.trim();
-  const err=document.getElementById('pwdError');
-  if(!nw){ err.textContent='Saisissez un code.'; err.style.display='block'; return; }
-  if(nw!==cf){ err.textContent='Codes différents.'; err.style.display='block'; return; }
-  err.style.display='none'; state.passwords[type]=nw; saveState();
-  document.getElementById('pwdSuccess').style.display='block';
-  setTimeout(closePwdModal,1400);
-}
-
-// ============================================================
-// STUDENT ID & LEVEL
-// ============================================================
 function validateStudentId(){
   const prenom=(document.getElementById('sidPrenom').value||'').toUpperCase().replace(/[^A-Z]/g,'');
   const nom=(document.getElementById('sidNom').value||'').toUpperCase().replace(/[^A-Z]/g,'');
@@ -4531,8 +4504,7 @@ function init(){
   document.getElementById('rulesBackBtn').onclick=()=>{ if(state.currentUser&&state.topic) showScreen('screen-exercises'); else if(state.currentUser) showScreen('screen-student'); else showScreen('screen-home'); };
   document.getElementById('verbModal').addEventListener('click',function(e){if(e.target===this)closeVerbModal();});
   document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLoginModal();});
-  document.getElementById('pwdModal').addEventListener('click',function(e){if(e.target===this)closePwdModal();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeVerbModal();closeLoginModal();closePwdModal();document.getElementById('progressModal').classList.add('hidden');}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeVerbModal();closeLoginModal();document.getElementById('progressModal').classList.add('hidden');}});
 }
 init();
 </script>
